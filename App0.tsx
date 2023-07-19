@@ -76,8 +76,7 @@ function App(): JSX.Element {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        <Text>Hello Sagini</Text>
-
+        <Text>Hello Piruthuvi</Text>
       </View>
     </SafeAreaView>
   );
