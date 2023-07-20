@@ -40,7 +40,6 @@ const Map = ({navigation, route}) => {
       ...placeInfo,
       selectedPlaceCoord,
     ]);
-    console.log('camera', camera);
     await mapRef.current?.animateCamera(camera, {duration: 1000});
   };
 
