@@ -1,13 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   StyleSheet,
   Dimensions,
-  DrawerLayoutAndroid,
   Text,
   RefreshControl,
 } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
-import * as Location from "expo-location";
 import {
   Box,
   HStack,
@@ -15,19 +12,13 @@ import {
   ScrollView,
   Fab,
   Icon,
-  Center,
   Button,
-  SectionList,
-  Heading,
   Slider,
   VStack,
   Checkbox,
   Radio,
   Actionsheet,
   useDisclose,
-  Skeleton,
-  Spinner,
-  Flex,
 } from "native-base";
 import Constants from "expo-constants";
 import { Client } from "@googlemaps/google-maps-services-js";
@@ -36,7 +27,6 @@ import AutoComplete from "../components/AutoComplete";
 
 import { FontAwesome, Entypo } from "@expo/vector-icons";
 import axios from "axios";
-import Skelton from "../components/core/Skelton";
 import { findAddress, findLocation } from "../components/findLocation";
 import BrowserSkelton from "../components/core/SkeltonBrowser";
 import env from "../env";
@@ -84,7 +74,6 @@ const Browse = ({ navigation }) => {
   };
 
   useEffect(() => {
-    console.log("Browse");
     fetchLocationData();
     fetchPlaces();
   }, []);
