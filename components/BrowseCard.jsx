@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { TouchableOpacity, StyleSheet, Text } from "react-native";
-import { Box, HStack, Image, Row, Column, Badge, Pressable } from "native-base";
-import { Client } from "@googlemaps/google-maps-services-js";
-import Constants from "expo-constants";
+import React, {useEffect, useState} from 'react';
+import {TouchableOpacity, StyleSheet, Text} from 'react-native';
+import {Box, HStack, Image, Row, Column, Badge, Pressable} from 'native-base';
+import {Client} from '@googlemaps/google-maps-services-js';
+import Constants from 'expo-constants';
 
-import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
-import axios from "axios";
+import {FontAwesome, MaterialIcons} from '@expo/vector-icons';
+import axios from 'axios';
 const client = new Client({});
 
 const BrowseCard = ({
@@ -22,12 +22,11 @@ const BrowseCard = ({
   const [distTime, setDistTime] = useState([]);
 
   useEffect(() => {
-    // console.log("Browser card.jsx",);
     const calculateDistance = async () => {
       await client
         .distancematrix({
           params: {
-            key: "AIzaSyCz5aHnnwPi7R_v65PASfRLikJ5VVA8Ytc",
+            key: 'AIzaSyCz5aHnnwPi7R_v65PASfRLikJ5VVA8Ytc',
             origins: [uniLocation],
             destinations: [
               {
@@ -37,14 +36,14 @@ const BrowseCard = ({
             ],
           },
         })
-        .then((r) => {
+        .then(r => {
           setDistTime([
             r.data?.rows[0].elements[0].distance.text,
             r.data?.rows[0].elements[0].duration.text,
           ]);
         })
-        .catch((e) => {
-          console.log("e", e);
+        .catch(e => {
+          console.log('e', e);
         });
     };
     uniLocation && calculateDistance();
@@ -54,7 +53,7 @@ const BrowseCard = ({
     <Box style={styles.card} w="full" my={1} borderRadius={3}>
       <Pressable
         onPress={() =>
-          navigation.navigate("Details", {
+          navigation.navigate('Details', {
             _id,
             PlaceTitle,
             Cost,
@@ -62,14 +61,13 @@ const BrowseCard = ({
             Facilities,
             uniLocation,
           })
-        }
-      >
+        }>
         <Row>
-          <Box h={150} w={"40%"} py={2}>
+          <Box h={150} w={'40%'} py={2}>
             <TouchableOpacity
               activeOpacity={0.7}
               onPress={() =>
-                navigation.navigate("Details", {
+                navigation.navigate('Details', {
                   _id,
                   PlaceTitle,
                   Cost,
@@ -77,30 +75,27 @@ const BrowseCard = ({
                   Facilities,
                   uniLocation,
                 })
-              }
-            >
+              }>
               <Image
                 source={{
-                  uri:
-                    "https://www.travelanddestinations.com/wp-content/uploads/2017/10/hostel-room-pixabay-182965_1280.jpg",
+                  uri: 'https://www.travelanddestinations.com/wp-content/uploads/2017/10/hostel-room-pixabay-182965_1280.jpg',
                 }}
                 alt="room1"
-                h={"full"}
-                w={"full"}
+                h={'full'}
+                w={'full'}
               />
             </TouchableOpacity>
           </Box>
-          <Row justifyContent={"space-between"} style={{ width: "60%" }} py={2}>
+          <Row justifyContent={'space-between'} style={{width: '60%'}} py={2}>
             <Column marginX={1}>
               <Text style={styles.title}>{PlaceTitle}</Text>
               <Text style={styles.cost}>Rs.{Cost}</Text>
-              <Text style={styles.desc}>{Facilities?.RoomType}</Text>
               <Text style={styles.km}>
-                {distTime.length > 0 ? [distTime[0], "  ", distTime[1]] : ""}
+                {distTime.length > 0 ? [distTime[0], '  ', distTime[1]] : ''}
               </Text>
-              <HStack alignItems={"center"} justifyContent="space-between">
-                <Row alignItems={"center"}>
-                  {Facilities?.WashRoomType.includes("Attached") && (
+              <HStack alignItems={'center'} justifyContent="space-between">
+                <Row alignItems={'center'}>
+                  {Facilities?.WashRoomType.includes('Attached') && (
                     <Box pr={2}>
                       <FontAwesome name="bathtub" size={18} color="#aaa" />
                     </Box>
@@ -116,7 +111,7 @@ const BrowseCard = ({
                       <Text style={styles.badge}>{Facilities?.NoOfBeds}</Text>
                     </>
                   ) : (
-                    <Text style={styles.badge}>"</Text>
+                    <Text style={styles.badge}>Badge</Text>
                   )}
                 </Row>
               </HStack>
@@ -125,8 +120,7 @@ const BrowseCard = ({
               <Badge
                 colorScheme="warning"
                 alignSelf="center"
-                fontFamily={"Poppins-Regular"}
-              >
+                fontFamily={'Poppins-Regular'}>
                 {Rating}
               </Badge>
             </Box>
@@ -141,25 +135,31 @@ const styles = StyleSheet.create({
   card: {
     height: 150,
     // width: "100%",
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   title: {
-    fontFamily: "Poppins-Bold",
+    fontFamily: 'Poppins-Bold',
     fontSize: 20,
+    color: '#223343',
+  },
+  desc:{
+    fontFamily: 'Poppins-Bold',
+    fontSize: 20,
+    color: '#223343',
   },
   cost: {
-    fontFamily: "Poppins-Bold",
+    fontFamily: 'Poppins-Bold',
     fontSize: 18,
-    color: "#223343",
+    color: '#223343',
   },
   km: {
-    fontFamily: "Poppins-Regular",
+    fontFamily: 'Poppins-Regular',
     fontSize: 12,
-    color: "#888",
+    color: '#888',
   },
   badge: {
-    fontFamily: "Poppins-Regular",
-    color: "#aaa",
+    fontFamily: 'Poppins-Regular',
+    color: '#aaa',
     paddingHorizontal: 2,
   },
 });
