@@ -5,15 +5,11 @@
  * @format
  */
 
-import { registerRootComponent } from 'expo';
-import Constants from 'expo-constants';
-console.log(Constants.systemFonts);
+import {registerRootComponent} from 'expo';
 
-import React from 'react';
-import type { PropsWithChildren } from 'react';
+import React, {useEffect} from 'react';
 import {
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
@@ -21,21 +17,19 @@ import {
   View,
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-
-export default function App(): JSX.Element {
+import {Colors} from 'react-native/Libraries/NewAppScreen';
+import findLocation from './functions/currentLocation';
+import Constants from 'expo-constants';
+// console.log(Constants.systemFonts);
+export default function App() {
   const isDarkMode = useColorScheme() === 'dark';
+  useEffect(() => {
+    console.log('Hello Piruthuviraj');
+    (async () => {
+      let n = await findLocation();
+      console.log(n);
+    })();
+  }, []);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -81,4 +75,3 @@ const styles = StyleSheet.create({
 });
 
 registerRootComponent(App);
-
