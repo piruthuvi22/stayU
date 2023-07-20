@@ -5,6 +5,10 @@
  * @format
  */
 
+import { registerRootComponent } from 'expo';
+import Constants from 'expo-constants';
+console.log(Constants.systemFonts);
+
 import React from 'react';
 import type { PropsWithChildren } from 'react';
 import {
@@ -29,33 +33,8 @@ type SectionProps = PropsWithChildren<{
   title: string;
 }>;
 
-function Section({ children, title }: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
 
-function App(): JSX.Element {
+export default function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
@@ -76,7 +55,7 @@ function App(): JSX.Element {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        <Text>Hello Piruthuvi</Text>
+        <Text>Hello Piruthuviraj</Text>
       </View>
     </SafeAreaView>
   );
@@ -101,4 +80,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+registerRootComponent(App);
+
