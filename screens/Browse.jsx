@@ -39,18 +39,23 @@ const Browse = ({navigation}) => {
   const [places, setPlaces] = useState([]);
   const {isOpen, onOpen, onClose} = useDisclose();
 
-  const fetchLocationData = () => {
+  const fetchLocationData = async () => {
     setRefreshing(true);
-    findLocation()
-      .then(res => {
-        setUniLocation(res.lantlong);
-        findAddress(res.lantlong)
-          .then(res => {
-            setUniName(res.uniName);
-          })
-          .catch(err => console.log(err));
-      })
-      .catch(err => console.log(err));
+    let latlong;
+    try {
+      latlong = await findLocation();
+      setUniLocation(latlong);
+    } catch (error) {
+      console.log(error);
+    }
+    let uniName;
+    try {
+      uniName = await findAddress(latlong);
+      setUniName(uniName);
+    } catch (error) {
+      console.log(error);
+    }
+
     setRefreshing(false);
   };
 
