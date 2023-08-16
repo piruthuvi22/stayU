@@ -47,7 +47,7 @@ const Profile = () => {
   const handleLogout = async () => {};
   const handleFindNearest = async () => {
 
-    let v = geolib.isPointWithinRadius(coord[6], base, 200);
+    let v = geolib.isPointWithinRadius(coord[1], base, 200);
 
     let near = geolib.findNearest(base, coord);
     console.log(v);

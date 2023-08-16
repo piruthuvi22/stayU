@@ -48,8 +48,8 @@ const Browse = ({navigation}) => {
     } catch (error) {
       console.log(error);
     }
-    let uniName;
     try {
+      let uniName;
       uniName = await findAddress(latlong);
       setUniName(uniName);
     } catch (error) {
@@ -59,17 +59,17 @@ const Browse = ({navigation}) => {
     setRefreshing(false);
   };
 
-  const fetchPlaces = () => {
+  const fetchPlaces = async () => {
     setRefreshing(true);
-    axios
-      .get(env.api + '/places/get-places')
-      .then(res => {
-        // console.log("places/get-places", res.data);
+
+    try {
+      let res = await axios.get(env.api + '/places/get-places');
+      if (res.status === 200) {
         setPlaces(res.data);
-      })
-      .catch(err => {
-        console.log(err);
-      });
+      }
+    } catch (error) {
+      console.log(error);
+    }
     setRefreshing(false);
   };
 
@@ -108,7 +108,6 @@ const Browse = ({navigation}) => {
   };
 
   const onRefresh = useCallback(() => {
-    // setRefreshing(true);
     fetchLocationData();
     fetchPlaces();
   }, []);

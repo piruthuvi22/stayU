@@ -43,7 +43,7 @@ const BrowseCard = ({
           ]);
         })
         .catch(e => {
-          console.log('e', e);
+          console.log('Browser card', e);
         });
     };
     uniLocation && calculateDistance();
