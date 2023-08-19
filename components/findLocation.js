@@ -29,7 +29,7 @@ export const findAddress = async lantlong => {
         latlng: lantlong,
       },
     });
-    return response.data?.results[0]?.formatted_address;
+    return response.data?.results[0]?.formatted_address.split(',')[0];
   } catch (error) {
     throw new Error('Error while reverse geocoding: ' + error.message);
   }
