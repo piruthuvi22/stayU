@@ -11,7 +11,7 @@ const AutoComplete = ({label, placeholder, onPlaceSelected}) => {
       </Text>
       <GooglePlacesAutocomplete
         styles={styles}
-        placeholder={'search'}
+        placeholder={placeholder || 'Search'}
         fetchDetails
         query={{
           key: 'AIzaSyCz5aHnnwPi7R_v65PASfRLikJ5VVA8Ytc',

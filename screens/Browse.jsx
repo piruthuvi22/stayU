@@ -7,13 +7,9 @@ import {
   ScrollView,
   Fab,
   Icon,
-  Button,
-  Slider,
-  VStack,
-  Checkbox,
-  Radio,
   Actionsheet,
   useDisclose,
+  useToast,
 } from 'native-base';
 import Constants from 'expo-constants';
 import {Client} from '@googlemaps/google-maps-services-js';
@@ -27,11 +23,12 @@ import BrowserSkelton from '../components/core/SkeltonBrowser';
 import Filters from '../components/Filters';
 
 import env from '../env';
-const client = new Client({});
+import showToast from '../components/core/toast';
 
 const Browse = ({navigation}) => {
+  // States
   const [refreshing, setRefreshing] = useState(false);
-  const [uniName, setUniName] = useState('');
+  const [uniName, setUniName] = useState(null);
   const [uniLocation, setUniLocation] = useState({
     latitude: null,
     longitude: null,
@@ -39,21 +36,27 @@ const Browse = ({navigation}) => {
   const [places, setPlaces] = useState([]);
   const {isOpen, onOpen, onClose} = useDisclose();
 
-  const fetchLocationData = async () => {
+  // Hooks
+  const toast = useToast();
+
+  const fetchLocationAndAddress = async () => {
     setRefreshing(true);
     let latlong;
     try {
       latlong = await findLocation();
+      console.log('latlong: ', latlong);
       setUniLocation(latlong);
     } catch (error) {
-      console.log(error);
+      console.log('Error findLocation: ', error);
+      // showToast(toast, 'error', error.message.toString());
     }
     try {
       let uniName;
       uniName = await findAddress(latlong);
       setUniName(uniName);
     } catch (error) {
-      console.log(error);
+      console.log('Error findAddress: ', error);
+      // showToast(toast, 'error', error.message.toString());
     }
 
     setRefreshing(false);
@@ -63,19 +66,25 @@ const Browse = ({navigation}) => {
     setRefreshing(true);
 
     try {
-      let res = await axios.get(env.api + '/places/get-places');
-      if (res.status === 200) {
-        setPlaces(res.data);
-      }
+      let res = await axios.get(env.api + '/places/get-places', {
+        params: {
+          coordinates: uniLocation,
+        },
+      });
+      console.log(res.data.length);
+      setPlaces(res.data);
     } catch (error) {
-      console.log(error);
+      console.log('Error axios: ', error);
+      // showToast(toast, 'error', error.toString());
     }
     setRefreshing(false);
   };
 
   useEffect(() => {
-    fetchLocationData();
+    console.log('Browse useEffect start');
+    fetchLocationAndAddress();
     fetchPlaces();
+    console.log('Browse useEffect end');
   }, []);
 
   const passToMaps = () => {
@@ -108,7 +117,7 @@ const Browse = ({navigation}) => {
   };
 
   const onRefresh = useCallback(() => {
-    fetchLocationData();
+    fetchLocationAndAddress();
     fetchPlaces();
   }, []);
 
@@ -137,10 +146,11 @@ const Browse = ({navigation}) => {
       </ScrollView>
     );
   };
+  console.log(places.length, uniLocation.latitude);
 
   return (
     <Box style={styles.wrapper}>
-      {uniLocation.latitude ? (
+      {uniLocation.latitude && places.length > 0 ? (
         <>
           <HStack
             marginX={3}

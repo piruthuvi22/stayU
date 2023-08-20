@@ -23,8 +23,8 @@ const BrowseCard = ({
 
   useEffect(() => {
     const calculateDistance = async () => {
-      await client
-        .distancematrix({
+      try {
+        let response = await client.distancematrix({
           params: {
             key: 'AIzaSyCz5aHnnwPi7R_v65PASfRLikJ5VVA8Ytc',
             origins: [uniLocation],
@@ -35,16 +35,15 @@ const BrowseCard = ({
               },
             ],
           },
-        })
-        .then(r => {
-          setDistTime([
-            r.data?.rows[0].elements[0].distance.text,
-            r.data?.rows[0].elements[0].duration.text,
-          ]);
-        })
-        .catch(e => {
-          console.log('Browser card', e);
         });
+
+        setDistTime([
+          response.data?.rows[0].elements[0].distance.text,
+          response.data?.rows[0].elements[0].duration.text,
+        ]);
+      } catch (error) {
+        throw new Error(error);
+      }
     };
     uniLocation && calculateDistance();
   }, [uniLocation ? uniLocation : null]);
@@ -142,7 +141,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: '#223343',
   },
-  desc:{
+  desc: {
     fontFamily: 'Poppins-Bold',
     fontSize: 20,
     color: '#223343',
