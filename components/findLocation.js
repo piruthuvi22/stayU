@@ -1,40 +1,36 @@
-import * as Location from "expo-location";
-
-export const findLocation = async () => {
-  let data = {};
-  let { status } = await Location.requestForegroundPermissionsAsync();
-  if (status !== "granted") {
-    data.error = "Permission to access location was denied";
-    return data;
-  }
-
-  let location = await Location.getCurrentPositionAsync({});
-  let lantlong = {
-    latitude: location?.coords.latitude,
-    longitude: location?.coords.longitude,
-  };
-  data.lantlong = lantlong;
-  return data;
-};
-
-import { Client } from "@googlemaps/google-maps-services-js";
+import * as Location from 'expo-location';
+import {Client} from '@googlemaps/google-maps-services-js';
 const client = new Client({});
 
-export const findAddress = async (lantlong) => {
-  let data = {};
-  await client
-    .reverseGeocode({
+export const findLocation = async () => {
+  try {
+    let {status} = await Location.requestForegroundPermissionsAsync();
+    // if (status !== 'granted') {
+    //   throw new Error('Error 0 : Permission not granted');
+    // }
+
+    let location = await Location.getCurrentPositionAsync({});
+    let latlong = {
+      latitude: location?.coords.latitude,
+      longitude: location?.coords.longitude,
+    };
+
+    return latlong;
+  } catch (error) {
+    throw new Error('Error 1: ' + error.message);
+  }
+};
+
+export const findAddress = async latlong => {
+  try {
+    let response = await client.reverseGeocode({
       params: {
-        key: "AIzaSyCz5aHnnwPi7R_v65PASfRLikJ5VVA8Ytc",
-        latlng: lantlong,
+        key: 'AIzaSyCz5aHnnwPi7R_v65PASfRLikJ5VVA8Ytc',
+        latlng: latlong,
       },
-    })
-    .then((r) => {
-      data.uniName = r.data?.results[0]?.formatted_address;
-    })
-    .catch((e) => {
-      console.log(e);
-      data.error = "Error-Unable to find address";
     });
-  return data;
+    return response.data?.results[0]?.formatted_address.split(',')[0];
+  } catch (error) {
+    throw new Error('Error while reverse geocoding: ' + error.message);
+  }
 };

@@ -62,7 +62,7 @@ const Map = ({navigation, route}) => {
             // console.log("Distance setted");
           })
           .catch(e => {
-            console.log('e', e);
+            console.log('Map error', e);
           }));
     })();
   }, [selectedPlaceCoord, placeInfo]);
