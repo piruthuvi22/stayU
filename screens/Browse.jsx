@@ -44,19 +44,18 @@ const Browse = ({navigation}) => {
     let latlong;
     try {
       latlong = await findLocation();
-      console.log('latlong: ', latlong);
       setUniLocation(latlong);
     } catch (error) {
-      console.log('Error findLocation: ', error);
-      // showToast(toast, 'error', error.message.toString());
+      console.log(error);
+      showToast(toast, 'error', error);
     }
     try {
       let uniName;
       uniName = await findAddress(latlong);
       setUniName(uniName);
     } catch (error) {
-      console.log('Error findAddress: ', error);
-      // showToast(toast, 'error', error.message.toString());
+      console.log(error);
+      showToast(toast, 'error', error);
     }
 
     setRefreshing(false);
@@ -71,11 +70,10 @@ const Browse = ({navigation}) => {
           coordinates: uniLocation,
         },
       });
-      console.log(res.data.length);
       setPlaces(res.data);
     } catch (error) {
       console.log('Error axios: ', error);
-      // showToast(toast, 'error', error.toString());
+      showToast(toast, 'error', error.message);
     }
     setRefreshing(false);
   };
@@ -146,8 +144,8 @@ const Browse = ({navigation}) => {
       </ScrollView>
     );
   };
-  console.log(places.length, uniLocation.latitude);
 
+  console.log(places.length, uniLocation.latitude);
   return (
     <Box style={styles.wrapper}>
       {uniLocation.latitude && places.length > 0 ? (
@@ -236,9 +234,9 @@ const styles = StyleSheet.create({
     color: '#A0A0A0',
   },
   fab: {
-    // position: "absolute",
-    // bottom: 80,
-    // right: 20,
+    position: "absolute",
+    bottom: 80,
+    right: 10,
   },
   fabBtn: {
     backgroundColor: '#223343',
