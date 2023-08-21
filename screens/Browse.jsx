@@ -65,6 +65,7 @@ const Browse = ({navigation}) => {
     try {
       let res = await axios.get(env.api + '/places/get-places');
       if (res.status === 200) {
+        console.log(res.data);
         setPlaces(res.data);
       }
     } catch (error) {

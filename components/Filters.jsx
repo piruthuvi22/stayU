@@ -1,4 +1,15 @@
+import {
+  Box,
+  Checkbox,
+  HStack,
+  Radio,
+  Slider,
+  VStack,
+  Button,
+} from 'native-base';
 import React from 'react';
+import {Text, StyleSheet, Dimensions} from 'react-native';
+import Constants from 'expo-constants';
 
 export default Filter = () => {
   return (
@@ -191,3 +202,64 @@ export default Filter = () => {
     </Box>
   );
 };
+const styles = StyleSheet.create({
+  wrapper: {
+    position: 'relative',
+    top: Constants.statusBarHeight,
+    backgroundColor: '#eee',
+    paddingBottom: 60,
+  },
+  searchContainer: {
+    position: 'absolute',
+    width: '100%',
+    backgroundColor: '#eee',
+    padding: 5,
+    // height: 50,
+    // zIndex: 3000,
+  },
+  head: {
+    fontFamily: 'Poppins-Regular',
+    fontSize: 16,
+    color: '#5C5A6F',
+  },
+  currentLocation: {
+    fontFamily: 'Poppins-Medium',
+    fontSize: 13,
+    color: '#A0A0A0',
+  },
+  fab: {
+    // position: "absolute",
+    // bottom: 80,
+    // right: 20,
+  },
+  fabBtn: {
+    backgroundColor: '#223343',
+    borderWidth: 1,
+    borderColor: '#FF754E',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  map: {
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
+  },
+
+  categoryTitle: {
+    fontSize: 20,
+    color: '#FD683D',
+    fontFamily: 'Poppins-Medium',
+  },
+  slideVal: {
+    color: '#737373',
+    fontFamily: 'Poppins-Medium',
+  },
+  filterValues: {
+    color: '#fff',
+    fontFamily: 'Poppins-Medium',
+    fontSize: 14,
+  },
+});
