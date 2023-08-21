@@ -7,13 +7,9 @@ import {
   ScrollView,
   Fab,
   Icon,
-  Button,
-  Slider,
-  VStack,
-  Checkbox,
-  Radio,
   Actionsheet,
   useDisclose,
+  useToast,
 } from 'native-base';
 import Constants from 'expo-constants';
 import {Client} from '@googlemaps/google-maps-services-js';
@@ -27,11 +23,12 @@ import BrowserSkelton from '../components/core/SkeltonBrowser';
 import Filters from '../components/Filters';
 
 import env from '../env';
-const client = new Client({});
+import showToast from '../components/core/toast';
 
 const Browse = ({navigation}) => {
+  // States
   const [refreshing, setRefreshing] = useState(false);
-  const [uniName, setUniName] = useState('');
+  const [uniName, setUniName] = useState(null);
   const [uniLocation, setUniLocation] = useState({
     latitude: null,
     longitude: null,
@@ -39,7 +36,10 @@ const Browse = ({navigation}) => {
   const [places, setPlaces] = useState([]);
   const {isOpen, onOpen, onClose} = useDisclose();
 
-  const fetchLocationData = async () => {
+  // Hooks
+  const toast = useToast();
+
+  const fetchLocationAndAddress = async () => {
     setRefreshing(true);
     let latlong;
     try {
@@ -47,6 +47,7 @@ const Browse = ({navigation}) => {
       setUniLocation(latlong);
     } catch (error) {
       console.log(error);
+      showToast(toast, 'error', error);
     }
     try {
       let uniName;
@@ -54,6 +55,7 @@ const Browse = ({navigation}) => {
       setUniName(uniName);
     } catch (error) {
       console.log(error);
+      showToast(toast, 'error', error);
     }
 
     setRefreshing(false);
@@ -69,14 +71,17 @@ const Browse = ({navigation}) => {
         setPlaces(res.data);
       }
     } catch (error) {
-      console.log(error);
+      console.log('Error axios: ', error);
+      showToast(toast, 'error', error.message);
     }
     setRefreshing(false);
   };
 
   useEffect(() => {
-    fetchLocationData();
+    console.log('Browse useEffect start');
+    fetchLocationAndAddress();
     fetchPlaces();
+    console.log('Browse useEffect end');
   }, []);
 
   const passToMaps = () => {
@@ -109,7 +114,7 @@ const Browse = ({navigation}) => {
   };
 
   const onRefresh = useCallback(() => {
-    fetchLocationData();
+    fetchLocationAndAddress();
     fetchPlaces();
   }, []);
 
@@ -139,9 +144,10 @@ const Browse = ({navigation}) => {
     );
   };
 
+  console.log(places.length, uniLocation.latitude);
   return (
     <Box style={styles.wrapper}>
-      {uniLocation.latitude ? (
+      {uniLocation.latitude && places.length > 0 ? (
         <>
           <HStack
             marginX={3}
@@ -227,9 +233,9 @@ const styles = StyleSheet.create({
     color: '#A0A0A0',
   },
   fab: {
-    // position: "absolute",
-    // bottom: 80,
-    // right: 20,
+    position: "absolute",
+    bottom: 80,
+    right: 10,
   },
   fabBtn: {
     backgroundColor: '#223343',

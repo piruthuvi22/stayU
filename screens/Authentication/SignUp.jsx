@@ -62,7 +62,6 @@ const RenterLogin = ({ navigation }) => {
         axios
           .post(env.api +"/users/register", body)
           .then((res) => {
-            console.log(res.data);
             showToast(toast, "warning", "Registration success", () =>
               navigation.navigate("student-login")
             );

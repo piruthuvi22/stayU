@@ -17,20 +17,20 @@ export const findLocation = async () => {
 
     return latlong;
   } catch (error) {
-    throw new Error('Error : ' + error.message);
+    throw new Error('FindLocation Error : ' + error);
   }
 };
 
-export const findAddress = async lantlong => {
+export const findAddress = async latlong => {
   try {
     let response = await client.reverseGeocode({
       params: {
         key: 'AIzaSyCz5aHnnwPi7R_v65PASfRLikJ5VVA8Ytc',
-        latlng: lantlong,
+        latlng: latlong,
       },
     });
-    return response.data?.results[0]?.formatted_address;
+    return response.data?.results[0]?.formatted_address.split(',')[0];
   } catch (error) {
-    throw new Error('Error while reverse geocoding: ' + error.message);
+    throw new Error('FindAddress Error : ' + error);
   }
 };

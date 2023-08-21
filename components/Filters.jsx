@@ -202,6 +202,7 @@ export default Filter = () => {
     </Box>
   );
 };
+
 const styles = StyleSheet.create({
   wrapper: {
     position: 'relative',
