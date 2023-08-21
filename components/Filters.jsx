@@ -1,7 +1,14 @@
-import { Box, Button, Checkbox, Radio, Slider, VStack } from 'native-base';
+import {
+  Box,
+  Checkbox,
+  HStack,
+  Radio,
+  Slider,
+  VStack,
+  Button,
+} from 'native-base';
 import React from 'react';
-import { Dimensions, Text } from 'react-native';
-import {StyleSheet} from 'react-native';
+import {Text, StyleSheet, Dimensions} from 'react-native';
 import Constants from 'expo-constants';
 
 export default Filter = () => {

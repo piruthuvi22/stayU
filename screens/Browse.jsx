@@ -65,12 +65,11 @@ const Browse = ({navigation}) => {
     setRefreshing(true);
 
     try {
-      let res = await axios.get(env.api + '/places/get-places', {
-        params: {
-          coordinates: uniLocation,
-        },
-      });
-      setPlaces(res.data);
+      let res = await axios.get(env.api + '/places/get-places');
+      if (res.status === 200) {
+        console.log(res.data);
+        setPlaces(res.data);
+      }
     } catch (error) {
       console.log('Error axios: ', error);
       showToast(toast, 'error', error.message);
