@@ -40,10 +40,13 @@ const Browse = ({navigation}) => {
   const toast = useToast();
 
   const fetchLocationAndAddress = async () => {
+    console.log('fetchLocationAndAddress');
     setRefreshing(true);
     let latlong;
     try {
       latlong = await findLocation();
+      console.log(latlong);
+
       setUniLocation(latlong);
     } catch (error) {
       console.log(error);
@@ -52,37 +55,43 @@ const Browse = ({navigation}) => {
     try {
       let uniName;
       uniName = await findAddress(latlong);
+      console.log(uniName);
       setUniName(uniName);
+
     } catch (error) {
       console.log(error);
       showToast(toast, 'error', error);
     }
-
     setRefreshing(false);
   };
 
   const fetchPlaces = async () => {
-    setRefreshing(true);
-
-    try {
-      let res = await axios.get(env.api + '/places/get-places');
-      if (res.status === 200) {
-        console.log(res.data);
-        setPlaces(res.data);
+    console.log('uniLocation', uniLocation);
+    if (uniLocation.latitude) {
+      setRefreshing(true);
+      try {
+        let res = await axios.get(env.api + '/places/get-places', {
+          params: {uniLocation},
+        });
+        if (res.status === 200) {
+          // console.log(res.data.length);
+          setPlaces(res.data);
+        }
+      } catch (error) {
+        console.log('Error axios: ', error);
+        showToast(toast, 'error', error.message);
       }
-    } catch (error) {
-      console.log('Error axios: ', error);
-      showToast(toast, 'error', error.message);
+      setRefreshing(false);
     }
-    setRefreshing(false);
   };
 
   useEffect(() => {
-    console.log('Browse useEffect start');
     fetchLocationAndAddress();
-    fetchPlaces();
-    console.log('Browse useEffect end');
   }, []);
+
+  useEffect(() => {
+    fetchPlaces();
+  }, [uniLocation]);
 
   const passToMaps = () => {
     if (places.length !== 0) {
@@ -90,7 +99,7 @@ const Browse = ({navigation}) => {
       places.map(place => {
         placeInfo.push({
           latitude: Number(place.Coordinates.Latitude),
-          longitude: Number(place.Coordinates.Longtitude),
+          longitude: Number(place.Coordinates.Longitude),
           title: place.PlaceTitle,
         });
       });
@@ -115,7 +124,7 @@ const Browse = ({navigation}) => {
 
   const onRefresh = useCallback(() => {
     fetchLocationAndAddress();
-    fetchPlaces();
+    // fetchPlaces();
   }, []);
 
   const renderPlaceCard = () => {
@@ -144,7 +153,7 @@ const Browse = ({navigation}) => {
     );
   };
 
-  console.log(places.length, uniLocation.latitude);
+  // console.log(places.length, uniLocation);
   return (
     <Box style={styles.wrapper}>
       {uniLocation.latitude && places.length > 0 ? (
@@ -233,7 +242,7 @@ const styles = StyleSheet.create({
     color: '#A0A0A0',
   },
   fab: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 80,
     right: 10,
   },

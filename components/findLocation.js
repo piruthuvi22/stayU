@@ -9,7 +9,9 @@ export const findLocation = async () => {
     //   throw new Error('Error 0 : Permission not granted');
     // }
 
-    let location = await Location.getCurrentPositionAsync({});
+    let location = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.High,
+    });
     let latlong = {
       latitude: location?.coords.latitude,
       longitude: location?.coords.longitude,
