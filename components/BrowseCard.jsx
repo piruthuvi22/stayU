@@ -6,7 +6,6 @@ import Constants from 'expo-constants';
 
 import {FontAwesome, MaterialIcons} from '@expo/vector-icons';
 import axios from 'axios';
-const client = new Client({});
 
 const BrowseCard = ({
   navigation,
@@ -22,6 +21,8 @@ const BrowseCard = ({
   const [distTime, setDistTime] = useState([]);
 
   useEffect(() => {
+    const client = new Client({});
+
     const calculateDistance = async () => {
       try {
         let response = await client.distancematrix({
@@ -31,12 +32,24 @@ const BrowseCard = ({
             destinations: [
               {
                 latitude: Coordinates.Latitude,
-                longitude: Coordinates.Longtitude,
+                longitude: Coordinates.Longitude,
               },
             ],
+            mode: 'walking',
+            language: 'en',
+            units: 'metric',
           },
         });
 
+        //
+        // geolib.getDistance(
+        //   baseCoord,
+        //   {
+        //     latitude: res.Coordinates.Latitude,
+        //     longitude: res.Coordinates.Longitude,
+        //   },
+        //   0.1,
+        // ),
         setDistTime([
           response.data?.rows[0].elements[0].distance.text,
           response.data?.rows[0].elements[0].duration.text,
@@ -58,6 +71,7 @@ const BrowseCard = ({
             Cost,
             Rating,
             Facilities,
+            Coordinates,
             uniLocation,
           })
         }>
