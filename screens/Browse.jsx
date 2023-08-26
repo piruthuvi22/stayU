@@ -16,7 +16,7 @@ import {Client} from '@googlemaps/google-maps-services-js';
 import BrowseCard from '../components/BrowseCard';
 import AutoComplete from '../components/AutoComplete';
 
-import {FontAwesome, Entypo} from '@expo/vector-icons';
+import {FontAwesome, Entypo, MaterialIcons} from '@expo/vector-icons';
 import axios from 'axios';
 import {findAddress, findLocation} from '../components/findLocation';
 import BrowserSkelton from '../components/core/SkeltonBrowser';
@@ -24,40 +24,44 @@ import Filters from '../components/Filters';
 
 import env from '../env';
 import showToast from '../components/core/toast';
+import {getLocation, useLocation} from '../hooks/useLocation';
 
 const Browse = ({navigation}) => {
   // States
   const [refreshing, setRefreshing] = useState(false);
   const [uniName, setUniName] = useState(null);
-  const [uniLocation, setUniLocation] = useState({
-    latitude: null,
-    longitude: null,
-  });
+  // const [uniLocation, setUniLocation] = useState({
+  //   latitude: null,
+  //   longitude: null,
+  // });
   const [places, setPlaces] = useState([]);
   const {isOpen, onOpen, onClose} = useDisclose();
 
   // Hooks
   const toast = useToast();
+  const {location, updateLocation, error} = useLocation();
 
-  const fetchLocationAndAddress = async () => {
-    console.log('fetchLocationAndAddress');
-    setRefreshing(true);
-    let latlong;
-    try {
-      latlong = await findLocation();
-      console.log(latlong);
+  // const fetchLocationAndAddress = async () => {
+  //   console.log('fetchLocationAndAddress');
+  //   setRefreshing(true);
+  //   let latlong;
+  //   try {
+  //     latlong = await findLocation();
+  //     console.log(latlong);
 
-      setUniLocation(latlong);
-    } catch (error) {
-      console.log(error);
-      showToast(toast, 'error', error);
-    }
+  //     setUniLocation(latlong);
+  //   } catch (error) {
+  //     console.log(error);
+  //     showToast(toast, 'error', error);
+  //   }
+  //   setRefreshing(false);
+  // };
+
+  const getAddress = async latlong => {
     try {
-      let uniName;
-      uniName = await findAddress(latlong);
+      let uniName = await findAddress(latlong);
       console.log(uniName);
       setUniName(uniName);
-
     } catch (error) {
       console.log(error);
       showToast(toast, 'error', error);
@@ -66,12 +70,12 @@ const Browse = ({navigation}) => {
   };
 
   const fetchPlaces = async () => {
-    console.log('uniLocation', uniLocation);
-    if (uniLocation.latitude) {
+    console.log('Location', location);
+    if (location?.latitude) {
       setRefreshing(true);
       try {
         let res = await axios.get(env.api + '/places/get-places', {
-          params: {uniLocation},
+          params: {location},
         });
         if (res.status === 200) {
           // console.log(res.data.length);
@@ -86,12 +90,13 @@ const Browse = ({navigation}) => {
   };
 
   useEffect(() => {
-    fetchLocationAndAddress();
-  }, []);
+    // fetchLocationAndAddress();
+    if (location?.latitude) getAddress(location);
+  }, [location]);
 
   useEffect(() => {
     fetchPlaces();
-  }, [uniLocation]);
+  }, [location]);
 
   const passToMaps = () => {
     if (places.length !== 0) {
@@ -105,9 +110,7 @@ const Browse = ({navigation}) => {
       });
       navigation.navigate('Map', {
         placeInfo,
-        selectedPlaceCoord: uniLocation.hasOwnProperty('latitude')
-          ? uniLocation
-          : {},
+        selectedPlaceCoord: location.hasOwnProperty('latitude') ? location : {},
         selectedPlaceName: uniName,
       });
     }
@@ -123,7 +126,8 @@ const Browse = ({navigation}) => {
   };
 
   const onRefresh = useCallback(() => {
-    fetchLocationAndAddress();
+    updateLocation();
+    // fetchLocationAndAddress();
     // fetchPlaces();
   }, []);
 
@@ -145,7 +149,7 @@ const Browse = ({navigation}) => {
           <BrowseCard
             key={place._id}
             {...place}
-            uniLocation={uniLocation}
+            uniLocation={location}
             navigation={navigation}
           />
         ))}
@@ -156,7 +160,7 @@ const Browse = ({navigation}) => {
   // console.log(places.length, uniLocation);
   return (
     <Box style={styles.wrapper}>
-      {uniLocation.latitude && places.length > 0 ? (
+      {location?.latitude && places.length > 0 ? (
         <>
           <HStack
             marginX={3}
@@ -171,11 +175,18 @@ const Browse = ({navigation}) => {
               }}>
               {uniName}
             </Text>
-            <Pressable
-              android_ripple={{color: '#ccc', borderless: true, radius: 30}}
-              onPress={onOpen}>
-              <FontAwesome name="bars" size={24} color="#A0A0A0" />
-            </Pressable>
+            <HStack width={'20'} justifyContent={'space-between'}>
+              <Pressable
+                android_ripple={{color: '#ccc', borderless: true, radius: 30}}
+                onPress={updateLocation}>
+                <MaterialIcons name="gps-fixed" size={24} color="#A0A0A0" />
+              </Pressable>
+              <Pressable
+                android_ripple={{color: '#ccc', borderless: true, radius: 30}}
+                onPress={onOpen}>
+                <FontAwesome name="bars" size={24} color="#A0A0A0" />
+              </Pressable>
+            </HStack>
           </HStack>
           <Box style={{zIndex: 20}} m={2}>
             <Box style={styles.searchContainer}>
@@ -199,15 +210,15 @@ const Browse = ({navigation}) => {
             />
           </Box>
 
-          <Actionsheet isOpen={isOpen} onClose={onClose}>
+          {/* <Actionsheet isOpen={isOpen} onClose={onClose}>
             <Actionsheet.Content bgColor={'rgba(34, 51, 67,0.95)'}>
               <ScrollView
                 showsVerticalScrollIndicator={false}
-                style={{width: '100%'}}>
-                <Filters />
-              </ScrollView>
+                style={{width: '100%'}}> */}
+                <Filters isOpen={isOpen} onClose={onClose}/>
+              {/* </ScrollView>
             </Actionsheet.Content>
-          </Actionsheet>
+          </Actionsheet> */}
         </>
       ) : (
         <BrowserSkelton />

@@ -1,10 +1,10 @@
-import { Box, Divider, HStack, VStack } from "native-base";
-import React from "react";
-import { StyleSheet, Text } from "react-native";
-import { AirbnbRating } from "react-native-ratings";
+import {Box, Divider, HStack, VStack} from 'native-base';
+import React from 'react';
+import {StyleSheet, Text} from 'react-native';
+import {AirbnbRating} from 'react-native-ratings';
 
-const FacilitiesActionSheet = ({ info }) => {
-  console.log("info", info);
+export const FacilitiesDetails = ({info}) => {
+  console.log('info', info);
   return (
     <>
       <Box px={2} py={2} mb={4}>
@@ -33,7 +33,7 @@ const FacilitiesActionSheet = ({ info }) => {
             </Text>
 
             <Text style={styles.subtitle}>
-              Offering meals : {info?.Facilities?.OfferingMeals ? "Yes" : "No"}
+              Offering meals : {info?.Facilities?.OfferingMeals ? 'Yes' : 'No'}
             </Text>
             <Text style={styles.subtitle}>
               Payment : {info?.Facilities?.Payment}
@@ -41,31 +41,30 @@ const FacilitiesActionSheet = ({ info }) => {
           </Box>
         </VStack>
       </Box>
-      <Divider bgColor={"#eee"} />
+      <Divider bgColor={'#eee'} />
     </>
   );
 };
 const styles = StyleSheet.create({
   username: {
-    fontFamily: "Poppins-Medium",
+    fontFamily: 'Poppins-Medium',
     fontSize: 16,
-    color: "#F24E1E",
+    color: '#F24E1E',
   },
   date: {
-    fontFamily: "Poppins-Regular",
+    fontFamily: 'Poppins-Regular',
     fontSize: 13,
-    color: "#999",
+    color: '#999',
   },
   comment: {
-    fontFamily: "Poppins-Regular",
+    fontFamily: 'Poppins-Regular',
     fontSize: 13,
-    color: "#A0A0A0",
+    color: '#A0A0A0',
     lineHeight: 16,
   },
   subtitle: {
-    fontFamily: "Poppins-SemiBold",
+    fontFamily: 'Poppins-SemiBold',
     fontSize: 16,
-    color: "#666",
+    color: '#666',
   },
 });
-export default FacilitiesActionSheet;

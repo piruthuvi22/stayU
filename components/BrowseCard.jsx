@@ -71,6 +71,7 @@ const BrowseCard = ({
             Cost,
             Rating,
             Facilities,
+            Coordinates,
             uniLocation,
           })
         }>
