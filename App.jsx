@@ -34,6 +34,7 @@ import {AntDesign, Ionicons} from '@expo/vector-icons';
 import {TouchableOpacity} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AuthContext from './context';
+import { Reserved } from './screens/Reserved';
 
 export default function App() {
   const [isUser, setIsUser] = useState(true);
@@ -238,6 +239,29 @@ export default function App() {
                       },
                       tabBarItemStyle: {marginBottom: 2, display: 'none'},
                     })}
+                  />
+                  <Tab.Screen
+                    name="Settings"
+                    component={Reserved}
+                    options={{
+                      headerShown: false,
+                      tabBarStyle: {backgroundColor: '#FD683D', height: 60},
+                      tabBarIcon: () => (
+                        <Ionicons
+                          name="bookmarks-outline"
+                          size={24}
+                          color="white"
+                        />
+                      ),
+                      tabBarItemStyle: {
+                        marginBottom: 2,
+                        borderBottomWidth: 2,
+                        borderBottomColor: '#fff',
+                        borderRadius: 10,
+                      },
+                      tabBarLabel: 'Settings',
+                      tabBarLabelStyle: {color: 'white', fontSize: 14},
+                    }}
                   />
                 </Tab.Navigator>
               ) : (

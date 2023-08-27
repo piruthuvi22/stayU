@@ -16,7 +16,7 @@ import Constants from 'expo-constants';
 
 export default Filters = ({isOpen, onClose}) => {
   useEffect(() => {
-    console.log('Filters');
+    // console.log('Filters');
   }, []);
 
   const filters = () => {};
