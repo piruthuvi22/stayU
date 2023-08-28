@@ -18,35 +18,37 @@ import BrowserSkelton from '../components/core/SkeltonBrowser';
 import env from '../env';
 import showToast from '../components/core/toast';
 
-const WishList = ({navigation}) => {
+export const Reserved = ({navigation}) => {
   // States
   const [refreshing, setRefreshing] = useState(true);
-  const [places, setPlaces] = useState([]);
+  const [place, setPlace] = useState([]);
   const [statusCode, setStatusCode] = useState(null);
 
   // Hooks
   const toast = useToast();
-  
-  const fetchWishlist = async () => {
+
+  const fetchReserved = async () => {
     setRefreshing(true);
     try {
-      let res = await axios.get(env.api + '/wish-list/get-wishlist', {
+      let res = await axios.get(env.api + '/reservation/get-reservation', {
         params: {
           userId: 'user1',
         },
       });
       if (res.status === 200) {
+        // console.log('*', res.data);
         setStatusCode(res.status);
-        setPlaces(res.data);
+        setPlace(res.data);
       }
     } catch (error) {
+      // console.log('**');
       console.log('Error axios: ', error);
       if (error.isAxiosError && error.response === undefined) {
         showToast(toast, 'error', error.message);
       } else {
         setStatusCode(error.response.status);
         if (error.response.status === 404) {
-          showToast(toast, 'error', error.response.data.message);
+          showToast(toast, 'error', error.response.data);
         }
         if (error.response.status === 500) {
           showToast(toast, 'error', error.message);
@@ -57,11 +59,11 @@ const WishList = ({navigation}) => {
   };
 
   useEffect(() => {
-    fetchWishlist();
+    fetchReserved();
   }, []);
 
   const onRefresh = useCallback(() => {
-    fetchWishlist();
+    fetchReserved();
   }, []);
 
   const renderPlaceCard = () => {
@@ -77,14 +79,12 @@ const WishList = ({navigation}) => {
             progressBackgroundColor={'#223343'}
           />
         }>
-        {places.map(place => (
-          <BrowseCard
-            key={place._id}
-            {...place}
-            // uniLocation={uniLocation}
-            navigation={navigation}
-          />
-        ))}
+        <BrowseCard
+          key={place._id}
+          {...place}
+          // uniLocation={uniLocation}
+          navigation={navigation}
+        />
       </ScrollView>
     );
   };
@@ -96,7 +96,7 @@ const WishList = ({navigation}) => {
       ) : statusCode == 200 ? (
         <Box style={styles.wrapper}>
           <Box m={3}>
-            <Text style={styles.head}>Your favorites</Text>
+            <Text style={styles.head}>Reserved places</Text>
           </Box>
           {renderPlaceCard()}
         </Box>
@@ -157,5 +157,3 @@ const styles = StyleSheet.create({
     color: '#5C5A6F',
   },
 });
-
-export default WishList;

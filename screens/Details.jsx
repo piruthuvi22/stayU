@@ -28,8 +28,16 @@ import {FacilitiesDetails} from '../components/Facilities';
 // import ImageSlider from "react-native-image-slider";
 
 const Details = ({route}) => {
-  const {_id, PlaceTitle, Cost, Rating, Facilities, uniLocation, Coordinates} =
-    route.params;
+  const {
+    _id,
+    PlaceTitle,
+    PlaceDescription,
+    Cost,
+    Rating,
+    Facilities,
+    uniLocation,
+    Coordinates,
+  } = route.params;
   const [isSaved, setIsSaved] = useState(false);
   const [images, setImages] = useState([
     'https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014__340.jpg',
@@ -52,7 +60,12 @@ const Details = ({route}) => {
   useEffect(() => {
     console.log('Details');
     axios
-      .get(env.api + '/wish-list/get-status/' + _id)
+      .get(env.api + '/wish-list/get-status', {
+        params: {
+          placeId: _id,
+          userId: 'user1',
+        },
+      })
       .then(res => {
         console.log(res.data.status);
         res.data.status ? setIsSaved(true) : setIsSaved(false);
@@ -62,8 +75,12 @@ const Details = ({route}) => {
 
   const handleSave = () => {
     axios
-      .post(env.api + '/wish-list/add-remove-wishlist/' + _id)
+      .post(env.api + '/wish-list/add-remove-wishlist', {
+        placeId: _id,
+        userId: 'user1',
+      })
       .then(res => {
+        console.log(res.data);
         res.data.status === 'added' ? setIsSaved(true) : setIsSaved(false);
       })
       .catch(err => console.log(err));
@@ -103,27 +120,15 @@ const Details = ({route}) => {
         />
         <Text style={styles.location}>{Rating}</Text>
       </HStack>
+      <Divider />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         StickyHeaderComponent={() => <Text>Hello</Text>}
         style={{width: '100%', marginBottom: '60px'}}>
         {/* Description */}
-        <Box px={3}>
-          <Text style={styles.desc}>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur,
-            ipsa repudiandae ullam earum minima ducimus dolorem ut dolores quas
-            sapiente, similique dicta itaque veniam deserunt neque illo, quae
-            deleniti aliquam! Lorem ipsum dolor sit amet consectetur adipisicing
-            elit. Dolorem obcaecati molestias error ullam ab exercitationem.
-            Quam autem, quis fuga qui rerum ducimus officiis aliquam laudantium
-            enim tenetur temporibus Lorem ipsum dolor sit amet consectetur
-            adipisicing elit. Ea, nam earum itaque maxime deleniti magnam
-            reiciendis unde enim? Porro non dolores similique possimus
-            consectetur nulla, praesentium maiores voluptatum quo delectus
-            repellat accusamus ad quis provident impedit, earum quae rerum
-            velit.
-          </Text>
+        <Box px={3} py={2}>
+          <Text style={styles.desc}>{PlaceDescription}</Text>
         </Box>
 
         {/* Images */}
@@ -168,14 +173,14 @@ const Details = ({route}) => {
         <Divider />
 
         {/* Facilities bar */}
-        <HStack
+        {/* <HStack
           style={styles.facilities}
           my={2}
           px={3}
           alignItems="center"
           justifyContent={'space-between'}>
           <Text style={styles.location}>Faclities</Text>
-        </HStack>
+        </HStack> */}
 
         {/* Facilities */}
         <FacilitiesDetails info={route.params} />
@@ -209,6 +214,7 @@ const Details = ({route}) => {
           </HStack>
         </HStack>
       </ScrollView>
+
       {/* Review actionsheet */}
       <Actionsheet isOpen={isOpenComm} onClose={onCloseComm}>
         <Actionsheet.Content>
@@ -277,7 +283,7 @@ const styles = StyleSheet.create({
   },
   desc: {
     fontFamily: 'Poppins-Regular',
-    fontSize: 13,
+    fontSize: 14,
     color: '#777',
     lineHeight: 16,
   },
@@ -289,6 +295,8 @@ const styles = StyleSheet.create({
   month: {
     fontFamily: 'Poppins-Bold',
     fontSize: 16,
+    color: '#223343',
+
     // paddingTop:20
   },
   bottomBar: {

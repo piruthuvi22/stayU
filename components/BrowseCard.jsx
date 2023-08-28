@@ -68,6 +68,7 @@ const BrowseCard = ({
           navigation.navigate('Details', {
             _id,
             PlaceTitle,
+            PlaceDescription,
             Cost,
             Rating,
             Facilities,

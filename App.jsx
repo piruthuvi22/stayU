@@ -29,6 +29,7 @@ import WishList from './screens/WishList';
 import Profile from './screens/Profile';
 import Map from './screens/Map';
 import Details from './screens/Details';
+import {Reserved} from './screens/Reserved';
 
 // ===============Imports Icons==============
 import {AntDesign, Ionicons} from '@expo/vector-icons';
