@@ -23,7 +23,6 @@ import {
   IconButton,
 } from 'native-base';
 import Constants from 'expo-constants';
-import {Client} from '@googlemaps/google-maps-services-js';
 import BrowseCard from '../components/BrowseCard';
 import AutoComplete from '../components/AutoComplete';
 
@@ -60,7 +59,7 @@ const Browse = ({navigation}) => {
       // console.log(uniName);
       setUniName(uniName);
     } catch (error) {
-      console.log(error);
+      console.log('Get address error: ', error);
       showToast(toast, 'error', error);
     }
     setRefreshing(false);
@@ -74,7 +73,7 @@ const Browse = ({navigation}) => {
           params: {location},
         });
         if (res.status === 200) {
-          console.log('res.data.length = ', res.data.length);
+          // console.log('res.data.length = ', res.data.length);
           setStatusCode(res.status);
           setPlaces(res.data);
         }
@@ -83,7 +82,7 @@ const Browse = ({navigation}) => {
         setStatusCode(error.response.status);
 
         if (error.response.status === 404) {
-          console.log(error.response.data.message);
+          // console.log(error.response.data.message);
           showToast(toast, 'error', error.response.data.message);
         }
         if (error.response.status === 500) {
@@ -229,7 +228,7 @@ const Browse = ({navigation}) => {
       ) : statusCode === 500 ? (
         <Box h="full" style={styles.wrapper}>
           <Center h="full">
-            <Text style={{fontSize: 38, color: '#f00'}}>Request failed</Text>
+            <Text style={{fontSize: 28, color: '#f00'}}>Request failed</Text>
             <NBButton onPress={onRefresh} variant={'ghost'}>
               Try again
             </NBButton>
@@ -239,7 +238,7 @@ const Browse = ({navigation}) => {
         <Box h="full" style={styles.wrapper}>
           <Center h="full">
             {/* <Text style={{fontSize: 38, color: '#f00'}}>{errors}</Text> */}
-            <Text style={{fontSize: 38, color: '#f00'}}>Places not found</Text>
+            <Text style={{fontSize: 28, color: '#f00'}}>Places not found</Text>
             <NBButton onPress={onRefresh} variant={'ghost'}>
               Try again
             </NBButton>
@@ -248,8 +247,8 @@ const Browse = ({navigation}) => {
       ) : (
         <Box h="full" style={styles.wrapper}>
           <Center h="full">
-            <Text style={{fontSize: 38, color: '#f00'}}>{statusCode}</Text>
-            <Text style={{fontSize: 38, color: '#f00'}}>
+            <Text style={{fontSize: 28, color: '#f00'}}>{statusCode}</Text>
+            <Text style={{fontSize: 28, color: '#f00'}}>
               Something went wrong
             </Text>
             <NBButton onPress={onRefresh} variant={'ghost'}>

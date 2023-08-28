@@ -28,8 +28,16 @@ import {FacilitiesDetails} from '../components/Facilities';
 // import ImageSlider from "react-native-image-slider";
 
 const Details = ({route}) => {
-  const {_id, PlaceTitle,PlaceDescription, Cost, Rating, Facilities, uniLocation, Coordinates} =
-    route.params;
+  const {
+    _id,
+    PlaceTitle,
+    PlaceDescription,
+    Cost,
+    Rating,
+    Facilities,
+    uniLocation,
+    Coordinates,
+  } = route.params;
   const [isSaved, setIsSaved] = useState(false);
   const [images, setImages] = useState([
     'https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014__340.jpg',
@@ -52,7 +60,12 @@ const Details = ({route}) => {
   useEffect(() => {
     console.log('Details');
     axios
-      .get(env.api + '/wish-list/get-status/' + _id)
+      .get(env.api + '/wish-list/get-status', {
+        params: {
+          placeId: _id,
+          userId: 'user1',
+        },
+      })
       .then(res => {
         console.log(res.data.status);
         res.data.status ? setIsSaved(true) : setIsSaved(false);
@@ -62,8 +75,12 @@ const Details = ({route}) => {
 
   const handleSave = () => {
     axios
-      .post(env.api + '/wish-list/add-remove-wishlist/' + _id)
+      .post(env.api + '/wish-list/add-remove-wishlist', {
+        placeId: _id,
+        userId: 'user1',
+      })
       .then(res => {
+        console.log(res.data);
         res.data.status === 'added' ? setIsSaved(true) : setIsSaved(false);
       })
       .catch(err => console.log(err));
@@ -111,9 +128,7 @@ const Details = ({route}) => {
         style={{width: '100%', marginBottom: '60px'}}>
         {/* Description */}
         <Box px={3} py={2}>
-          <Text style={styles.desc}>
-            {PlaceDescription}
-          </Text>
+          <Text style={styles.desc}>{PlaceDescription}</Text>
         </Box>
 
         {/* Images */}
