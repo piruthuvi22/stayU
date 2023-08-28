@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import {useState} from 'react';
 import {
   Text,
   Center,
@@ -18,126 +18,129 @@ import {
   KeyboardAvoidingView,
   IconButton,
   useToast,
-} from "native-base";
+} from 'native-base';
 import {
   ImageBackground,
   StyleSheet,
   Dimensions,
   // ScrollView,
-} from "react-native";
-import { Feather, Ionicons } from "@expo/vector-icons";
-import axios from "axios";
-import AuthContext from "../../context";
-import showToast from "../../components/core/toast";
-import env from "../../env";
+} from 'react-native';
+import {Feather, Ionicons} from '@expo/vector-icons';
+import axios from 'axios';
+import showToast from '../../components/core/toast';
+import env from '../../env';
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from 'firebase/auth';
+import auth from '../../utilities/firebase';
+import {useAuth} from '../../utilities/context';
 
-let { height, width } = Dimensions.get("screen");
+let {height, width} = Dimensions.get('screen');
 
-const RenterLogin = ({ navigation }) => {
+const RenterLogin = ({navigation, route}) => {
+  const {user} = useAuth();
   const [show, setShow] = useState(false);
-  const [username, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [password2, setPassword2] = useState("");
+  const [email, setEmail] = useState('navaratnamsagini@gmail.com');
+  const [password, setPassword] = useState('Sagini18');
+  const [password2, setPassword2] = useState('Sagini18');
 
   const toast = useToast();
 
-  const { signIn } = useContext(AuthContext);
-
-  const handleEmail = (e) => {
+  const handleEmail = e => {
     setEmail(e);
   };
 
-  const handlePassword = (e) => {
+  const handlePassword = e => {
     setPassword(e);
   };
 
-  const handlePassword2 = (e) => {
+  const handlePassword2 = e => {
     setPassword2(e);
   };
 
   const handleRegister = () => {
-    let body = { username, password };
-    if (username != "" && password != "" && password2 != "") {
+    let body = {email, password};
+    if (email != '' && password != '' && password2 != '') {
       if (password === password2) {
-        axios
-          .post(env.api +"/users/register", body)
-          .then((res) => {
-            showToast(toast, "warning", "Registration success", () =>
-              navigation.navigate("student-login")
-            );
+        createUserWithEmailAndPassword(auth, email, password)
+          .then(userCredential => {
+            // Signed in
+            sendEmailVerification(auth.currentUser).then(() => {
+              // Email verification sent!
+              showToast(toast, 'success', 'Email verification sent!', () =>
+                navigation.navigate('get-start'),
+              );
+            });
           })
-          .catch((err) => {
-            showToast(toast, "error", "Registration failed");
+          .catch(error => {
+            const errorMessage = error?.message?.split('/')[1]?.split(')')[0];
+            showToast(toast, 'warning', errorMessage);
           });
       } else {
-        showToast(toast, "error", "Password not match");
+        showToast(toast, 'error', 'Password not match');
       }
     } else {
-      console.log("Invalid params");
-      showToast(toast, "error", "Invalid credentials!");
+      console.log('Invalid params');
+      showToast(toast, 'error', 'Invalid credentials!');
     }
   };
   return (
     <ScrollView>
-      <KeyboardAvoidingView h={height} behavior={"a"}>
+      <KeyboardAvoidingView h={height} behavior={'a'}>
         <ImageBackground
-          source={require("../../assets/images/backkgroun-login.png")}
-          resizeMode="stretch"
-        >
+          source={require('../../assets/images/backkgroun-login.png')}
+          resizeMode="stretch">
           <Stack
-            justifyContent={"space-evenly"}
-            h={"full"}
-            mx={{ base: "5%", sm: 10, md: 20 }}
-          >
-            <Box h={"30%"} justifyContent={"center"}>
-              <Box alignItems={"flex-start"}>
+            justifyContent={'space-evenly'}
+            h={'full'}
+            mx={{base: '5%', sm: 10, md: 20}}>
+            <Box h={'30%'} justifyContent={'center'}>
+              <Box alignItems={'flex-start'}>
                 <Pressable
-                  android_ripple={{ color: "#ddd" }}
-                  onPress={() => navigation.goBack()}
-                >
+                  android_ripple={{color: '#ddd'}}
+                  onPress={() => navigation.goBack()}>
                   <Ionicons
                     name="chevron-back-outline"
                     size={36}
-                    color="#FD683D"
+                    color="#FF4E83"
                   />
                 </Pressable>
               </Box>
               <Text
-                color={"#FD683D"}
-                fontFamily={"Poppins-Bold"}
-                fontSize={"5xl"}
-              >
+                color={'#FF4E83'}
+                fontFamily={'Poppins-Bold'}
+                fontSize={'5xl'}>
                 Sign up
               </Text>
               <Text
-                color={"#A0A0A0"}
-                fontFamily={"Poppins-Regular"}
-                fontSize={"md"}
-              >
+                color={'#A0A0A0'}
+                fontFamily={'Poppins-Regular'}
+                fontSize={'md'}>
                 Create your account for free
               </Text>
             </Box>
-            <VStack h={"70%"}>
+            <VStack h={'70%'}>
               <FormControl isRequired my={2}>
                 <Stack mx="4">
-                  <FormControl.Label _text={{ fontFamily: "Poppins-Medium" }}>
-                    Username
+                  <FormControl.Label _text={{fontFamily: 'Poppins-Medium'}}>
+                    email
                   </FormControl.Label>
                   <Input
                     _focus={{
-                      borderWidth: "2",
-                      borderColor: "#FD683D",
-                      backgroundColor: "#FD683D:alpha.5",
+                      borderWidth: '2',
+                      borderColor: '#FF4E83',
+                      backgroundColor: '#FF4E83:alpha.5',
                     }}
                     type="text"
                     defaultValue=""
-                    value={username}
-                    placeholder="Username"
-                    backgroundColor={"#FD683D:alpha.10"}
-                    borderColor={"#FD683D"}
-                    focusOutlineColor={"red"}
-                    fontSize={"md"}
-                    color={"#666"}
+                    value={email}
+                    placeholder="email"
+                    backgroundColor={'#FF4E83:alpha.10'}
+                    borderColor={'#FF4E83'}
+                    focusOutlineColor={'red'}
+                    fontSize={'md'}
+                    color={'#666'}
                     onChangeText={handleEmail}
                   />
                   {/* <FormControl.HelperText>
@@ -153,21 +156,21 @@ const RenterLogin = ({ navigation }) => {
 
               <FormControl isRequired my={2}>
                 <Stack mx="4">
-                  <FormControl.Label _text={{ fontFamily: "Poppins-Medium" }}>
+                  <FormControl.Label _text={{fontFamily: 'Poppins-Medium'}}>
                     Password
                   </FormControl.Label>
                   <Input
-                    type={show ? "text" : "password"}
+                    type={show ? 'text' : 'password'}
                     _focus={{
-                      borderWidth: "2",
-                      borderColor: "#FD683D",
-                      backgroundColor: "#FD683D:alpha.5",
+                      borderWidth: '2',
+                      borderColor: '#FF4E83',
+                      backgroundColor: '#FF4E83:alpha.5',
                     }}
                     InputRightElement={
                       <Feather
-                        name={show ? "eye" : "eye-off"}
+                        name={show ? 'eye' : 'eye-off'}
                         size={20}
-                        style={{ marginRight: 5 }}
+                        style={{marginRight: 5}}
                         color="#999"
                         onPress={() => setShow(!show)}
                       />
@@ -175,11 +178,11 @@ const RenterLogin = ({ navigation }) => {
                     defaultValue=""
                     value={password}
                     placeholder="Password"
-                    backgroundColor={"#FD683D:alpha.10"}
-                    borderColor={"#FD683D"}
-                    focusOutlineColor={"red"}
-                    fontSize={"md"}
-                    color={"#666"}
+                    backgroundColor={'#FF4E83:alpha.10'}
+                    borderColor={'#FF4E83'}
+                    focusOutlineColor={'red'}
+                    fontSize={'md'}
+                    color={'#666'}
                     onChangeText={handlePassword}
                   />
                 </Stack>
@@ -187,21 +190,21 @@ const RenterLogin = ({ navigation }) => {
 
               <FormControl isRequired my={2}>
                 <Stack mx="4">
-                  <FormControl.Label _text={{ fontFamily: "Poppins-Medium" }}>
+                  <FormControl.Label _text={{fontFamily: 'Poppins-Medium'}}>
                     Confirm Password
                   </FormControl.Label>
                   <Input
-                    type={show ? "text" : "password"}
+                    type={show ? 'text' : 'password'}
                     _focus={{
-                      borderWidth: "2",
-                      borderColor: "#FD683D",
-                      backgroundColor: "#FD683D:alpha.5",
+                      borderWidth: '2',
+                      borderColor: '#FF4E83',
+                      backgroundColor: '#FF4E83:alpha.5',
                     }}
                     InputRightElement={
                       <Feather
-                        name={show ? "eye" : "eye-off"}
+                        name={show ? 'eye' : 'eye-off'}
                         size={20}
-                        style={{ marginRight: 5 }}
+                        style={{marginRight: 5}}
                         color="#999"
                         onPress={() => setShow(!show)}
                       />
@@ -209,63 +212,57 @@ const RenterLogin = ({ navigation }) => {
                     defaultValue=""
                     value={password2}
                     placeholder="Password"
-                    backgroundColor={"#FD683D:alpha.10"}
-                    borderColor={"#FD683D"}
-                    focusOutlineColor={"red"}
-                    fontSize={"md"}
-                    color={"#666"}
+                    backgroundColor={'#FF4E83:alpha.10'}
+                    borderColor={'#FF4E83'}
+                    focusOutlineColor={'red'}
+                    fontSize={'md'}
+                    color={'#666'}
                     onChangeText={handlePassword2}
                   />
-                  <HStack justifyContent={"space-between"}>
+                  <HStack justifyContent={'space-between'}>
                     <FormControl.HelperText
-                      _text={{ fontFamily: "Poppins-Medium" }}
-                    >
+                      _text={{fontFamily: 'Poppins-Medium'}}>
                       Must be atleast 6 characters.
-                    </FormControl.HelperText>
-                    <FormControl.HelperText
-                      _text={{ fontSize: "md", fontFamily: "Poppins-Medium" }}
-                      onTouchEnd={() => console.log("Forgot password")}
-                    >
-                      Forgot Password
                     </FormControl.HelperText>
                   </HStack>
 
                   <FormControl.ErrorMessage
-                    leftIcon={<WarningOutlineIcon size="xs" />}
-                  >
+                    leftIcon={<WarningOutlineIcon size="xs" />}>
                     Atleast 6 characters are required.
                   </FormControl.ErrorMessage>
                 </Stack>
               </FormControl>
 
-              <Center mt={3} justify={"center"} align={"center"} w={"100%"}>
+              <Center mt={3} justify={'center'} align={'center'} w={'100%'}>
                 <Button
-                  android_ripple={{ color: "#F0F1F6" }}
+                  android_ripple={{color: '#F0F1F6'}}
                   backgroundColor="#223343"
                   onPress={handleRegister}
                   width="60%"
                   marginY={1}
                   height={50}
                   borderRadius={100}
-                  borderColor={"#FD683D"}
+                  borderColor={'#FF4E83'}
                   borderWidth={2}
                   // fontFamily={"Poppins-Bold"}
                   _text={{
-                    fontFamily: "Poppins-Bold",
-                    fontSize: "xl",
-                    textAlign: "center",
-                  }}
-                >
+                    fontFamily: 'Poppins-Bold',
+                    fontSize: 'xl',
+                    textAlign: 'center',
+                  }}>
                   Register
                 </Button>
-                <Text fontFamily={"Poppins-Medium"} color={"#A0A0A0"} mt={2}>
+                <Text fontFamily={'Poppins-Medium'} color={'#A0A0A0'} mt={2}>
                   Don't have an account?
                   <Text
-                    color={"#A0A0A0"}
-                    fontWeight={"extrabold"}
-                    onPress={() => console.log("Dont have an acc")}
-                  >
-                    &nbsp;Sign up
+                    color={'#A0A0A0'}
+                    fontWeight={'extrabold'}
+                    onPress={() =>
+                      navigation.navigate('renter-login', {
+                        userRole: route?.params?.userRole,
+                      })
+                    }>
+                    &nbsp;Sign in
                   </Text>
                 </Text>
               </Center>
