@@ -228,7 +228,7 @@ const Browse = ({navigation}) => {
       ) : statusCode === 500 ? (
         <Box h="full" style={styles.wrapper}>
           <Center h="full">
-            <Text style={{fontSize: 28, color: '#f00'}}>Request failed</Text>
+            <Text style={styles.error}>Request failed</Text>
             <NBButton onPress={onRefresh} variant={'ghost'}>
               Try again
             </NBButton>
@@ -237,8 +237,7 @@ const Browse = ({navigation}) => {
       ) : statusCode === 404 ? (
         <Box h="full" style={styles.wrapper}>
           <Center h="full">
-            {/* <Text style={{fontSize: 38, color: '#f00'}}>{errors}</Text> */}
-            <Text style={{fontSize: 28, color: '#f00'}}>Places not found</Text>
+            <Text style={styles.error}>Places not found</Text>
             <NBButton onPress={onRefresh} variant={'ghost'}>
               Try again
             </NBButton>
@@ -247,10 +246,8 @@ const Browse = ({navigation}) => {
       ) : (
         <Box h="full" style={styles.wrapper}>
           <Center h="full">
-            <Text style={{fontSize: 28, color: '#f00'}}>{statusCode}</Text>
-            <Text style={{fontSize: 28, color: '#f00'}}>
-              Something went wrong
-            </Text>
+            <Text style={styles.error}>{statusCode}</Text>
+            <Text style={styles.error}>Something went wrong</Text>
             <NBButton onPress={onRefresh} variant={'ghost'}>
               Try again
             </NBButton>
@@ -320,6 +317,11 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontFamily: 'Poppins-Medium',
     fontSize: 14,
+  },
+  error: {
+    fontSize: 28,
+    fontFamily: 'Poppins-Regular',
+    color: '#5C5A6F',
   },
 });
 

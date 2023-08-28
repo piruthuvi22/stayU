@@ -97,7 +97,7 @@ const WishList = ({navigation}) => {
       ) : statusCode === 500 ? (
         <Box h="full" style={styles.wrapper}>
           <Center h="full">
-            <Text style={{fontSize: 28, color: '#f00'}}>Request failed</Text>
+            <Text style={styles.error}>Request failed</Text>
             <NBButton onPress={onRefresh} variant={'ghost'}>
               Try again
             </NBButton>
@@ -106,8 +106,7 @@ const WishList = ({navigation}) => {
       ) : statusCode === 404 ? (
         <Box h="full" style={styles.wrapper}>
           <Center h="full">
-            {/* <Text style={{fontSize: 38, color: '#f00'}}>{errors}</Text> */}
-            <Text style={{fontSize: 28, color: '#f00'}}>Wishlist is empty</Text>
+            <Text style={styles.error}>Wishlist is empty</Text>
             <NBButton onPress={onRefresh} variant={'ghost'}>
               Try again
             </NBButton>
@@ -116,10 +115,8 @@ const WishList = ({navigation}) => {
       ) : (
         <Box h="full" style={styles.wrapper}>
           <Center h="full">
-            <Text style={{fontSize: 28, color: '#f00'}}>{statusCode}</Text>
-            <Text style={{fontSize: 28, color: '#f00'}}>
-              Something went wrong
-            </Text>
+            <Text style={styles.error}>{statusCode}</Text>
+            <Text style={styles.error}>Something went wrong</Text>
             <NBButton onPress={onRefresh} variant={'ghost'}>
               Try again
             </NBButton>
@@ -146,6 +143,11 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Medium',
     fontSize: 13,
     color: '#A0A0A0',
+  },
+  error: {
+    fontSize: 28,
+    fontFamily: 'Poppins-Regular',
+    color: '#5C5A6F',
   },
 });
 
