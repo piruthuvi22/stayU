@@ -78,15 +78,17 @@ const Browse = ({navigation}) => {
           setPlaces(res.data);
         }
       } catch (error) {
-        console.log('Error axios: ', error.response.status);
-        setStatusCode(error.response.status);
-
-        if (error.response.status === 404) {
-          // console.log(error.response.data.message);
-          showToast(toast, 'error', error.response.data.message);
-        }
-        if (error.response.status === 500) {
+        console.log('Error axios: ', error);
+        if (error.isAxiosError && error.response === undefined) {
           showToast(toast, 'error', error.message);
+        } else {
+          setStatusCode(error.response.status);
+          if (error.response.status === 404) {
+            showToast(toast, 'error', error.response.data.message);
+          }
+          if (error.response.status === 500) {
+            showToast(toast, 'error', error.message);
+          }
         }
       }
     }

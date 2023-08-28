@@ -1,6 +1,12 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {RefreshControl, StyleSheet, Dimensions, Text} from 'react-native';
-import {Box, Center, Button as NBButton, ScrollView} from 'native-base';
+import {
+  Box,
+  Center,
+  Button as NBButton,
+  ScrollView,
+  useToast,
+} from 'native-base';
 import axios from 'axios';
 import Constants from 'expo-constants';
 
@@ -13,10 +19,14 @@ import env from '../env';
 import showToast from '../components/core/toast';
 
 const WishList = ({navigation}) => {
+  // States
   const [refreshing, setRefreshing] = useState(true);
   const [places, setPlaces] = useState([]);
   const [statusCode, setStatusCode] = useState(null);
 
+  // Hooks
+  const toast = useToast();
+  
   const fetchWishlist = async () => {
     setRefreshing(true);
     try {
@@ -25,19 +35,23 @@ const WishList = ({navigation}) => {
           userId: 'user1',
         },
       });
-      setStatusCode(res.status);
-      setPlaces(res.data);
+      if (res.status === 200) {
+        setStatusCode(res.status);
+        setPlaces(res.data);
+      }
     } catch (error) {
-      console.log('Error axios: ', error.response.status);
-      setStatusCode(error.response.status);
-      if (error.response.status === 404) {
-        setRefreshing(false);
-        showToast(toast, 'error', error.response.data.message);
-      }
-      if (error.response.status === 500) {
+      console.log('Error axios: ', error);
+      if (error.isAxiosError && error.response === undefined) {
         showToast(toast, 'error', error.message);
+      } else {
+        setStatusCode(error.response.status);
+        if (error.response.status === 404) {
+          showToast(toast, 'error', error.response.data.message);
+        }
+        if (error.response.status === 500) {
+          showToast(toast, 'error', error.message);
+        }
       }
-      setRefreshing(false);
     }
     setRefreshing(false);
   };

@@ -9,7 +9,7 @@ const ToastAlert = ({onComplete, msg, type, toast}) => {
       alignSelf="center"
       flexDirection="row"
       status={type}
-      variant={'top-accent'}>
+      variant={'subtle'}>
       <VStack space={1} flexShrink={1} w="95%">
         <HStack
           flexShrink={1}
