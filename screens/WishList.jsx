@@ -29,28 +29,23 @@ const WishList = ({navigation}) => {
     try {
       let res = await axios.get(env.api + '/wish-list/get-wishlist', {
         params: {
-          userId: 'user2',
+          userId: 'user1',
         },
       });
-      console.log(res.status);
       setStatusCode(res.status);
       setPlaces(res.data);
     } catch (error) {
       console.log('Error axios: ', error.response.status);
       setStatusCode(error.response.status);
       if (error.response.status === 404) {
-        console.log(error.response.data.message);
-        console.log('*1');
         setRefreshing(false);
         showToast(toast, 'error', error.response.data.message);
       }
       if (error.response.status === 500) {
         showToast(toast, 'error', error.message);
       }
-      console.log('*2');
       setRefreshing(false);
     }
-    console.log('*3');
     setRefreshing(false);
   };
 
@@ -93,7 +88,12 @@ const WishList = ({navigation}) => {
       {refreshing ? (
         <BrowserSkelton />
       ) : statusCode == 200 ? (
-        <Box style={styles.wrapper}>{renderPlaceCard()}</Box>
+        <Box style={styles.wrapper}>
+          <Box m={3}>
+            <Text style={styles.head}>Your favorites</Text>
+          </Box>
+          {renderPlaceCard()}
+        </Box>
       ) : statusCode === 500 ? (
         <Box h="full" style={styles.wrapper}>
           <Center h="full">
@@ -132,11 +132,12 @@ const styles = StyleSheet.create({
     position: 'relative',
     top: Constants.statusBarHeight,
     backgroundColor: '#eee',
+    height: Dimensions.get('window').height,
     paddingBottom: 60,
   },
   head: {
     fontFamily: 'Poppins-Regular',
-    fontSize: 16,
+    fontSize: 24,
     color: '#5C5A6F',
   },
   currentLocation: {

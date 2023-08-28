@@ -264,6 +264,7 @@ const styles = StyleSheet.create({
     top: Constants.statusBarHeight,
     backgroundColor: '#eee',
     paddingBottom: 60,
+    height: Dimensions.get('window').height,
   },
   searchContainer: {
     position: 'absolute',
@@ -284,9 +285,9 @@ const styles = StyleSheet.create({
     color: '#A0A0A0',
   },
   fab: {
-    position: 'absolute',
-    bottom: 0,
-    right: 10,
+    // position: 'absolute',
+    // bottom: 50,
+    // right: 10,
   },
   fabBtn: {
     backgroundColor: '#223343',
