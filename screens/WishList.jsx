@@ -1,24 +1,17 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {
-  Box,
-  Center,
-  Button as NBButton,
-  ScrollView,
-  useDisclose,
-} from 'native-base';
-import * as Location from 'expo-location';
-import {Client} from '@googlemaps/google-maps-services-js';
+import {RefreshControl, StyleSheet, Dimensions, Text} from 'react-native';
+import {Box, Center, Button as NBButton, ScrollView} from 'native-base';
 import axios from 'axios';
 import Constants from 'expo-constants';
-import {RefreshControl, StyleSheet, Dimensions, Text} from 'react-native';
+
+// Components
 import BrowseCard from '../components/BrowseCard';
 import BrowserSkelton from '../components/core/SkeltonBrowser';
-import {findAddress, findLocation} from '../components/findLocation';
-import {FontAwesome} from '@expo/vector-icons';
+
+// Other imports
 import env from '../env';
 import showToast from '../components/core/toast';
 
-const client = new Client({});
 const WishList = ({navigation}) => {
   const [refreshing, setRefreshing] = useState(true);
   const [places, setPlaces] = useState([]);
@@ -82,7 +75,6 @@ const WishList = ({navigation}) => {
     );
   };
 
-  console.log('Refresh: ', refreshing);
   return (
     <>
       {refreshing ? (
