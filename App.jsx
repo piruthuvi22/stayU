@@ -28,7 +28,7 @@ import WishList from './screens/WishList';
 import Profile from './screens/Profile';
 import Map from './screens/Map';
 import Details from './screens/Details';
-import { Reserved } from './screens/Reserved';
+import {Reserved} from './screens/Reserved';
 
 // ===============Imports Icons==============
 import {AntDesign, Ionicons} from '@expo/vector-icons';
@@ -247,11 +247,7 @@ export default function App() {
                       headerShown: false,
                       tabBarStyle: {backgroundColor: '#FD683D', height: 60},
                       tabBarIcon: () => (
-                        <Ionicons
-                          name="bookmarks-outline"
-                          size={24}
-                          color="white"
-                        />
+                        <Ionicons name="home" size={24} color="white" />
                       ),
                       tabBarItemStyle: {
                         marginBottom: 2,

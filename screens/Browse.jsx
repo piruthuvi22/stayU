@@ -56,11 +56,9 @@ const Browse = ({navigation}) => {
   const getAddress = async latlong => {
     try {
       let uniName = await findAddress(latlong);
-      // console.log(uniName);
       setUniName(uniName);
     } catch (error) {
-      console.log('Get address error: ', error);
-      showToast(toast, 'error', error);
+      showToast(toast, 'error', error.message);
     }
     setRefreshing(false);
   };
