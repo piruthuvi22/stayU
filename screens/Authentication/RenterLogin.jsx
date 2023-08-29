@@ -32,7 +32,7 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
 } from 'firebase/auth';
-import auth from '../../utilities/firebase';
+import {auth} from '../../utilities/firebase';
 import env from '../../env';
 import showToast from '../../components/core/toast';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -260,6 +260,13 @@ const RenterLogin = ({navigation, route}) => {
                 backgroundColor={"#ddd"}
               />
             </HStack> */}
+              {/* Temporary button */}
+              <Button
+                onPress={() =>
+                  navigation.navigate('TabNavigator', {screen: 'add-home'})
+                }>
+                landlord - upload
+              </Button>
             </VStack>
           </Stack>
         </ImageBackground>

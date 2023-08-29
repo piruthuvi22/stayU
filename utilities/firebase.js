@@ -1,6 +1,7 @@
 // Import the functions you need from the SDKs you need
 import {initializeApp} from 'firebase/app';
 import {getAuth} from 'firebase/auth';
+import {getStorage} from 'firebase/storage';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -16,5 +17,21 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth();
-export default auth;
+export const auth = getAuth();
+export const storage = getStorage(app);
+
+// firebase - storage version 1
+// rules_version = '2';
+
+// // Craft rules based on data in your Firestore database
+// // allow write: if firestore.get(
+// //    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
+// service firebase.storage {
+//   match /b/{bucket}/o {
+//     match /{allPaths=**} {
+
+//       allow read, write: if request.auth.token.roles.size() > 0;
+//       allow read, write: if false;
+//     }
+//   }
+// }

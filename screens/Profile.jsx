@@ -18,9 +18,11 @@ import {
 import {Feather} from '@expo/vector-icons';
 import {View, Dimensions} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import auth from '../utilities/firebase';
+import {auth} from '../utilities/firebase';
 import {updatePassword, signOut, updateProfile} from 'firebase/auth';
+import axios from 'axios';
 import {useAuth} from '../utilities/context';
+import env from '../env';
 import showToast from '../components/core/toast';
 
 const Profile = ({navigation}) => {
@@ -32,7 +34,7 @@ const Profile = ({navigation}) => {
   const [changedPassword, setChangedPassword] = useState('');
   const [confirmedPassword, setConfirmedPassword] = useState('');
 
-  let {height, width} = Dimensions.get('screen');
+  let {height} = Dimensions.get('screen');
 
   const handleSignOut = async () => {
     try {
@@ -41,7 +43,7 @@ const Profile = ({navigation}) => {
           navigation.navigate('get-start');
         })
         .catch(error => {
-          // An error happened.
+          console.log(error);
         });
     } catch (e) {
       console.log(e);
@@ -56,7 +58,24 @@ const Profile = ({navigation}) => {
       phoneNumber: contactNumber,
     })
       .then(() => {
-        showToast(toast, 'success', 'Updated Successfully!');
+        console.log(
+          'displayName:',
+          displayName,
+          'contactNumber:',
+          contactNumber,
+        );
+        axios
+          .put(env.api + '/users/updateDisplayName', {
+            email: auth?.currentUser?.email,
+            displayName: displayName,
+            phoneNumber: contactNumber,
+          })
+          .then(res => {
+            showToast(toast, 'success', 'Updated Successfully!');
+          })
+          .catch(err => {
+            console.log(err);
+          });
       })
       .catch(error => {
         showToast(toast, 'warning', 'Error in Update');
