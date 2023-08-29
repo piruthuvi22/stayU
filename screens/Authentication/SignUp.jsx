@@ -33,7 +33,7 @@ import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
 } from 'firebase/auth';
-import auth from '../../utilities/firebase';
+import {auth} from '../../utilities/firebase';
 import {useAuth} from '../../utilities/context';
 
 let {height, width} = Dimensions.get('screen');
@@ -66,8 +66,21 @@ const RenterLogin = ({navigation, route}) => {
         createUserWithEmailAndPassword(auth, email, password)
           .then(userCredential => {
             // Signed in
+            console.log('user:');
             sendEmailVerification(auth.currentUser).then(() => {
               // Email verification sent!
+              console.log('Email verification sent!');
+              axios
+                .post(env.api + '/users/register', {
+                  email: email,
+                  userRole: userRoute?.params?.userRole,
+                })
+                .then(res => {
+                  console.log(res.data);
+                })
+                .catch(err => {
+                  console.log(err);
+                });
               showToast(toast, 'success', 'Email verification sent!', () =>
                 navigation.navigate('get-start'),
               );

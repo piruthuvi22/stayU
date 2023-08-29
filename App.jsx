@@ -29,6 +29,8 @@ import WishList from './screens/WishList';
 import Profile from './screens/Profile';
 import Map from './screens/Map';
 import Details from './screens/Details';
+import AddHome from './screens/landlord/AddHome';
+// import ImageViewer from './components/ImageViewer';
 
 // ===============Imports Icons==============
 import {AntDesign, Ionicons} from '@expo/vector-icons';
@@ -71,7 +73,11 @@ export default function App() {
                   component={SignUp}
                   options={{headerShown: false}}
                 />
-
+                {/* <Stack.Screen
+                  name="image-viewer"
+                  component={ImageViewer}
+                  options={{headerShown: false}}
+                /> */}
                 <Stack.Screen
                   name="TabNavigator"
                   component={TabNavigator}
@@ -143,6 +149,17 @@ const TabNavigator = () => {
       <Tab.Screen
         name="Map"
         component={Map}
+        options={{
+          headerShown: false,
+          tabBarStyle: {
+            display: 'none',
+          },
+          tabBarItemStyle: {marginBottom: 2, display: 'none'},
+        }}
+      />
+      <Tab.Screen
+        name="add-home"
+        component={AddHome}
         options={{
           headerShown: false,
           tabBarStyle: {
