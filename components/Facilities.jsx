@@ -61,8 +61,8 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   subtitle: {
-    fontFamily: 'Poppins-SemiBold',
-    fontSize: 16,
+    fontFamily: 'Poppins-Regular',
+    fontSize: 14,
     color: '#666',
   },
 });

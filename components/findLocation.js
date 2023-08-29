@@ -33,7 +33,7 @@ export const findAddress = async latlong => {
     });
     return response.data?.results[0]?.formatted_address.split(',')[0];
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     throw new Error('Find address error');
   }
 };
