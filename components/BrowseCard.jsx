@@ -68,6 +68,7 @@ const BrowseCard = ({
           navigation.navigate('Details', {
             _id,
             PlaceTitle,
+            PlaceDescription,
             Cost,
             Rating,
             Facilities,
@@ -105,22 +106,23 @@ const BrowseCard = ({
               <Text style={styles.cost}>Rs.{Cost}</Text>
               <Text style={styles.km}>
                 {distTime.length > 0 ? [distTime[0], '  ', distTime[1]] : ''}
+                <MaterialIcons name="directions-walk" size={14} color="#aaa" />
               </Text>
               <HStack alignItems={'center'} justifyContent="space-between">
                 <Row alignItems={'center'}>
                   {Facilities?.WashRoomType.includes('Attached') && (
                     <Box pr={2}>
-                      <FontAwesome name="bathtub" size={18} color="#aaa" />
+                      <FontAwesome name="bathtub" size={14} color="#aaa" />
                     </Box>
                   )}
                   {Facilities?.OfferingMeals && (
                     <Box pr={2}>
-                      <MaterialIcons name="restaurant" size={18} color="#aaa" />
+                      <MaterialIcons name="restaurant" size={14} color="#aaa" />
                     </Box>
                   )}
                   {Facilities?.NoOfBeds ? (
                     <>
-                      <FontAwesome name="bed" size={18} color="#aaa" />
+                      <FontAwesome name="bed" size={14} color="#aaa" />
                       <Text style={styles.badge}>{Facilities?.NoOfBeds}</Text>
                     </>
                   ) : (
@@ -151,8 +153,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   title: {
-    fontFamily: 'Poppins-Bold',
-    fontSize: 20,
+    fontFamily: 'Poppins-Medium',
+    fontSize: 16,
     color: '#223343',
   },
   desc: {
@@ -161,7 +163,7 @@ const styles = StyleSheet.create({
     color: '#223343',
   },
   cost: {
-    fontFamily: 'Poppins-Bold',
+    fontFamily: 'Poppins-SemiBold',
     fontSize: 18,
     color: '#223343',
   },

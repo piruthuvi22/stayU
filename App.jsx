@@ -29,13 +29,16 @@ import WishList from './screens/WishList';
 import Profile from './screens/Profile';
 import Map from './screens/Map';
 import Details from './screens/Details';
+
 import AddHome from './screens/landlord/AddHome';
 // import ImageViewer from './components/ImageViewer';
+import {Reserved} from './screens/Reserved';
 
 // ===============Imports Icons==============
-import {AntDesign, Ionicons} from '@expo/vector-icons';
+import {AntDesign, Ionicons, MaterialIcons} from '@expo/vector-icons';
 import {TouchableOpacity} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {LocationPicker} from './components/LocationPicker';
 
 export default function App() {
   if (!importFont()) {
@@ -51,7 +54,7 @@ export default function App() {
           <SafeAreaProvider>
             <StatusBar networkActivityIndicatorVisible={false} />
             <NavigationContainer>
-              <Stack.Navigator initialRouteName="get-start" id="stack">
+              <Stack.Navigator initialRouteName="TabNavigator" id="stack">
                 <Stack.Screen
                   name="get-start"
                   component={GetStarted}
@@ -191,6 +194,28 @@ const TabNavigator = () => {
           },
           tabBarItemStyle: {marginBottom: 2, display: 'none'},
         })}
+      />
+
+      {/* Location picker test purpose */}
+
+      <Tab.Screen
+        name="LocationPicker"
+        component={LocationPicker}
+        options={{
+          headerShown: false,
+          tabBarStyle: {backgroundColor: '#FF4E83', height: 60,display:'none'},
+          tabBarIcon: () => (
+            <MaterialIcons name="add-location-alt" size={24} color="white" />
+          ),
+          tabBarItemStyle: {
+            marginBottom: 2,
+            borderBottomWidth: 2,
+            borderBottomColor: '#fff',
+            borderRadius: 10,
+          },
+          tabBarLabel: 'Picker',
+          tabBarLabelStyle: {color: 'white', fontSize: 14},
+        }}
       />
     </Tab.Navigator>
   );
