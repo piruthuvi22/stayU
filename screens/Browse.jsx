@@ -179,7 +179,14 @@ const Browse = ({navigation}) => {
                 }}>
                 {uniName}
               </Text>
-              <HStack width={'20'} justifyContent={'space-between'}>
+              <Pressable
+                android_ripple={{color: '#ccc', borderless: true, radius: 30}}
+                onPress={updateLocation}>
+                <MaterialIcons name="gps-fixed" size={24} color="#A0A0A0" />
+              </Pressable>
+              {/* Filter button commented */}
+              
+              {/* <HStack width={'20'} justifyContent={'space-between'}>
                 <Pressable
                   android_ripple={{color: '#ccc', borderless: true, radius: 30}}
                   onPress={updateLocation}>
@@ -190,7 +197,7 @@ const Browse = ({navigation}) => {
                   onPress={onOpen}>
                   <FontAwesome name="bars" size={24} color="#A0A0A0" />
                 </Pressable>
-              </HStack>
+              </HStack> */}
             </HStack>
             <Box style={{zIndex: 20}} m={2}>
               <Box style={styles.searchContainer}>

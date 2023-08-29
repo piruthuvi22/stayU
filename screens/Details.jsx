@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   Box,
   Button,
@@ -25,6 +25,7 @@ import Comment from '../components/Comment';
 import axios from 'axios';
 import env from '../env';
 import {FacilitiesDetails} from '../components/Facilities';
+import {useFocusEffect} from '@react-navigation/native';
 // import ImageSlider from "react-native-image-slider";
 
 const Details = ({route}) => {
@@ -57,8 +58,21 @@ const Details = ({route}) => {
     onClose: onCloseFaci,
   } = useDisclose();
 
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     // Code to execute when the screen gains focus
+  //     console.log('Screen has gained focus');
+  //     getAdd;
+  //     // You can place any code you want to run here
+
+  //     return () => {
+  //       // Code to clean up when the screen loses focus (optional)
+  //       console.log('Screen has lost focus');
+  //     };
+  //   }, []),
+  // );
+
   useEffect(() => {
-    console.log('Details');
     axios
       .get(env.api + '/wish-list/get-status', {
         params: {
@@ -67,7 +81,7 @@ const Details = ({route}) => {
         },
       })
       .then(res => {
-        console.log(res.data.status);
+        // console.log(res.data.status);
         res.data.status ? setIsSaved(true) : setIsSaved(false);
       })
       .catch(err => console.log(err));
@@ -284,12 +298,12 @@ const styles = StyleSheet.create({
   desc: {
     fontFamily: 'Poppins-Regular',
     fontSize: 14,
-    color: '#777',
+    color: '#666',
     lineHeight: 16,
   },
   money: {
     fontFamily: 'Poppins-Bold',
-    fontSize: 30,
+    fontSize: 28,
     color: '#223343',
   },
   month: {
