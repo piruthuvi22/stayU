@@ -11,8 +11,7 @@ import {
   useDisclose,
 } from 'native-base';
 import React, { useEffect } from 'react';
-import {Text, StyleSheet, Dimensions} from 'react-native';
-import Constants from 'expo-constants';
+import {Text, StyleSheet, Dimensions, StatusBar} from 'react-native';
 
 export default Filters = ({isOpen, onClose}) => {
   useEffect(() => {
@@ -28,7 +27,7 @@ export default Filters = ({isOpen, onClose}) => {
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={{width: '100%'}}>
-          <Box height={'full'} w={'full'} pt={Constants.statusBarHeight} px={2}>
+          <Box height={'full'} w={'full'} pt={StatusBar.currentHeight} px={2}>
             <VStack mx={2} mb={3}>
               <Text style={styles.categoryTitle}>Distance</Text>
               <Slider
@@ -233,7 +232,7 @@ export default Filters = ({isOpen, onClose}) => {
 const styles = StyleSheet.create({
   wrapper: {
     position: 'relative',
-    top: Constants.statusBarHeight,
+    top: StatusBar.currentHeight,
     backgroundColor: '#eee',
     paddingBottom: 60,
   },

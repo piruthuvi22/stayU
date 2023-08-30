@@ -6,6 +6,7 @@ import {
   Text,
   // Image,
   View,
+  StatusBar,
 } from 'react-native';
 import {
   Box,
@@ -17,7 +18,7 @@ import {
 } from 'native-base';
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
-import Constants from 'expo-constants';
+// import Constants from 'expo-constants';
 const {width, height} = Dimensions.get('window');
 import {Client} from '@googlemaps/google-maps-services-js';
 
@@ -175,7 +176,7 @@ export const LocationPicker = ({navigation, route}) => {
 
 const styles = StyleSheet.create({
   wrapper: {
-    top: Constants.statusBarHeight,
+    top: StatusBar.currentHeight,
     backgroundColor: '#fff',
     height: Dimensions.get('window').height,
   },
