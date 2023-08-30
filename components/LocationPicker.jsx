@@ -102,9 +102,10 @@ export const LocationPicker = ({navigation, route}) => {
     updateLocation();
   };
 
-  const handleSelect = async () => {
-  }
-  // console.log('Selected location = ', coordinate, locationName);
+  const handleSelect = () => {
+    console.log('Selected location = ', coordinate, locationName);
+    navigation.navigate('add-home', {location: coordinate, locationName});
+  };
 
   return (
     <Box style={styles.wrapper}>
@@ -206,6 +207,6 @@ const styles = StyleSheet.create({
   fabBtn: {
     backgroundColor: '#223343',
     borderWidth: 1,
-    borderColor: '#FF754E',
+    borderColor: '#FD683D',
   },
 });

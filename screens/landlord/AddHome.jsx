@@ -3,6 +3,7 @@ import {
   ScrollView,
   PermissionsAndroid,
   Dimensions,
+  Text as RNText,
 } from 'react-native';
 import {
   Box,
@@ -18,13 +19,17 @@ import {
   Checkbox,
   useDisclose,
   Radio,
-  Popover,
-  Slider,
+  Pressable,
   KeyboardAvoidingView,
   useToast,
   Button,
 } from 'native-base';
-import {MaterialIcons, FontAwesome, AntDesign} from '@expo/vector-icons';
+import {
+  MaterialIcons,
+  FontAwesome,
+  AntDesign,
+  Ionicons,
+} from '@expo/vector-icons';
 import {SliderBox} from 'react-native-image-slider-box';
 import React, {useState, useEffect} from 'react';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
@@ -36,8 +41,9 @@ import axios from 'axios';
 import env from '../../env';
 import showToast from '../../components/core/toast';
 import {NavigationContainer} from '@react-navigation/native';
+import {useAuth} from '../../utilities/context';
 
-export default function AddHome({navigation}) {
+export default function AddHome({navigation, route}) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [rent, setRent] = useState('');
@@ -51,7 +57,7 @@ export default function AddHome({navigation}) {
   const [noOfBeds, setNoOfBeds] = useState('');
   const [imageDetails, setImageDetails] = useState([]);
   const toast = useToast();
-
+  const {user} = useAuth();
   let {height, width} = Dimensions.get('screen');
 
   const styles = StyleSheet.create({
@@ -302,11 +308,19 @@ export default function AddHome({navigation}) {
         ? showToast(toast, 'warning', 'No of beds must be a number!')
         : showToast(toast, 'warning', 'Rent amount must be a number!');
     } else {
+      if (route.params?.location === undefined)
+        return showToast(toast, 'warning', 'Please select location!');
+      if (roomType === '')
+        return showToast(toast, 'warning', 'Please select room type!');
+      if (images.length === 0)
+        return showToast(toast, 'warning', 'Please select image!');
       axios
         .post(env.api + '/places/add-place', {
+          LandlordEmail: user?.email,
           PlaceTitle: title,
           PlaceDescription: description,
           Cost: rentAmount,
+          Coordinates: route.params?.location,
           Facilities: {
             RoomType: roomType,
             NoOfBeds: beds,
@@ -319,6 +333,17 @@ export default function AddHome({navigation}) {
         .then(res => {
           console.log(res.data);
           showToast(toast, 'success', 'Successfully added!');
+          setTitle('');
+          etDescription('');
+          setRent('');
+          setRoomType('');
+          setFacilitiesValue([]);
+          setMeals(false);
+          setWashroom([]);
+          setImages([]);
+          setPayment('monthly');
+          setNoOfBeds('');
+          setImageDetails([]);
         })
         .catch(err => {
           console.log(err);
@@ -339,6 +364,13 @@ export default function AddHome({navigation}) {
             color: 'warmGray.50',
             textAlign: 'center',
           }}>
+          {/* <Box alignItems={'flex-start'} mb={4}>
+            <Pressable
+              android_ripple={{color: '#ddd'}}
+              onPress={() => navigation.navigate('home-landlord')}>
+              <Ionicons name="chevron-back-outline" size={36} color="#FF4E83" />
+            </Pressable>
+          </Box> */}
           <VStack>
             <FormControl>
               <Stack>
@@ -417,18 +449,18 @@ export default function AddHome({navigation}) {
                   color={'#666'}
                   onChangeText={e => setRent(e)}
                 />
-                <HStack my={5} space={2}>
+                <HStack mt={5} space={2}>
                   <Button
                     size="sm"
                     colorScheme="secondary"
-                    variant="outline"
+                    variant={`${images.length > 0 ? 'subtle' : 'outline'}`}
                     leftIcon={
                       <Icon
                         mt={1}
                         as={<MaterialIcons name="add-a-photo" />}
                         size={5}
                         ml="2"
-                        color="pink.400"
+                        color="pink.300"
                       />
                     }>
                     <Text
@@ -454,30 +486,49 @@ export default function AddHome({navigation}) {
                   <Button
                     size="sm"
                     colorScheme="secondary"
-                    variant="outline"
+                    variant={`${
+                      route?.params?.locationName ? 'subtle' : 'outline'
+                    }`}
                     leftIcon={
                       <Icon
                         as={<MaterialIcons name="add-location" />}
                         size={7}
                         ml="2"
-                        color="pink.400"
+                        color="pink.300"
                       />
                     }>
-                    <Text fontSize="lg">Pick Location</Text>
+                    <Text
+                      fontSize="lg"
+                      onPress={() => navigation.navigate('LocationPicker')}>
+                      Pick Location
+                    </Text>
                   </Button>
+                  {route?.params?.locationName && (
+                    <HStack mt={3}>
+                      <RNText
+                        style={{
+                          fontFamily: 'Poppins-Regular',
+                          fontSize: 15,
+                          marginHorizontal: 6,
+                        }}>
+                        {route?.params?.locationName}
+                      </RNText>
+                      <MaterialIcons name="check" size={24} color="green" />
+                    </HStack>
+                  )}
                 </HStack>
                 <HStack space={2} my={5}>
                   <Button
                     size="sm"
                     colorScheme="secondary"
-                    variant="outline"
+                    variant={`${roomType !== '' ? 'subtle' : 'outline'}`}
                     leftIcon={
                       <Icon
                         onPress={onOpen}
                         as={<AntDesign name="antdesign" />}
                         size={7}
                         ml="2"
-                        color="pink.400"
+                        color="pink.300"
                       />
                     }>
                     <Text fontSize="lg" onPress={onOpen}>
