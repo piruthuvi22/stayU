@@ -215,8 +215,8 @@ const Browse = ({navigation}) => {
               <ScrollView
                 showsVerticalScrollIndicator={false}
                 style={{width: '100%'}}> */}
-                <Filters isOpen={isOpen} onClose={onClose}/>
-              {/* </ScrollView>
+          <Filters isOpen={isOpen} onClose={onClose} />
+          {/* </ScrollView>
             </Actionsheet.Content>
           </Actionsheet> */}
         </>

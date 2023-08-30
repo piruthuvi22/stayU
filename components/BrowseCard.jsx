@@ -86,6 +86,7 @@ const BrowseCard = ({
                   Cost,
                   Rating,
                   Facilities,
+                  PlaceDescription,
                   uniLocation,
                 })
               }>
@@ -108,7 +109,7 @@ const BrowseCard = ({
               </Text>
               <HStack alignItems={'center'} justifyContent="space-between">
                 <Row alignItems={'center'}>
-                  {Facilities?.WashRoomType.includes('Attached') && (
+                  {Facilities?.WashRoomType.includes('attached') && (
                     <Box pr={2}>
                       <FontAwesome name="bathtub" size={18} color="#aaa" />
                     </Box>

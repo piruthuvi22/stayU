@@ -44,7 +44,7 @@ const RenterLogin = ({navigation, route}) => {
   const [show, setShow] = useState(false);
   const [email, setemail] = useState('saginisaju@gmail.com');
   const [password, setPassword] = useState('Sagini18');
-  console.log(route.params);
+  // console.log(route.params);
   const handleemail = e => {
     setemail(e);
   };
@@ -261,12 +261,12 @@ const RenterLogin = ({navigation, route}) => {
               />
             </HStack> */}
               {/* Temporary button */}
-              <Button
+              {/* <Button
                 onPress={() =>
                   navigation.navigate('TabNavigator', {screen: 'add-home'})
                 }>
                 landlord - upload
-              </Button>
+              </Button> */}
             </VStack>
           </Stack>
         </ImageBackground>

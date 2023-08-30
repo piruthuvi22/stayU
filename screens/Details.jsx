@@ -25,11 +25,20 @@ import Comment from '../components/Comment';
 import axios from 'axios';
 import env from '../env';
 import {FacilitiesDetails} from '../components/Facilities';
+import {useAuth} from '../utilities/context';
 // import ImageSlider from "react-native-image-slider";
 
 const Details = ({route}) => {
-  const {_id, PlaceTitle, Cost, Rating, Facilities, uniLocation, Coordinates} =
-    route.params;
+  const {
+    _id,
+    PlaceTitle,
+    Cost,
+    Rating,
+    Facilities,
+    uniLocation,
+    Coordinates,
+    PlaceDescription,
+  } = route.params;
   const [isSaved, setIsSaved] = useState(false);
   const [images, setImages] = useState([
     'https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014__340.jpg',
@@ -48,8 +57,23 @@ const Details = ({route}) => {
     onOpen: onOpenFaci,
     onClose: onCloseFaci,
   } = useDisclose();
+  const {user} = useAuth();
+  const [userRole, setUserRole] = useState('student');
+
+  const getUserRole = () => {
+    const email = user?.email;
+    axios
+      .get(env.api + '/users/getUserRole', {params: {email}})
+      .then(res => {
+        setUserRole(res.data);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
 
   useEffect(() => {
+    getUserRole();
     console.log('Details');
     axios
       .get(env.api + '/wish-list/get-status/' + _id)
@@ -111,18 +135,18 @@ const Details = ({route}) => {
         {/* Description */}
         <Box px={3}>
           <Text style={styles.desc}>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur,
-            ipsa repudiandae ullam earum minima ducimus dolorem ut dolores quas
-            sapiente, similique dicta itaque veniam deserunt neque illo, quae
-            deleniti aliquam! Lorem ipsum dolor sit amet consectetur adipisicing
-            elit. Dolorem obcaecati molestias error ullam ab exercitationem.
-            Quam autem, quis fuga qui rerum ducimus officiis aliquam laudantium
-            enim tenetur temporibus Lorem ipsum dolor sit amet consectetur
-            adipisicing elit. Ea, nam earum itaque maxime deleniti magnam
-            reiciendis unde enim? Porro non dolores similique possimus
-            consectetur nulla, praesentium maiores voluptatum quo delectus
-            repellat accusamus ad quis provident impedit, earum quae rerum
-            velit.
+            {PlaceDescription}Lorem ipsum dolor sit amet consectetur adipisicing
+            elit. Pariatur, ipsa repudiandae ullam earum minima ducimus dolorem
+            ut dolores quas sapiente, similique dicta itaque veniam deserunt
+            neque illo, quae deleniti aliquam! Lorem ipsum dolor sit amet
+            consectetur adipisicing elit. Dolorem obcaecati molestias error
+            ullam ab exercitationem. Quam autem, quis fuga qui rerum ducimus
+            officiis aliquam laudantium enim tenetur temporibus Lorem ipsum
+            dolor sit amet consectetur adipisicing elit. Ea, nam earum itaque
+            maxime deleniti magnam reiciendis unde enim? Porro non dolores
+            similique possimus consectetur nulla, praesentium maiores voluptatum
+            quo delectus repellat accusamus ad quis provident impedit, earum
+            quae rerum velit.
           </Text>
         </Box>
 
@@ -148,20 +172,22 @@ const Details = ({route}) => {
           >
             <AntDesign name="sharealt" size={25} color="#F24E1E" />
           </Pressable> */}
-            <Pressable
-              android_ripple={{
-                color: '#F24E1E22',
-                borderless: true,
-                radius: 25,
-                foreground: true,
-              }}
-              onPress={handleSave}>
-              <Ionicons
-                name={isSaved ? 'bookmarks' : 'bookmarks-outline'}
-                size={25}
-                color="#F24E1E"
-              />
-            </Pressable>
+            {userRole !== 'landlord' && (
+              <Pressable
+                android_ripple={{
+                  color: '#F24E1E22',
+                  borderless: true,
+                  radius: 25,
+                  foreground: true,
+                }}
+                onPress={handleSave}>
+                <Ionicons
+                  name={isSaved ? 'bookmarks' : 'bookmarks-outline'}
+                  size={25}
+                  color="#F24E1E"
+                />
+              </Pressable>
+            )}
           </HStack>
         </HStack>
 
@@ -231,34 +257,64 @@ const Details = ({route}) => {
 
       {/* Bottom bar */}
       <Box style={styles.bottomBar}>
-        <HStack
-          alignItems={'center'}
-          h="full"
-          justifyContent={'flex-end'}
-          px={3}
-          w="full">
-          <Button
-            mx={2}
-            px={6}
-            style={styles.compare}
-            borderRadius={5}
-            _text={{
-              style: {color: '#FD683D', fontFamily: 'Poppins-Medium'},
-            }}
-            android_ripple={{color: '#ffffff55'}}>
-            Compare
-          </Button>
-          <Button
-            mx={2}
-            px={6}
-            style={styles.reserve}
-            borderRadius={5}
-            _text={{style: {color: '#fff', fontFamily: 'Poppins-Medium'}}}
-            android_ripple={{color: '#ffffff55'}}
-            onPress={handleReserve}>
-            Reserve
-          </Button>
-        </HStack>
+        {userRole !== 'landlord' ? (
+          <HStack
+            alignItems={'center'}
+            h="full"
+            justifyContent={'flex-end'}
+            px={3}
+            w="full">
+            <Button
+              mx={2}
+              px={6}
+              style={styles.compare}
+              borderRadius={5}
+              _text={{
+                style: {color: '#FD683D', fontFamily: 'Poppins-Medium'},
+              }}
+              android_ripple={{color: '#ffffff55'}}>
+              Compare
+            </Button>
+            <Button
+              mx={2}
+              px={6}
+              style={styles.reserve}
+              borderRadius={5}
+              _text={{style: {color: '#fff', fontFamily: 'Poppins-Medium'}}}
+              android_ripple={{color: '#ffffff55'}}
+              onPress={handleReserve}>
+              Reserve
+            </Button>
+          </HStack>
+        ) : (
+          <HStack
+            alignItems={'center'}
+            h="full"
+            justifyContent={'flex-end'}
+            px={3}
+            w="full">
+            <Button
+              mx={2}
+              px={6}
+              style={styles.reject}
+              borderRadius={5}
+              _text={{style: {color: '#fff', fontFamily: 'Poppins-Medium'}}}
+              android_ripple={{color: '#ffffff55'}}
+              onPress={handleReserve}>
+              Reject
+            </Button>
+            <Button
+              mx={2}
+              px={6}
+              style={styles.accept}
+              borderRadius={5}
+              _text={{style: {color: '#fff', fontFamily: 'Poppins-Medium'}}}
+              android_ripple={{color: '#ffffff55'}}
+              onPress={handleReserve}>
+              Accept
+            </Button>
+          </HStack>
+        )}
       </Box>
     </Box>
   );
@@ -310,6 +366,17 @@ const styles = StyleSheet.create({
     borderColor: '#FD683D',
     borderWidth: 1,
   },
+  accept: {
+    backgroundColor: '#04a256',
+    borderColor: '#027f43',
+    borderWidth: 1,
+  },
+  reject: {
+    backgroundColor: '#a20420',
+    borderColor: '#9b031c',
+    borderWidth: 1,
+  },
+
   facilities: {
     backgroundColor: '#E9E9E9',
     height: 40,

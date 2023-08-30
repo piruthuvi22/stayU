@@ -18,13 +18,17 @@ import {
   Checkbox,
   useDisclose,
   Radio,
-  Popover,
-  Slider,
+  Pressable,
   KeyboardAvoidingView,
   useToast,
   Button,
 } from 'native-base';
-import {MaterialIcons, FontAwesome, AntDesign} from '@expo/vector-icons';
+import {
+  MaterialIcons,
+  FontAwesome,
+  AntDesign,
+  Ionicons,
+} from '@expo/vector-icons';
 import {SliderBox} from 'react-native-image-slider-box';
 import React, {useState, useEffect} from 'react';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
@@ -36,6 +40,7 @@ import axios from 'axios';
 import env from '../../env';
 import showToast from '../../components/core/toast';
 import {NavigationContainer} from '@react-navigation/native';
+import {useAuth} from '../../utilities/context';
 
 export default function AddHome({navigation}) {
   const [title, setTitle] = useState('');
@@ -51,7 +56,7 @@ export default function AddHome({navigation}) {
   const [noOfBeds, setNoOfBeds] = useState('');
   const [imageDetails, setImageDetails] = useState([]);
   const toast = useToast();
-
+  const {user} = useAuth();
   let {height, width} = Dimensions.get('screen');
 
   const styles = StyleSheet.create({
@@ -304,6 +309,7 @@ export default function AddHome({navigation}) {
     } else {
       axios
         .post(env.api + '/places/add-place', {
+          LandlordEmail: user?.email,
           PlaceTitle: title,
           PlaceDescription: description,
           Cost: rentAmount,
@@ -339,6 +345,13 @@ export default function AddHome({navigation}) {
             color: 'warmGray.50',
             textAlign: 'center',
           }}>
+          <Box alignItems={'flex-start'} mb={4}>
+            <Pressable
+              android_ripple={{color: '#ddd'}}
+              onPress={() => navigation.navigate('home-landlord')}>
+              <Ionicons name="chevron-back-outline" size={36} color="#FF4E83" />
+            </Pressable>
+          </Box>
           <VStack>
             <FormControl>
               <Stack>
@@ -417,7 +430,7 @@ export default function AddHome({navigation}) {
                   color={'#666'}
                   onChangeText={e => setRent(e)}
                 />
-                <HStack my={5} space={2}>
+                <HStack mt={5} space={2}>
                   <Button
                     size="sm"
                     colorScheme="secondary"
