@@ -162,24 +162,38 @@ const BrowseCard = ({
               {Rating}
             </Badge>
 
-            {status === 'PENDING' && userRole === 'landlord' && (
-              <HStack style={styles.pendingContainer}>
-                <Ionicons name="ios-lock-closed" size={24} color="#a0044d" />
-                <Text
-                  style={{
-                    marginTop: 6,
-                    color: '#a0044d',
-                    fontWeight: 'bold',
-                  }}>
-                  PENDING
-                </Text>
-              </HStack>
-            )}
-            {status === 'PENDING' && userRole === 'student' && (
-              <HStack style={styles.pendingContainer}>
-                <Ionicons name="ios-lock-closed" size={24} color="#a0044d" />
-              </HStack>
-            )}
+            {status === 'PENDING' ||
+              (status === 'RESERVED' && userRole === 'landlord' && (
+                <HStack style={styles.pendingContainer}>
+                  <Ionicons name="ios-lock-closed" size={24} color="#a0044d" />
+                  {status === 'PENDING' && (
+                    <Text
+                      style={{
+                        marginTop: 6,
+                        color: '#a0044d',
+                        fontWeight: 'bold',
+                      }}>
+                      PENDING
+                    </Text>
+                  )}
+                  {status === 'RESERVED' && (
+                    <Text
+                      style={{
+                        marginTop: 6,
+                        color: '#a0044d',
+                        fontWeight: 'bold',
+                      }}>
+                      RESERVED
+                    </Text>
+                  )}
+                </HStack>
+              ))}
+            {status === 'PENDING' ||
+              (status === 'RESERVED' && userRole === 'student' && (
+                <HStack style={styles.pendingContainer}>
+                  <Ionicons name="ios-lock-closed" size={24} color="#a0044d" />
+                </HStack>
+              ))}
           </Row>
         </Row>
       </Pressable>
