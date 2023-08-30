@@ -128,7 +128,13 @@ const BrowseCard = ({
               <Text style={styles.cost}>Rs.{Cost}</Text>
               <Text style={styles.km}>
                 {distTime.length > 0 ? [distTime[0], '  ', distTime[1]] : ''}
-                <MaterialIcons name="directions-walk" size={14} color="#aaa" />
+                {distTime.length > 0 && (
+                  <MaterialIcons
+                    name="directions-walk"
+                    size={14}
+                    color="#aaa"
+                  />
+                )}
               </Text>
               <HStack alignItems={'center'} justifyContent="space-between">
                 <Row alignItems={'center'}>

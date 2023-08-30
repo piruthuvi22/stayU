@@ -32,6 +32,7 @@ import env from '../../env';
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
+  updateProfile,
 } from 'firebase/auth';
 import {auth} from '../../utilities/firebase';
 import {useAuth} from '../../utilities/context';
@@ -67,13 +68,19 @@ const RenterLogin = ({navigation, route}) => {
           .then(userCredential => {
             // Signed in
             console.log('user:');
-            sendEmailVerification(auth.currentUser)
+            sendEmailVerification(auth?.currentUser)
               .then(res => {
                 // Email verification sent!
                 console.log('Email verification sent!');
+                updateProfile(auth?.currentUser, {
+                  displayName: auth?.currentUser?.email?.split('@')[0],
+                  photoURL:
+                    'https://cdn5.vectorstock.com/i/1000x1000/09/79/user-neon-sign-vector-28270979.jpg',
+                });
                 axios
                   .post(env.api + '/users/register', {
                     email: email,
+                    displayName: auth?.currentUser?.email?.split('@')[0],
                     userRole: route?.params?.userRole,
                   })
                   .then(res => {

@@ -52,34 +52,41 @@ const Profile = ({navigation}) => {
   const handleDetails = (name, number) => {
     let displayName = name === '' ? auth?.currentUser?.displayName : name;
     let contactNumber = number === '' ? auth?.currentUser?.phoneNumber : number;
+    contactNumber = parseInt(contactNumber, 10);
 
-    updateProfile(auth?.currentUser, {
-      displayName: displayName,
-      phoneNumber: contactNumber,
-    })
-      .then(() => {
-        console.log(
-          'displayName:',
-          displayName,
-          'contactNumber:',
-          contactNumber,
-        );
-        axios
-          .put(env.api + '/users/updateDisplayName', {
-            email: auth?.currentUser?.email,
-            displayName: displayName,
-            phoneNumber: contactNumber,
-          })
-          .then(res => {
-            showToast(toast, 'success', 'Updated Successfully!');
-          })
-          .catch(err => {
-            console.log(err);
-          });
+    if (isNaN(contactNumber)) {
+      showToast(toast, 'warning', 'Contact Number is not valid');
+    } else {
+      updateProfile(auth?.currentUser, {
+        displayName: displayName,
+        phoneNumber: contactNumber,
       })
-      .catch(error => {
-        showToast(toast, 'warning', 'Error in Update');
-      });
+        .then(() => {
+          console.log(
+            'displayName:',
+            displayName,
+            'contactNumber:',
+            contactNumber,
+          );
+          axios
+            .put(env.api + '/users/updateDisplayName', {
+              email: auth?.currentUser?.email,
+              displayName: displayName,
+              phoneNumber: contactNumber,
+            })
+            .then(res => {
+              setDisplayName('');
+              setContactNumber('');
+              showToast(toast, 'success', 'Updated Successfully!');
+            })
+            .catch(err => {
+              console.log(err);
+            });
+        })
+        .catch(error => {
+          showToast(toast, 'warning', 'Error in Update');
+        });
+    }
   };
   const handleChangePassword = async () => {
     try {
