@@ -162,8 +162,8 @@ const BrowseCard = ({
               {Rating}
             </Badge>
 
-            {status === 'PENDING' ||
-              (status === 'RESERVED' && userRole === 'landlord' && (
+            {(status === 'PENDING' || status === 'RESERVED') &&
+              userRole === 'landlord' && (
                 <HStack style={styles.pendingContainer}>
                   <Ionicons name="ios-lock-closed" size={24} color="#a0044d" />
                   {status === 'PENDING' && (
@@ -187,13 +187,13 @@ const BrowseCard = ({
                     </Text>
                   )}
                 </HStack>
-              ))}
-            {status === 'PENDING' ||
-              (status === 'RESERVED' && userRole === 'student' && (
+              )}
+            {(status === 'PENDING' || status === 'RESERVED') &&
+              userRole === 'student' && (
                 <HStack style={styles.pendingContainer}>
                   <Ionicons name="ios-lock-closed" size={24} color="#a0044d" />
                 </HStack>
-              ))}
+              )}
           </Row>
         </Row>
       </Pressable>
