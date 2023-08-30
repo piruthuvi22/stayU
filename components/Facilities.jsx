@@ -4,19 +4,18 @@ import {StyleSheet, Text} from 'react-native';
 import {AirbnbRating} from 'react-native-ratings';
 
 export const FacilitiesDetails = ({info}) => {
-  console.log('info', info);
   return (
-    <>
-      <Box px={2} py={2} mb={4}>
-        <HStack>
+
+      <Box px={2} py={2}>
+        {/* <HStack>
           <Text style={styles.username}>Address : </Text>
-        </HStack>
+        </HStack> */}
         <VStack>
-          <Text style={styles.username}>Facilities</Text>
+          {/* <Text style={styles.username}>Facilities</Text> */}
           <Box pl={2}>
             {info?.Facilities?.Facilities?.map((faci, index) => (
               <Text key={faci + index} style={styles.subtitle}>
-                {faci}
+                Facilities : {faci.charAt(0).toUpperCase() + faci.slice(1)}
               </Text>
             ))}
             <Text style={styles.subtitle}>
@@ -41,8 +40,7 @@ export const FacilitiesDetails = ({info}) => {
           </Box>
         </VStack>
       </Box>
-      <Divider bgColor={'#eee'} />
-    </>
+
   );
 };
 const styles = StyleSheet.create({
@@ -63,8 +61,8 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   subtitle: {
-    fontFamily: 'Poppins-SemiBold',
-    fontSize: 16,
+    fontFamily: 'Poppins-Regular',
+    fontSize: 14,
     color: '#666',
   },
 });

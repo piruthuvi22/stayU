@@ -10,17 +10,16 @@ import {
   ScrollView,
   useDisclose,
 } from 'native-base';
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import {Text, StyleSheet, Dimensions} from 'react-native';
 import Constants from 'expo-constants';
 
 export default Filters = ({isOpen, onClose}) => {
   useEffect(() => {
-    console.log('Filters');
+    // console.log('Filters');
   }, []);
 
   const filters = () => {};
-  
 
   return (
     <Actionsheet isOpen={isOpen} onClose={onClose}>
@@ -263,7 +262,7 @@ const styles = StyleSheet.create({
   fabBtn: {
     backgroundColor: '#223343',
     borderWidth: 1,
-    borderColor: '#FF754E',
+    borderColor: '#FD683D',
   },
   container: {
     flex: 1,

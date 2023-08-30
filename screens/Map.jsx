@@ -49,7 +49,7 @@ const Map = ({navigation, route}) => {
     (async () => {
       // moveTo(placeIfo);
       selectedPlaceCoord.hasOwnProperty('latitude') &&
-        await client
+        (await client
           .distancematrix({
             params: {
               key: 'AIzaSyCz5aHnnwPi7R_v65PASfRLikJ5VVA8Ytc',
@@ -66,7 +66,7 @@ const Map = ({navigation, route}) => {
           })
           .catch(e => {
             console.log('Map error', e);
-          });
+          }));
     })();
   }, [selectedPlaceCoord, placeInfo]);
 

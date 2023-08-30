@@ -1,11 +1,13 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import {TouchableOpacity, StyleSheet, Text} from 'react-native';
 import {Box, HStack, Image, Row, Column, Badge, Pressable} from 'native-base';
 import {Client} from '@googlemaps/google-maps-services-js';
 import Constants from 'expo-constants';
-
-import {FontAwesome, MaterialIcons} from '@expo/vector-icons';
+import {useFocusEffect} from '@react-navigation/native';
+import {useAuth} from '../utilities/context';
+import {FontAwesome, MaterialIcons, Ionicons} from '@expo/vector-icons';
 import axios from 'axios';
+import env from '../env';
 
 const BrowseCard = ({
   navigation,
@@ -16,9 +18,28 @@ const BrowseCard = ({
   Cost,
   Coordinates,
   uniLocation,
+  status,
   _id,
 }) => {
+  const {user} = useAuth();
   const [distTime, setDistTime] = useState([]);
+  const [userRole, setUserRole] = useState('');
+  const getUserRole = () => {
+    const email = user?.email;
+    axios
+      .get(env.api + '/users/getUserRole', {params: {email}})
+      .then(res => {
+        setUserRole(res.data);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+  useFocusEffect(
+    useCallback(() => {
+      getUserRole();
+    }, []),
+  );
 
   useEffect(() => {
     const client = new Client({});
@@ -68,6 +89,7 @@ const BrowseCard = ({
           navigation.navigate('Details', {
             _id,
             PlaceTitle,
+            PlaceDescription,
             Cost,
             Rating,
             Facilities,
@@ -106,22 +128,23 @@ const BrowseCard = ({
               <Text style={styles.cost}>Rs.{Cost}</Text>
               <Text style={styles.km}>
                 {distTime.length > 0 ? [distTime[0], '  ', distTime[1]] : ''}
+                <MaterialIcons name="directions-walk" size={14} color="#aaa" />
               </Text>
               <HStack alignItems={'center'} justifyContent="space-between">
                 <Row alignItems={'center'}>
                   {Facilities?.WashRoomType.includes('attached') && (
                     <Box pr={2}>
-                      <FontAwesome name="bathtub" size={18} color="#aaa" />
+                      <FontAwesome name="bathtub" size={14} color="#aaa" />
                     </Box>
                   )}
                   {Facilities?.OfferingMeals && (
                     <Box pr={2}>
-                      <MaterialIcons name="restaurant" size={18} color="#aaa" />
+                      <MaterialIcons name="restaurant" size={14} color="#aaa" />
                     </Box>
                   )}
                   {Facilities?.NoOfBeds ? (
                     <>
-                      <FontAwesome name="bed" size={18} color="#aaa" />
+                      <FontAwesome name="bed" size={14} color="#aaa" />
                       <Text style={styles.badge}>{Facilities?.NoOfBeds}</Text>
                     </>
                   ) : (
@@ -130,14 +153,33 @@ const BrowseCard = ({
                 </Row>
               </HStack>
             </Column>
-            <Box w="20%">
-              <Badge
-                colorScheme="warning"
-                alignSelf="center"
-                fontFamily={'Poppins-Regular'}>
-                {Rating}
-              </Badge>
-            </Box>
+
+            <Badge
+              colorScheme="warning"
+              alignSelf=" flex-end"
+              fontFamily={'Poppins-Regular'}
+              style={{position: 'absolute', top: 10, right: 10}}>
+              {Rating}
+            </Badge>
+
+            {status === 'PENDING' && userRole === 'landlord' && (
+              <HStack style={styles.pendingContainer}>
+                <Ionicons name="ios-lock-closed" size={24} color="#a0044d" />
+                <Text
+                  style={{
+                    marginTop: 6,
+                    color: '#a0044d',
+                    fontWeight: 'bold',
+                  }}>
+                  PENDING
+                </Text>
+              </HStack>
+            )}
+            {status === 'PENDING' && userRole === 'student' && (
+              <HStack style={styles.pendingContainer}>
+                <Ionicons name="ios-lock-closed" size={24} color="#a0044d" />
+              </HStack>
+            )}
           </Row>
         </Row>
       </Pressable>
@@ -152,8 +194,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   title: {
-    fontFamily: 'Poppins-Bold',
-    fontSize: 20,
+    fontFamily: 'Poppins-Medium',
+    fontSize: 16,
     color: '#223343',
   },
   desc: {
@@ -162,7 +204,7 @@ const styles = StyleSheet.create({
     color: '#223343',
   },
   cost: {
-    fontFamily: 'Poppins-Bold',
+    fontFamily: 'Poppins-SemiBold',
     fontSize: 18,
     color: '#223343',
   },
@@ -175,6 +217,11 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     color: '#aaa',
     paddingHorizontal: 2,
+  },
+  pendingContainer: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
   },
 });
 

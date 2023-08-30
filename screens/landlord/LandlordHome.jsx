@@ -56,10 +56,6 @@ const LandlordHome = ({navigation}) => {
               Rating={place.Rating}
               PlaceTitle={place.PlaceTitle}
               PlaceDescription={place.PlaceDescription}
-              Coordinates={{
-                latitude: place.Coordinates.Latitude,
-                longitude: place.Coordinates.Longitude,
-              }}
               Facilities={{
                 WashRoomType: place.Facilities.WashRoomType,
                 Facilities: place.Facilities.Facilities,
@@ -70,6 +66,7 @@ const LandlordHome = ({navigation}) => {
               }}
               Cost={place.Cost}
               navigation={navigation}
+              status={place.status}
             />
           ))}
         </ScrollView>

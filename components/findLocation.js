@@ -19,7 +19,7 @@ export const findLocation = async () => {
 
     return latlong;
   } catch (error) {
-    throw new Error('FindLocation Error : ' + error);
+    throw new Error('Location error');
   }
 };
 
@@ -33,6 +33,7 @@ export const findAddress = async latlong => {
     });
     return response.data?.results[0]?.formatted_address.split(',')[0];
   } catch (error) {
-    throw new Error('FindAddress Error : ' + error);
+    // console.log(error.message);
+    throw new Error('Find address error');
   }
 };

@@ -32,11 +32,13 @@ import Details from './screens/Details';
 import AddHome from './screens/landlord/AddHome';
 import LandlordHome from './screens/landlord/LandlordHome';
 // import ImageViewer from './components/ImageViewer';
+import {Reserved} from './screens/Reserved';
 
 // ===============Imports Icons==============
-import {AntDesign, Ionicons} from '@expo/vector-icons';
+import {AntDesign, Ionicons, MaterialIcons} from '@expo/vector-icons';
 import {TouchableOpacity} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {LocationPicker} from './components/LocationPicker';
 
 export default function App() {
   const TabNavigator = () => {
@@ -141,6 +143,30 @@ export default function App() {
         <Tab.Screen
           name="add-home"
           component={AddHome}
+          options={({route, navigation}) => ({
+            headerTitleStyle: {color: '#fff'},
+            headerLeft: () => {
+              return (
+                <Ionicons
+                  style={{paddingLeft: 5}}
+                  name="chevron-back-outline"
+                  size={24}
+                  color="#fff"
+                  onPress={() => navigation.navigate('home-landlord')}
+                />
+              );
+            },
+            headerStyle: {backgroundColor: '#FF4E83'},
+            title: 'Add Home',
+            tabBarStyle: {
+              display: 'none',
+            },
+            tabBarItemStyle: {marginBottom: 2, display: 'none'},
+          })}
+        />
+        <Tab.Screen
+          name="LocationPicker"
+          component={LocationPicker}
           options={{
             headerShown: false,
             tabBarStyle: {
@@ -178,20 +204,20 @@ export default function App() {
                   options={{headerShown: false}}
                 />
                 {/* <Stack.Screen
-                  name="student-login"
-                  component={StudentLogin}
-                  options={{headerShown: false}}
-                /> */}
+                name="student-login"
+                component={StudentLogin}
+                options={{headerShown: false}}
+              /> */}
                 <Stack.Screen
                   name="sign-up"
                   component={SignUp}
                   options={{headerShown: false}}
                 />
                 {/* <Stack.Screen
-                  name="image-viewer"
-                  component={ImageViewer}
-                  options={{headerShown: false}}
-                /> */}
+                name="image-viewer"
+                component={ImageViewer}
+                options={{headerShown: false}}
+              /> */}
                 <Stack.Screen
                   name="TabNavigator"
                   component={TabNavigator}
