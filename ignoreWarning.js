@@ -10,7 +10,8 @@ if (__DEV__) {
     "exported from 'deprecated-react-native-prop-types'.",
     "Non-serializable values were found in the navigation state.",
     "VirtualizedLists should never be nested inside plain ScrollViews",
-    "In React 18, SSRProvider is not necessary and is a noop."
+    "In React 18, SSRProvider is not necessary and is a noop.",
+    "Possible Unhandled Promise Rejection"
   ];
 
   const warn = console.warn;

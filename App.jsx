@@ -1,10 +1,10 @@
 import 'react-native-gesture-handler';
-import './ignoreWarnng';
-import {registerRootComponent} from 'expo';
+import './ignoreWarning';
 import React, {useState, useEffect} from 'react';
-import {StatusBar} from 'expo-status-bar';
+import {StyleSheet, Text, View, StatusBar} from 'react-native';
+import {StatusBar as ExpoStatusBar} from 'expo-status-bar';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {Button, NativeBaseProvider, Pressable, Text} from 'native-base';
+import {Button, NativeBaseProvider, Pressable} from 'native-base';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -189,7 +189,11 @@ export default function App() {
       <AuthProvider>
         <NativeBaseProvider>
           <SafeAreaProvider>
-            <StatusBar networkActivityIndicatorVisible={false} />
+            <ExpoStatusBar
+              // animated={true}
+              // showHideTransition={'slide'}
+              networkActivityIndicatorVisible={false}
+            />
             <NavigationContainer>
               <Stack.Navigator initialRouteName="get-start" id="stack">
                 <Stack.Screen
@@ -232,5 +236,3 @@ export default function App() {
     );
   }
 }
-
-registerRootComponent(App);
