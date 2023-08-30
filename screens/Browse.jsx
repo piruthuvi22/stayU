@@ -185,7 +185,7 @@ const Browse = ({navigation}) => {
                 <MaterialIcons name="gps-fixed" size={24} color="#A0A0A0" />
               </Pressable>
               {/* Filter button commented */}
-              
+
               {/* <HStack width={'20'} justifyContent={'space-between'}>
                 <Pressable
                   android_ripple={{color: '#ccc', borderless: true, radius: 30}}
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
   fabBtn: {
     backgroundColor: '#223343',
     borderWidth: 1,
-    borderColor: '#FF754E',
+    borderColor: '#FD683D',
   },
   container: {
     flex: 1,

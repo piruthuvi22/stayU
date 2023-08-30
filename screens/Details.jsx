@@ -25,6 +25,7 @@ import Comment from '../components/Comment';
 import axios from 'axios';
 import env from '../env';
 import {FacilitiesDetails} from '../components/Facilities';
+import {useAuth} from '../utilities/context';
 import {useFocusEffect} from '@react-navigation/native';
 // import ImageSlider from "react-native-image-slider";
 
@@ -57,6 +58,20 @@ const Details = ({route}) => {
     onOpen: onOpenFaci,
     onClose: onCloseFaci,
   } = useDisclose();
+  const {user} = useAuth();
+  const [userRole, setUserRole] = useState('');
+
+  const getUserRole = () => {
+    const email = user?.email;
+    axios
+      .get(env.api + '/users/getUserRole', {params: {email}})
+      .then(res => {
+        setUserRole(res.data);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
 
   // useFocusEffect(
   //   useCallback(() => {
@@ -73,6 +88,8 @@ const Details = ({route}) => {
   // );
 
   useEffect(() => {
+    getUserRole();
+    console.log('Details');
     axios
       .get(env.api + '/wish-list/get-status', {
         params: {
@@ -167,20 +184,22 @@ const Details = ({route}) => {
           >
             <AntDesign name="sharealt" size={25} color="#F24E1E" />
           </Pressable> */}
-            <Pressable
-              android_ripple={{
-                color: '#F24E1E22',
-                borderless: true,
-                radius: 25,
-                foreground: true,
-              }}
-              onPress={handleSave}>
-              <Ionicons
-                name={isSaved ? 'bookmarks' : 'bookmarks-outline'}
-                size={25}
-                color="#F24E1E"
-              />
-            </Pressable>
+            {userRole === 'student' && (
+              <Pressable
+                android_ripple={{
+                  color: '#F24E1E22',
+                  borderless: true,
+                  radius: 25,
+                  foreground: true,
+                }}
+                onPress={handleSave}>
+                <Ionicons
+                  name={isSaved ? 'bookmarks' : 'bookmarks-outline'}
+                  size={25}
+                  color="#F24E1E"
+                />
+              </Pressable>
+            )}
           </HStack>
         </HStack>
 
@@ -251,34 +270,64 @@ const Details = ({route}) => {
 
       {/* Bottom bar */}
       <Box style={styles.bottomBar}>
-        <HStack
-          alignItems={'center'}
-          h="full"
-          justifyContent={'flex-end'}
-          px={3}
-          w="full">
-          <Button
-            mx={2}
-            px={6}
-            style={styles.compare}
-            borderRadius={5}
-            _text={{
-              style: {color: '#FD683D', fontFamily: 'Poppins-Medium'},
-            }}
-            android_ripple={{color: '#ffffff55'}}>
-            Compare
-          </Button>
-          <Button
-            mx={2}
-            px={6}
-            style={styles.reserve}
-            borderRadius={5}
-            _text={{style: {color: '#fff', fontFamily: 'Poppins-Medium'}}}
-            android_ripple={{color: '#ffffff55'}}
-            onPress={handleReserve}>
-            Reserve
-          </Button>
-        </HStack>
+        {userRole === 'student' ? (
+          <HStack
+            alignItems={'center'}
+            h="full"
+            justifyContent={'flex-end'}
+            px={3}
+            w="full">
+            <Button
+              mx={2}
+              px={6}
+              style={styles.compare}
+              borderRadius={5}
+              _text={{
+                style: {color: '#FD683D', fontFamily: 'Poppins-Medium'},
+              }}
+              android_ripple={{color: '#ffffff55'}}>
+              Compare
+            </Button>
+            <Button
+              mx={2}
+              px={6}
+              style={styles.reserve}
+              borderRadius={5}
+              _text={{style: {color: '#fff', fontFamily: 'Poppins-Medium'}}}
+              android_ripple={{color: '#ffffff55'}}
+              onPress={handleReserve}>
+              Reserve
+            </Button>
+          </HStack>
+        ) : (
+          <HStack
+            alignItems={'center'}
+            h="full"
+            justifyContent={'flex-end'}
+            px={3}
+            w="full">
+            <Button
+              mx={2}
+              px={6}
+              style={styles.reject}
+              borderRadius={5}
+              _text={{style: {color: '#fff', fontFamily: 'Poppins-Medium'}}}
+              android_ripple={{color: '#ffffff55'}}
+              onPress={handleReserve}>
+              Reject
+            </Button>
+            <Button
+              mx={2}
+              px={6}
+              style={styles.accept}
+              borderRadius={5}
+              _text={{style: {color: '#fff', fontFamily: 'Poppins-Medium'}}}
+              android_ripple={{color: '#ffffff55'}}
+              onPress={handleReserve}>
+              Accept
+            </Button>
+          </HStack>
+        )}
       </Box>
     </Box>
   );
@@ -332,6 +381,17 @@ const styles = StyleSheet.create({
     borderColor: '#FD683D',
     borderWidth: 1,
   },
+  accept: {
+    backgroundColor: '#04a256',
+    borderColor: '#027f43',
+    borderWidth: 1,
+  },
+  reject: {
+    backgroundColor: '#a20420',
+    borderColor: '#9b031c',
+    borderWidth: 1,
+  },
+
   facilities: {
     backgroundColor: '#E9E9E9',
     height: 40,

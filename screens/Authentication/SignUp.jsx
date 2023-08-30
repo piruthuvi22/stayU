@@ -67,24 +67,31 @@ const RenterLogin = ({navigation, route}) => {
           .then(userCredential => {
             // Signed in
             console.log('user:');
-            sendEmailVerification(auth.currentUser).then(() => {
-              // Email verification sent!
-              console.log('Email verification sent!');
-              axios
-                .post(env.api + '/users/register', {
-                  email: email,
-                  userRole: userRoute?.params?.userRole,
-                })
-                .then(res => {
-                  console.log(res.data);
-                })
-                .catch(err => {
-                  console.log(err);
-                });
-              showToast(toast, 'success', 'Email verification sent!', () =>
-                navigation.navigate('get-start'),
-              );
-            });
+            sendEmailVerification(auth.currentUser)
+              .then(res => {
+                // Email verification sent!
+                console.log('Email verification sent!');
+                axios
+                  .post(env.api + '/users/register', {
+                    email: email,
+                    userRole: route?.params?.userRole,
+                  })
+                  .then(res => {
+                    console.log(res.data);
+                    showToast(
+                      toast,
+                      'success',
+                      'Email verification sent!',
+                      () => navigation.navigate('get-start'),
+                    );
+                  })
+                  .catch(err => {
+                    console.log(err);
+                  });
+              })
+              .catch(error => {
+                console.log(error);
+              });
           })
           .catch(error => {
             const errorMessage = error?.message?.split('/')[1]?.split(')')[0];
@@ -98,6 +105,7 @@ const RenterLogin = ({navigation, route}) => {
       showToast(toast, 'error', 'Invalid credentials!');
     }
   };
+
   return (
     <ScrollView>
       <KeyboardAvoidingView h={height} behavior={'a'}>

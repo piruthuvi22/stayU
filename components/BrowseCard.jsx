@@ -1,11 +1,13 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import {TouchableOpacity, StyleSheet, Text} from 'react-native';
 import {Box, HStack, Image, Row, Column, Badge, Pressable} from 'native-base';
 import {Client} from '@googlemaps/google-maps-services-js';
 import Constants from 'expo-constants';
-
-import {FontAwesome, MaterialIcons} from '@expo/vector-icons';
+import {useFocusEffect} from '@react-navigation/native';
+import {useAuth} from '../utilities/context';
+import {FontAwesome, MaterialIcons, Ionicons} from '@expo/vector-icons';
 import axios from 'axios';
+import env from '../env';
 
 const BrowseCard = ({
   navigation,
@@ -16,9 +18,28 @@ const BrowseCard = ({
   Cost,
   Coordinates,
   uniLocation,
+  status,
   _id,
 }) => {
+  const {user} = useAuth();
   const [distTime, setDistTime] = useState([]);
+  const [userRole, setUserRole] = useState('');
+  const getUserRole = () => {
+    const email = user?.email;
+    axios
+      .get(env.api + '/users/getUserRole', {params: {email}})
+      .then(res => {
+        setUserRole(res.data);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+  useFocusEffect(
+    useCallback(() => {
+      getUserRole();
+    }, []),
+  );
 
   useEffect(() => {
     const client = new Client({});
@@ -87,6 +108,7 @@ const BrowseCard = ({
                   Cost,
                   Rating,
                   Facilities,
+                  PlaceDescription,
                   uniLocation,
                 })
               }>
@@ -110,7 +132,7 @@ const BrowseCard = ({
               </Text>
               <HStack alignItems={'center'} justifyContent="space-between">
                 <Row alignItems={'center'}>
-                  {Facilities?.WashRoomType.includes('Attached') && (
+                  {Facilities?.WashRoomType.includes('attached') && (
                     <Box pr={2}>
                       <FontAwesome name="bathtub" size={14} color="#aaa" />
                     </Box>
@@ -131,14 +153,47 @@ const BrowseCard = ({
                 </Row>
               </HStack>
             </Column>
-            <Box w="20%">
-              <Badge
-                colorScheme="warning"
-                alignSelf="center"
-                fontFamily={'Poppins-Regular'}>
-                {Rating}
-              </Badge>
-            </Box>
+
+            <Badge
+              colorScheme="warning"
+              alignSelf=" flex-end"
+              fontFamily={'Poppins-Regular'}
+              style={{position: 'absolute', top: 10, right: 10}}>
+              {Rating}
+            </Badge>
+
+            {(status === 'PENDING' || status === 'RESERVED') &&
+              userRole === 'landlord' && (
+                <HStack style={styles.pendingContainer}>
+                  <Ionicons name="ios-lock-closed" size={24} color="#a0044d" />
+                  {status === 'PENDING' && (
+                    <Text
+                      style={{
+                        marginTop: 6,
+                        color: '#a0044d',
+                        fontWeight: 'bold',
+                      }}>
+                      PENDING
+                    </Text>
+                  )}
+                  {status === 'RESERVED' && (
+                    <Text
+                      style={{
+                        marginTop: 6,
+                        color: '#a0044d',
+                        fontWeight: 'bold',
+                      }}>
+                      RESERVED
+                    </Text>
+                  )}
+                </HStack>
+              )}
+            {(status === 'PENDING' || status === 'RESERVED') &&
+              userRole === 'student' && (
+                <HStack style={styles.pendingContainer}>
+                  <Ionicons name="ios-lock-closed" size={24} color="#a0044d" />
+                </HStack>
+              )}
           </Row>
         </Row>
       </Pressable>
@@ -176,6 +231,11 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     color: '#aaa',
     paddingHorizontal: 2,
+  },
+  pendingContainer: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
   },
 });
 
