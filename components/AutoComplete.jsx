@@ -35,8 +35,8 @@ let styles = {
     zIndex: 1000,
   },
   textInput: {
-    backgroundColor: '#fff1ed',
-    borderColor: '#FD683D',
+    backgroundColor: '#f9e3e7',
+    borderColor: '#FF4E83',
     borderWidth: 1,
     color: '#666',
   },

@@ -14,12 +14,14 @@ const LandlordHome = ({navigation}) => {
   const [places, setPlaces] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
   const getPlaces = () => {
+    console.log(user?.email);
+
     axios
       .get(env.api + '/places/get-uploaded-places', {
         params: {email: user?.email},
       })
       .then(res => {
-        console.log('places:', res.data);
+        console.log(res.data.length);
         if (res.data.length > 0) {
           setPlaces(res.data);
         } else {
@@ -27,16 +29,13 @@ const LandlordHome = ({navigation}) => {
         }
       })
       .catch(err => {
+        console.log(err);
         setErrorMessage('Something went wrong');
       });
   };
   useFocusEffect(
     useCallback(() => {
       getPlaces();
-      return () => {
-        // Code to clean up when the screen loses focus (optional)
-        console.log('Screen has lost focus');
-      };
     }, []),
   );
   return (
@@ -67,6 +66,7 @@ const LandlordHome = ({navigation}) => {
               Cost={place.Cost}
               navigation={navigation}
               status={place.status}
+              _id={place._id}
             />
           ))}
         </ScrollView>
@@ -113,6 +113,6 @@ const styles = StyleSheet.create({
   fabBtn: {
     backgroundColor: '#223343',
     borderWidth: 1,
-    borderColor: '#FF754E',
+    borderColor: '#FF4E83',
   },
 });

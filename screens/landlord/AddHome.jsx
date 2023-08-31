@@ -81,7 +81,7 @@ export default function AddHome({navigation, route}) {
     fabBtn: {
       backgroundColor: '#223343',
       borderWidth: 1,
-      borderColor: '#FF754E',
+      borderColor: '#FF4E83',
     },
     container: {
       flex: 1,
@@ -716,7 +716,20 @@ export default function AddHome({navigation, route}) {
                 </Actionsheet>
                 <HStack space={2} my={5} style={styles.buttonContainer}>
                   <Button onPress={handleSubmit} backgroundColor={'#FF4E83'}>
-                    <Text color={'#fff'}>Submit</Text>
+                    <HStack space={1}>
+                      <MaterialIcons
+                        name="add-business"
+                        size={24}
+                        color="white"
+                      />
+                      <Text
+                        color={'#fff'}
+                        fontSize={17}
+                        fontWeight={'bold'}
+                        fontFamily={'Poppins-Regular'}>
+                        Submit
+                      </Text>
+                    </HStack>
                   </Button>
                 </HStack>
               </Stack>
