@@ -1,10 +1,25 @@
 import {createContext, useContext, useState, useEffect} from 'react';
 import {onAuthStateChanged, updateProfile} from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {auth} from '../utilities/firebase';
 const AuthContext = createContext();
 
 export const AuthProvider = ({children}) => {
   const [user, setUser] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+
+  const getUserRole = async () => {
+    try {
+      const value = await AsyncStorage.getItem('user');
+      if (value !== null) {
+        const val = JSON.parse(value);
+        setUserRole(val.userRole);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, user => {
       if (user) {
@@ -26,9 +41,16 @@ export const AuthProvider = ({children}) => {
       displayName: displayName,
       photoURL: photoURL,
     });
+
+    getUserRole();
+
     return unsubscribe;
   }, [user]);
 
-  return <AuthContext.Provider value={{user}}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{user, userRole}}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 export const useAuth = () => useContext(AuthContext);

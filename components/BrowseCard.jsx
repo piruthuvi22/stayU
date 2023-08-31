@@ -5,7 +5,12 @@ import {Client} from '@googlemaps/google-maps-services-js';
 import Constants from 'expo-constants';
 import {useFocusEffect} from '@react-navigation/native';
 import {useAuth} from '../utilities/context';
-import {FontAwesome, MaterialIcons, Ionicons} from '@expo/vector-icons';
+import {
+  FontAwesome,
+  MaterialIcons,
+  Ionicons,
+  MaterialCommunityIcons,
+} from '@expo/vector-icons';
 import axios from 'axios';
 import env from '../env';
 
@@ -21,15 +26,26 @@ const BrowseCard = ({
   status,
   _id,
 }) => {
-  const {user} = useAuth();
+  const {user, userRole} = useAuth();
   const [distTime, setDistTime] = useState([]);
-  const [userRole, setUserRole] = useState('');
-  const getUserRole = () => {
-    const email = user?.email;
+
+  const [availableNotification, setAvailableNotification] = useState(false);
+
+  const availableNotificationHandler = () => {
     axios
-      .get(env.api + '/users/getUserRole', {params: {email}})
+      .get(env.api + '/reservation/getAvailableNotification', {
+        params: {email: user?.email, placeId: _id},
+      })
       .then(res => {
-        setUserRole(res.data);
+        console.log(res.data);
+        setAvailableNotification(res.data);
+        console.log(
+          userRole,
+          'Available: ',
+          availableNotification,
+          _id,
+          user?.email,
+        );
       })
       .catch(err => {
         console.log(err);
@@ -37,10 +53,9 @@ const BrowseCard = ({
   };
   useFocusEffect(
     useCallback(() => {
-      getUserRole();
+      userRole === 'student' && availableNotificationHandler();
     }, []),
   );
-
   useEffect(() => {
     const client = new Client({});
 
@@ -95,6 +110,7 @@ const BrowseCard = ({
             Facilities,
             Coordinates,
             uniLocation,
+            status,
           })
         }>
         <Row>
@@ -109,6 +125,7 @@ const BrowseCard = ({
                   Rating,
                   Facilities,
                   PlaceDescription,
+                  status,
                   uniLocation,
                 })
               }>
@@ -168,21 +185,27 @@ const BrowseCard = ({
               {Rating}
             </Badge>
 
-            {(status === 'PENDING' || status === 'RESERVED') &&
-              userRole === 'landlord' && (
+            {userRole === 'landlord' &&
+              (status === 'PENDING' ? (
                 <HStack style={styles.pendingContainer}>
-                  <Ionicons name="ios-lock-closed" size={24} color="#a0044d" />
-                  {status === 'PENDING' && (
-                    <Text
-                      style={{
-                        marginTop: 6,
-                        color: '#a0044d',
-                        fontWeight: 'bold',
-                      }}>
-                      PENDING
-                    </Text>
-                  )}
-                  {status === 'RESERVED' && (
+                  <Ionicons name="lock-open" size={24} color="#a0044d" />
+                  <Text
+                    style={{
+                      marginTop: 6,
+                      color: '#a0044d',
+                      fontWeight: 'bold',
+                    }}>
+                    PENDING
+                  </Text>
+                </HStack>
+              ) : (
+                status === 'RESERVED' && (
+                  <HStack style={styles.pendingContainer}>
+                    <Ionicons
+                      name="ios-lock-closed"
+                      size={24}
+                      color="#a0044d"
+                    />
                     <Text
                       style={{
                         marginTop: 6,
@@ -191,15 +214,29 @@ const BrowseCard = ({
                       }}>
                       RESERVED
                     </Text>
-                  )}
+                  </HStack>
+                )
+              ))}
+            {userRole === 'student' &&
+              (availableNotification ? (
+                <HStack style={styles.pendingContainer}>
+                  <MaterialCommunityIcons
+                    name="sticker-check"
+                    size={24}
+                    color="#a0044d"
+                  />
                 </HStack>
-              )}
-            {(status === 'PENDING' || status === 'RESERVED') &&
-              userRole === 'student' && (
+              ) : status === 'RESERVED' ? (
                 <HStack style={styles.pendingContainer}>
                   <Ionicons name="ios-lock-closed" size={24} color="#a0044d" />
                 </HStack>
-              )}
+              ) : (
+                status === 'PENDING' && (
+                  <HStack style={styles.pendingContainer}>
+                    <Ionicons name="lock-open" size={24} color="#a0044d" />
+                  </HStack>
+                )
+              ))}
           </Row>
         </Row>
       </Pressable>

@@ -158,7 +158,7 @@ const Browse = ({navigation}) => {
             style={{zIndex: 500}}
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#FF754E', '#fff']}
+            colors={['#FF4E83', '#fff']}
             progressBackgroundColor={'#223343'}
           />
         }>
@@ -237,7 +237,7 @@ const Browse = ({navigation}) => {
               shadow={3}
               placement="bottom-right"
               icon={
-                <Icon color="#FF754E" as={Entypo} name="location" size="19" />
+                <Icon color="#FF4E83" as={Entypo} name="location" size="19" />
               }
             />
           </Box>

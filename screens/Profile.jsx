@@ -15,7 +15,7 @@ import {
   AddIcon,
   KeyboardAvoidingView,
 } from 'native-base';
-import {Feather} from '@expo/vector-icons';
+import {Feather, MaterialIcons} from '@expo/vector-icons';
 import {View, Dimensions} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {auth} from '../utilities/firebase';
@@ -26,7 +26,6 @@ import env from '../env';
 import showToast from '../components/core/toast';
 
 const Profile = ({navigation}) => {
-  const {user} = useAuth();
   const toast = useToast();
   const [show, setShow] = useState(false);
   const [displayName, setDisplayName] = useState('');
@@ -39,7 +38,8 @@ const Profile = ({navigation}) => {
   const handleSignOut = async () => {
     try {
       signOut(auth)
-        .then(() => {
+        .then(async () => {
+          await AsyncStorage.removeItem('user');
           navigation.navigate('get-start');
         })
         .catch(error => {
@@ -250,6 +250,7 @@ const Profile = ({navigation}) => {
           </Button>
         </Center>
         <View style={{width: '20%', marginLeft: 3}}>
+          <MaterialIcons name="logout" size={24} color="white" />
           <Button onPress={handleSignOut} style={{backgroundColor: 'red'}}>
             Logout
           </Button>

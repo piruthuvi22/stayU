@@ -57,11 +57,15 @@ const RenterLogin = ({navigation, route}) => {
     let body = {email, password, role: 'renter'};
 
     signInWithEmailAndPassword(auth, email, password)
-      .then(userCredential => {
+      .then(async userCredential => {
         const emailVerified = userCredential?.user?.emailVerified;
-        emailVerified
-          ? navigation.navigate('TabNavigator', {screen: 'Browse'})
-          : showToast(toast, 'warning', 'Please Verify Email!');
+        if (emailVerified) {
+          const user = {email: email, userRole: route?.params?.userRole};
+          await AsyncStorage.setItem('user', JSON.stringify(user));
+          navigation.navigate('TabNavigator', {screen: 'Browse'});
+        } else {
+          showToast(toast, 'warning', 'Please Verify Email!');
+        }
       })
       .catch(error => {
         const errorMessage = error?.message?.split('/')[1]?.split(')')[0];
