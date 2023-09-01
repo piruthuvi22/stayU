@@ -39,62 +39,54 @@ const BrowseCard = ({
       .then(res => {
         console.log(res.data);
         setAvailableNotification(res.data);
-        console.log(
-          userRole,
-          'Available: ',
-          availableNotification,
-          _id,
-          user?.email,
-        );
       })
       .catch(err => {
         console.log(err);
       });
   };
-  useFocusEffect(
-    useCallback(() => {
-      userRole === 'student' && availableNotificationHandler();
-    }, []),
-  );
+
   useEffect(() => {
-    const client = new Client({});
+    if (userRole === 'student') {
+      const client = new Client({});
 
-    const calculateDistance = async () => {
-      try {
-        let response = await client.distancematrix({
-          params: {
-            key: 'AIzaSyCz5aHnnwPi7R_v65PASfRLikJ5VVA8Ytc',
-            origins: [uniLocation],
-            destinations: [
-              {
-                latitude: Coordinates.Latitude,
-                longitude: Coordinates.Longitude,
-              },
-            ],
-            mode: 'walking',
-            language: 'en',
-            units: 'metric',
-          },
-        });
+      const calculateDistance = async () => {
+        try {
+          let response = await client.distancematrix({
+            params: {
+              key: 'AIzaSyCz5aHnnwPi7R_v65PASfRLikJ5VVA8Ytc',
+              origins: [uniLocation],
+              destinations: [
+                {
+                  latitude: Coordinates.Latitude,
+                  longitude: Coordinates.Longitude,
+                },
+              ],
+              mode: 'walking',
+              language: 'en',
+              units: 'metric',
+            },
+          });
 
-        //
-        // geolib.getDistance(
-        //   baseCoord,
-        //   {
-        //     latitude: res.Coordinates.Latitude,
-        //     longitude: res.Coordinates.Longitude,
-        //   },
-        //   0.1,
-        // ),
-        setDistTime([
-          response.data?.rows[0].elements[0].distance.text,
-          response.data?.rows[0].elements[0].duration.text,
-        ]);
-      } catch (error) {
-        throw new Error(error);
-      }
-    };
-    uniLocation && calculateDistance();
+          //
+          // geolib.getDistance(
+          //   baseCoord,
+          //   {
+          //     latitude: res.Coordinates.Latitude,
+          //     longitude: res.Coordinates.Longitude,
+          //   },
+          //   0.1,
+          // ),
+          setDistTime([
+            response.data?.rows[0].elements[0].distance.text,
+            response.data?.rows[0].elements[0].duration.text,
+          ]);
+          availableNotificationHandler();
+        } catch (error) {
+          throw new Error(error);
+        }
+      };
+      uniLocation && calculateDistance();
+    }
   }, [uniLocation ? uniLocation : null]);
 
   return (
@@ -223,7 +215,7 @@ const BrowseCard = ({
                   <MaterialCommunityIcons
                     name="sticker-check"
                     size={24}
-                    color="#a0044d"
+                    color="#04a256"
                   />
                 </HStack>
               ) : status === 'RESERVED' ? (

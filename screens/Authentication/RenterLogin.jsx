@@ -120,7 +120,7 @@ const RenterLogin = ({navigation, route}) => {
                 color={'#A0A0A0'}
                 fontFamily={'Poppins-Regular'}
                 fontSize={'md'}>
-                {route.params.userRole === 'landlord'
+                {route?.params?.userRole === 'landlord'
                   ? 'Showcase your rooms with us'
                   : 'Discover your boarding with us'}
               </Text>

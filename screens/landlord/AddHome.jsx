@@ -60,56 +60,6 @@ export default function AddHome({navigation, route}) {
   const {user} = useAuth();
   let {height, width} = Dimensions.get('screen');
 
-  const styles = StyleSheet.create({
-    searchContainer: {
-      position: 'absolute',
-      width: '100%',
-      backgroundColor: '#eee',
-      padding: 5,
-    },
-    head: {
-      fontFamily: 'Poppins-Regular',
-      fontSize: 16,
-      color: '#5C5A6F',
-    },
-    currentLocation: {
-      fontFamily: 'Poppins-Medium',
-      fontSize: 13,
-      color: '#A0A0A0',
-    },
-
-    fabBtn: {
-      backgroundColor: '#223343',
-      borderWidth: 1,
-      borderColor: '#FF4E83',
-    },
-    container: {
-      flex: 1,
-      backgroundColor: '#fff',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-
-    categoryTitle: {
-      fontSize: 20,
-      color: '#FF4E83',
-      fontFamily: 'Poppins-Medium',
-    },
-    slideVal: {
-      color: '#737373',
-      fontFamily: 'Poppins-Medium',
-    },
-    filterValues: {
-      color: '#fff',
-      fontFamily: 'Poppins-Medium',
-      fontSize: 14,
-    },
-    buttonContainer: {
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-  });
-
   const requestCameraPermission = async () => {
     if (Platform.OS === 'android') {
       try {
@@ -334,7 +284,7 @@ export default function AddHome({navigation, route}) {
           console.log(res.data);
           showToast(toast, 'success', 'Successfully added!');
           setTitle('');
-          etDescription('');
+          setDescription('');
           setRent('');
           setRoomType('');
           setFacilitiesValue([]);
@@ -740,3 +690,53 @@ export default function AddHome({navigation, route}) {
     </KeyboardAvoidingView>
   );
 }
+
+const styles = StyleSheet.create({
+  searchContainer: {
+    position: 'absolute',
+    width: '100%',
+    backgroundColor: '#eee',
+    padding: 5,
+  },
+  head: {
+    fontFamily: 'Poppins-Regular',
+    fontSize: 16,
+    color: '#5C5A6F',
+  },
+  currentLocation: {
+    fontFamily: 'Poppins-Medium',
+    fontSize: 13,
+    color: '#A0A0A0',
+  },
+
+  fabBtn: {
+    backgroundColor: '#223343',
+    borderWidth: 1,
+    borderColor: '#FF4E83',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  categoryTitle: {
+    fontSize: 20,
+    color: '#FF4E83',
+    fontFamily: 'Poppins-Medium',
+  },
+  slideVal: {
+    color: '#737373',
+    fontFamily: 'Poppins-Medium',
+  },
+  filterValues: {
+    color: '#fff',
+    fontFamily: 'Poppins-Medium',
+    fontSize: 14,
+  },
+  buttonContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
