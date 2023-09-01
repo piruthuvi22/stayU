@@ -25,9 +25,9 @@ import Comment from '../components/Comment';
 import axios from 'axios';
 import env from '../env';
 import {FacilitiesDetails} from '../components/Facilities';
-import {useAuth} from '../utilities/context';
 import {useFocusEffect} from '@react-navigation/native';
 import showToast from '../components/core/toast';
+import {useAuth} from '../utilities/context';
 // import ImageSlider from "react-native-image-slider";
 
 const Details = ({navigation, route}) => {
@@ -87,6 +87,7 @@ const Details = ({navigation, route}) => {
         },
       })
       .then(res => {
+        console.log(res.data);
         setLandlord(res.data);
       })
       .catch(err => console.log(err));
@@ -104,21 +105,24 @@ const Details = ({navigation, route}) => {
       .catch(err => console.log(err));
   };
   useEffect(() => {
-    getStudent();
-    getLandlord();
-    console.log('Details');
-    axios
-      .get(env.api + '/wish-list/get-status', {
-        params: {
-          placeId: _id,
-          userEmail: user?.email,
-        },
-      })
-      .then(res => {
-        // console.log(res.data.status);
-        res.data.status ? setIsSaved(true) : setIsSaved(false);
-      })
-      .catch(err => console.log(err));
+    console.log('Details:', userRole);
+    if (userRole === 'student') {
+      getLandlord();
+      axios
+        .get(env.api + '/wish-list/get-status', {
+          params: {
+            placeId: _id,
+            userEmail: user?.email,
+          },
+        })
+        .then(res => {
+          // console.log(res.data.status);
+          res.data.status ? setIsSaved(true) : setIsSaved(false);
+        })
+        .catch(err => console.log(err));
+    } else {
+      getStudent();
+    }
   }, []);
 
   const handleSave = () => {
@@ -142,6 +146,7 @@ const Details = ({navigation, route}) => {
         UserEmail: user?.email,
       })
       .then(res => {
+        console.log(res);
         showToast(toast, 'success', 'Reservation Requested');
         navigation.navigate('Browse');
       })
@@ -255,7 +260,7 @@ const Details = ({navigation, route}) => {
                 <Ionicons
                   name={isSaved ? 'bookmarks' : 'bookmarks-outline'}
                   size={25}
-                  color="#F24E1E"
+                  color="#FF4E83"
                 />
               </Pressable>
             )}
