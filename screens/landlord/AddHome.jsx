@@ -35,7 +35,12 @@ import React, {useState, useEffect} from 'react';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {storage} from '../../utilities/firebase';
-import {ref, getDownloadURL, uploadBytesResumable} from 'firebase/storage';
+import {
+  ref,
+  getDownloadURL,
+  uploadBytesResumable,
+  uploadBytes,
+} from 'firebase/storage';
 import {v4 as uuid} from 'uuid';
 import axios from 'axios';
 import env from '../../env';
@@ -194,7 +199,7 @@ export default function AddHome({navigation, route}) {
     };
 
     launchImageLibrary(options, response => {
-      console.log('Response = ', response);
+      // console.log('Response = ', response);
 
       if (response.didCancel) {
         alert('User cancelled camera picker');
@@ -216,7 +221,7 @@ export default function AddHome({navigation, route}) {
       };
       setImageDetails([...imageDetails, details]);
       const filePath = response?.assets[0]?.uri;
-      fireStoreUpload(filePath);
+      fireStoreUpload(response);
       const newImages = [...images, response?.assets[0]?.uri];
       setImages([...images, response?.assets[0]?.uri]);
       // storeImages(newImages);
@@ -229,53 +234,80 @@ export default function AddHome({navigation, route}) {
   //     console.log(e);
   //   }
   // };
+  uriToBlob = uri => {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        // return the blob
+        resolve(xhr.response);
+      };
+
+      xhr.onerror = function () {
+        // something went wrong
+        reject(new Error('uriToBlob failed'));
+      };
+      // this helps us get a blob
+      xhr.responseType = 'blob';
+      xhr.open('GET', uri, true);
+
+      xhr.send(null);
+    });
+  };
+
   const fireStoreUpload = async fireStoreImage => {
     const metadata = {
       contentType: 'image/jpeg',
     };
-    const storageRef = ref(storage, 'landlordImages/' + fireStoreImage);
-    const uploadTask = uploadBytesResumable(
-      storageRef,
-      fireStoreImage,
-      metadata,
+    const storageRef = ref(
+      storage,
+      'landlordImages/' + 'user1/' + fireStoreImage?.assets[0]?.fileName,
     );
-    uploadTask.on(
-      'state_changed',
-      snapshot => {
-        const progress =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log('Upload is ' + progress + '% done');
-        switch (snapshot.state) {
-          case 'paused':
-            console.log('Upload is paused');
-            break;
-          case 'running':
-            console.log('Upload is running');
-            break;
-        }
-      },
-      error => {
-        switch (error.code) {
-          case 'storage/unauthorized':
-            // User doesn't have permission to access the object
-            console.log("User doesn't have permission to access the object");
-            break;
-          case 'storage/canceled':
-            // User canceled the upload
-            console.log('User canceled the upload');
-            break;
-          case 'storage/unknown':
-            // Unknown error occurred, inspect error.serverResponse
-            console.log('Unknown error occurred, inspect error.serverResponse');
-            break;
-        }
-      },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then(downloadURL => {
+    let blob = await uriToBlob(fireStoreImage?.assets[0]?.uri);
+    const uploadTask = uploadBytes(storageRef, blob)
+      .then(snapshot => {
+        getDownloadURL(snapshot.ref).then(downloadURL => {
           console.log('File available at', downloadURL);
         });
-      },
-    );
+      })
+      .catch(err => console.log(err));
+
+    // uploadTask.on(
+    //   'state_changed',
+    //   snapshot => {
+    //     const progress =
+    //       (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    //     console.log('Upload is ' + progress + '% done');
+    //     switch (snapshot.state) {
+    //       case 'paused':
+    //         console.log('Upload is paused');
+    //         break;
+    //       case 'running':
+    //         console.log('Upload is running');
+    //         break;
+    //     }
+    //   },
+    //   error => {
+    //     switch (error.code) {
+    //       case 'storage/unauthorized':
+    //         // User doesn't have permission to access the object
+    //         console.log("User doesn't have permission to access the object");
+    //         break;
+    //       case 'storage/canceled':
+    //         // User canceled the upload
+    //         console.log('User canceled the upload');
+    //         break;
+    //       case 'storage/unknown':
+    //         // Unknown error occurred, inspect error.serverResponse
+    //         console.log('Unknown error occurred, inspect error.serverResponse');
+    //         break;
+    //     }
+    //   },
+    //   () => {
+    //     getDownloadURL(uploadTask.snapshot.ref).then(downloadURL => {
+    //       console.log('File available at', downloadURL);
+    //     });
+    //   },
+    // );
   };
 
   // const getImages = async () => {
