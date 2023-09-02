@@ -115,7 +115,7 @@ export const LocationPicker = ({navigation, route}) => {
             {locationName ? locationName : 'Select a location'}
           </Text>
           <IconButton
-            icon={<Icon as={MaterialIcons} name="done" color="#FF754E" />}
+            icon={<Icon as={MaterialIcons} name="done" color="#FF4E83" />}
             borderRadius="full"
             size={'lg'}
             style={styles.fabBtn}
@@ -168,7 +168,7 @@ export const LocationPicker = ({navigation, route}) => {
         shadow={3}
         placement="bottom-right"
         icon={
-          <Icon color="#FF754E" as={MaterialIcons} name="gps-fixed" size="19" />
+          <Icon color="#FF4E83" as={MaterialIcons} name="gps-fixed" size="19" />
         }
       />
     </Box>

@@ -13,13 +13,14 @@ const LandlordHome = ({navigation}) => {
   const {user} = useAuth();
   const [places, setPlaces] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
+
   const getPlaces = () => {
     axios
       .get(env.api + '/places/get-uploaded-places', {
         params: {email: user?.email},
       })
       .then(res => {
-        console.log('places:', res.data);
+        console.log(res.data.length);
         if (res.data.length > 0) {
           setPlaces(res.data);
         } else {
@@ -27,16 +28,13 @@ const LandlordHome = ({navigation}) => {
         }
       })
       .catch(err => {
+        console.log(err);
         setErrorMessage('Something went wrong');
       });
   };
   useFocusEffect(
     useCallback(() => {
       getPlaces();
-      return () => {
-        // Code to clean up when the screen loses focus (optional)
-        console.log('Screen has lost focus');
-      };
     }, []),
   );
   return (
@@ -52,21 +50,22 @@ const LandlordHome = ({navigation}) => {
           mx={3}>
           {places.map(place => (
             <BrowseCard
-              key={place._id}
-              Rating={place.Rating}
-              PlaceTitle={place.PlaceTitle}
-              PlaceDescription={place.PlaceDescription}
+              key={place?._id}
+              Rating={place?.Rating}
+              PlaceTitle={place?.PlaceTitle}
+              PlaceDescription={place?.PlaceDescription}
               Facilities={{
-                WashRoomType: place.Facilities.WashRoomType,
-                Facilities: place.Facilities.Facilities,
-                OfferingMeals: place.Facilities.OfferingMeals,
-                NoOfBeds: place.Facilities.NoOfBeds,
-                Payment: place.Facilities.Payment,
-                RoomType: place.Facilities.RoomType,
+                WashRoomType: place?.Facilities?.WashRoomType,
+                Facilities: place?.Facilities?.Facilities,
+                OfferingMeals: place?.Facilities?.OfferingMeals,
+                NoOfBeds: place?.Facilities?.NoOfBeds,
+                Payment: place?.Facilities?.Payment,
+                RoomType: place?.Facilities?.RoomType,
               }}
-              Cost={place.Cost}
+              Cost={place?.Cost}
               navigation={navigation}
-              status={place.status}
+              status={place?.status}
+              _id={place?._id}
             />
           ))}
         </ScrollView>
@@ -113,6 +112,6 @@ const styles = StyleSheet.create({
   fabBtn: {
     backgroundColor: '#223343',
     borderWidth: 1,
-    borderColor: '#FF754E',
+    borderColor: '#FF4E83',
   },
 });

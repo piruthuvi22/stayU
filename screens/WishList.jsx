@@ -79,7 +79,7 @@ const WishList = ({navigation}) => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#FF754E', '#fff']}
+            colors={['#FF4E83', '#fff']}
             progressBackgroundColor={'#223343'}
           />
         }>

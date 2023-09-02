@@ -5,10 +5,10 @@ import {
   Center,
   Divider,
   HStack,
-  Image,
   VStack,
   Actionsheet,
   useDisclose,
+  useToast,
 } from 'native-base';
 import {Rating, AirbnbRating} from 'react-native-ratings';
 import {
@@ -20,16 +20,17 @@ import {
   View,
 } from 'react-native';
 import {SliderBox} from 'react-native-image-slider-box';
-import {AntDesign, Ionicons} from '@expo/vector-icons';
+import {AntDesign, Ionicons, MaterialCommunityIcons} from '@expo/vector-icons';
 import Comment from '../components/Comment';
 import axios from 'axios';
 import env from '../env';
 import {FacilitiesDetails} from '../components/Facilities';
-import {useAuth} from '../utilities/context';
 import {useFocusEffect} from '@react-navigation/native';
+import showToast from '../components/core/toast';
+import {useAuth} from '../utilities/context';
 // import ImageSlider from "react-native-image-slider";
 
-const Details = ({route}) => {
+const Details = ({navigation, route}) => {
   const {
     _id,
     PlaceTitle,
@@ -38,9 +39,11 @@ const Details = ({route}) => {
     Rating,
     Facilities,
     uniLocation,
+    status,
     Coordinates,
   } = route.params;
   const [isSaved, setIsSaved] = useState(false);
+  const toast = useToast();
   const [images, setImages] = useState([
     'https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014__340.jpg',
     'https://images.pexels.com/photos/15286/pexels-photo.jpg?cs=srgb&dl=pexels-luis-del-r%C3%ADo-15286.jpg&fm=jpg',
@@ -58,20 +61,10 @@ const Details = ({route}) => {
     onOpen: onOpenFaci,
     onClose: onCloseFaci,
   } = useDisclose();
-  const {user} = useAuth();
-  const [userRole, setUserRole] = useState('');
+  const {user, userRole} = useAuth();
+  const [landlord, setLandlord] = useState({});
 
-  const getUserRole = () => {
-    const email = user?.email;
-    axios
-      .get(env.api + '/users/getUserRole', {params: {email}})
-      .then(res => {
-        setUserRole(res.data);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
+  const [student, setStudent] = useState({});
 
   // useFocusEffect(
   //   useCallback(() => {
@@ -86,29 +79,57 @@ const Details = ({route}) => {
   //     };
   //   }, []),
   // );
-
-  useEffect(() => {
-    getUserRole();
-    console.log('Details');
+  const getLandlord = () => {
     axios
-      .get(env.api + '/wish-list/get-status', {
+      .get(env.api + '/users/getLandlord', {
         params: {
           placeId: _id,
-          userId: 'user1',
         },
       })
       .then(res => {
-        // console.log(res.data.status);
-        res.data.status ? setIsSaved(true) : setIsSaved(false);
+        console.log(res.data);
+        setLandlord(res.data);
       })
       .catch(err => console.log(err));
-  }, [_id]);
+  };
+  const getStudent = () => {
+    axios
+      .get(env.api + '/users/getStudent', {
+        params: {
+          placeId: _id,
+        },
+      })
+      .then(res => {
+        setStudent(res.data);
+      })
+      .catch(err => console.log(err));
+  };
+  useEffect(() => {
+    console.log('Details:', userRole);
+    if (userRole === 'student') {
+      getLandlord();
+      axios
+        .get(env.api + '/wish-list/get-status', {
+          params: {
+            placeId: _id,
+            userEmail: user?.email,
+          },
+        })
+        .then(res => {
+          // console.log(res.data.status);
+          res.data.status ? setIsSaved(true) : setIsSaved(false);
+        })
+        .catch(err => console.log(err));
+    } else {
+      getStudent();
+    }
+  }, []);
 
   const handleSave = () => {
     axios
       .post(env.api + '/wish-list/add-remove-wishlist', {
         placeId: _id,
-        userId: 'user1',
+        userEmail: user?.email,
       })
       .then(res => {
         console.log(res.data);
@@ -117,17 +138,56 @@ const Details = ({route}) => {
       .catch(err => console.log(err));
   };
 
-  const handleReserve = async () => {
-    try {
-      let response = await axios.post(env.api + '/reservation/new/', {
+  const handleReserve = () => {
+    console.log('Reserve', _id, user?.email);
+    axios
+      .post(env.api + '/reservation/new', {
         PlaceId: _id,
-        Username: 'user1',
-      });
-      console.log('Reservation Done', response.data);
-    } catch (error) {
-      console.log('error', error.response.data.msg);
-    }
+        UserEmail: user?.email,
+      })
+      .then(res => {
+        console.log(res);
+        showToast(toast, 'success', 'Reservation Requested');
+        navigation.navigate('Browse');
+      })
+      .catch(err => console.log(err));
   };
+  const handleAccept = () => {
+    axios
+      .put(env.api + '/reservation/accepted', {
+        PlaceId: _id,
+      })
+      .then(res => {
+        showToast(toast, 'success', 'Reservation Accepted');
+        navigation.navigate('home-landlord');
+      })
+      .catch(err => console.log(err));
+  };
+  const handleReject = () => {
+    axios
+      .put(env.api + '/reservation/rejected', {
+        PlaceId: _id,
+      })
+      .then(res => {
+        showToast(toast, 'success', 'Reservation Rejected');
+        navigation.navigate('home-landlord');
+      })
+      .catch(err => console.log(err));
+  };
+
+  const handleAvailable = () => {
+    axios
+      .put(env.api + '/reservation/available', {
+        PlaceId: _id,
+      })
+      .then(res => {
+        console.log(res.data);
+        showToast(toast, 'success', 'Place is now available');
+        navigation.navigate('home-landlord');
+      })
+      .catch(err => console.log(err));
+  };
+
   return (
     <Box h={'full'}>
       <HStack
@@ -164,14 +224,18 @@ const Details = ({route}) => {
 
         {/* Images */}
         <Box px={3} pt={2}>
-          <SliderBox images={images} sliderBoxHeight={200} />
+          <SliderBox images={images} sliderBoxHeight={200} parentWidth={337} />
         </Box>
 
         {/* Cost & Add to wishlist */}
         <HStack justifyContent={'space-between'} alignItems="baseline" px={3}>
           <HStack alignItems="baseline">
             <Text style={styles.money}>Rs. {Cost}/</Text>
-            <Text style={styles.month}>Month</Text>
+            <Text style={styles.month}>
+              {Facilities?.Payment?.toLowerCase() === 'monthly'
+                ? 'Month'
+                : 'Year'}
+            </Text>
           </HStack>
           <HStack alignItems="center" justifyContent="space-evenly">
             {/* <Pressable
@@ -196,7 +260,7 @@ const Details = ({route}) => {
                 <Ionicons
                   name={isSaved ? 'bookmarks' : 'bookmarks-outline'}
                   size={25}
-                  color="#F24E1E"
+                  color="#FF4E83"
                 />
               </Pressable>
             )}
@@ -204,6 +268,73 @@ const Details = ({route}) => {
         </HStack>
 
         <Divider />
+        {userRole === 'student' && (
+          <>
+            <Text style={styles.userTitle}>Landlord</Text>
+            <Box
+              style={{paddingStart: 25, flexWrap: 'wrap', paddingBottom: 10}}>
+              <HStack>
+                <AntDesign name="user" size={17} color="black" />
+                <Text style={styles.landlordSubtitle}>
+                  {landlord?.displayName}
+                </Text>
+              </HStack>
+              <HStack>
+                <MaterialCommunityIcons
+                  name="email-outline"
+                  size={17}
+                  color="black"
+                />
+                <Text style={styles.landlordSubtitle}>{landlord?.email}</Text>
+              </HStack>
+
+              <HStack>
+                <MaterialCommunityIcons
+                  name="phone-outline"
+                  size={17}
+                  color="black"
+                />
+                <Text style={styles.landlordSubtitle}>
+                  {landlord?.phoneNumber}
+                </Text>
+              </HStack>
+            </Box>
+          </>
+        )}
+        {userRole === 'landlord' &&
+          (status === 'PENDING' || status === 'RESERVED') && (
+            <>
+              <Text style={styles.userTitle}>Student</Text>
+              <Box
+                style={{paddingStart: 25, flexWrap: 'wrap', paddingBottom: 10}}>
+                <HStack>
+                  <AntDesign name="user" size={24} color="black" />
+                  <Text style={styles.landlordSubtitle}>
+                    {student?.displayName}
+                  </Text>
+                </HStack>
+                <HStack>
+                  <MaterialCommunityIcons
+                    name="email-outline"
+                    size={24}
+                    color="black"
+                  />
+                  <Text style={styles.landlordSubtitle}>{student?.email}</Text>
+                </HStack>
+
+                <HStack>
+                  <MaterialCommunityIcons
+                    name="phone-outline"
+                    size={24}
+                    color="black"
+                  />
+                  <Text style={styles.landlordSubtitle}>
+                    {student?.phoneNumber}
+                  </Text>
+                </HStack>
+              </Box>
+            </>
+          )}
 
         {/* Facilities bar */}
         {/* <HStack
@@ -214,7 +345,7 @@ const Details = ({route}) => {
           justifyContent={'space-between'}>
           <Text style={styles.location}>Faclities</Text>
         </HStack> */}
-
+        <Divider />
         {/* Facilities */}
         <FacilitiesDetails info={route.params} />
 
@@ -269,8 +400,8 @@ const Details = ({route}) => {
       </Actionsheet>
 
       {/* Bottom bar */}
-      <Box style={styles.bottomBar}>
-        {userRole === 'student' ? (
+      {userRole === 'student' ? (
+        <Box style={styles.bottomBar}>
           <HStack
             alignItems={'center'}
             h="full"
@@ -280,18 +411,14 @@ const Details = ({route}) => {
             <Button
               mx={2}
               px={6}
-              style={styles.compare}
-              borderRadius={5}
-              _text={{
-                style: {color: '#FD683D', fontFamily: 'Poppins-Medium'},
-              }}
-              android_ripple={{color: '#ffffff55'}}>
-              Compare
-            </Button>
-            <Button
-              mx={2}
-              px={6}
-              style={styles.reserve}
+              style={
+                status === 'RESERVED' || status === 'PENDING'
+                  ? styles.disabled
+                  : styles.reserve
+              }
+              disabled={
+                status === 'RESERVED' || status === 'PENDING' ? true : false
+              }
               borderRadius={5}
               _text={{style: {color: '#fff', fontFamily: 'Poppins-Medium'}}}
               android_ripple={{color: '#ffffff55'}}
@@ -299,7 +426,9 @@ const Details = ({route}) => {
               Reserve
             </Button>
           </HStack>
-        ) : (
+        </Box>
+      ) : userRole === 'landlord' && status === 'PENDING' ? (
+        <Box style={styles.bottomBar}>
           <HStack
             alignItems={'center'}
             h="full"
@@ -313,7 +442,7 @@ const Details = ({route}) => {
               borderRadius={5}
               _text={{style: {color: '#fff', fontFamily: 'Poppins-Medium'}}}
               android_ripple={{color: '#ffffff55'}}
-              onPress={handleReserve}>
+              onPress={handleReject}>
               Reject
             </Button>
             <Button
@@ -323,12 +452,35 @@ const Details = ({route}) => {
               borderRadius={5}
               _text={{style: {color: '#fff', fontFamily: 'Poppins-Medium'}}}
               android_ripple={{color: '#ffffff55'}}
-              onPress={handleReserve}>
+              onPress={handleAccept}>
               Accept
             </Button>
           </HStack>
-        )}
-      </Box>
+        </Box>
+      ) : (
+        userRole === 'landlord' &&
+        status === 'RESERVED' && (
+          <Box style={styles.bottomBar}>
+            <HStack
+              alignItems={'center'}
+              h="full"
+              justifyContent={'flex-end'}
+              px={3}
+              w="full">
+              <Button
+                mx={2}
+                px={6}
+                style={styles.available}
+                borderRadius={5}
+                _text={{style: {color: '#fff', fontFamily: 'Poppins-Medium'}}}
+                android_ripple={{color: '#ffffff55'}}
+                onPress={handleAvailable}>
+                Available
+              </Button>
+            </HStack>
+          </Box>
+        )
+      )}
     </Box>
   );
 };
@@ -377,13 +529,24 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   reserve: {
-    backgroundColor: '#FD683D',
-    borderColor: '#FD683D',
+    backgroundColor: '#ff638f',
+    borderColor: '#f74c7d',
+    borderWidth: 1,
+  },
+  disabled: {
+    backgroundColor: '#f9a7be',
+    borderColor: '#fc97b4',
+    color: '#000',
     borderWidth: 1,
   },
   accept: {
     backgroundColor: '#04a256',
     borderColor: '#027f43',
+    borderWidth: 1,
+  },
+  available: {
+    backgroundColor: '#ff638f',
+    borderColor: '#f74c7d',
     borderWidth: 1,
   },
   reject: {
@@ -411,6 +574,20 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-SemiBold',
     fontSize: 16,
     color: '#666',
+  },
+  userTitle: {
+    fontFamily: 'Poppins-SemiBold',
+    fontSize: 16,
+    color: '#ff638f',
+    paddingTop: 10,
+    paddingStart: 10,
+    marginStart: 8,
+  },
+  landlordSubtitle: {
+    fontFamily: 'Poppins-Regular',
+    fontSize: 14,
+    color: '#666',
+    marginTop: 3,
   },
 });
 export default Details;

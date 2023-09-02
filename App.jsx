@@ -119,7 +119,7 @@ export default function App() {
                 />
               );
             },
-            headerStyle: {backgroundColor: '#FF754E'},
+            headerStyle: {backgroundColor: '#FF4E83'},
             title: route.params?.name || 'Details',
             tabBarStyle: {
               display: 'none',
