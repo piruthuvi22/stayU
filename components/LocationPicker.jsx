@@ -26,7 +26,7 @@ import AutoComplete from '../components/AutoComplete';
 
 import {MaterialIcons} from '@expo/vector-icons';
 import {useLocation} from '../hooks/useLocation';
-import {findAddress} from './findLocation';
+import {findAddress} from '../functions/findAddress';
 import showToast from './core/toast';
 
 const client = new Client({});

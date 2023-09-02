@@ -35,13 +35,19 @@ import React, {useState, useEffect} from 'react';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {storage} from '../../utilities/firebase';
-import {ref, getDownloadURL, uploadBytesResumable} from 'firebase/storage';
+import {
+  ref,
+  getDownloadURL,
+  uploadBytesResumable,
+  uploadBytes,
+} from 'firebase/storage';
 import {v4 as uuid} from 'uuid';
 import axios from 'axios';
 import env from '../../env';
 import showToast from '../../components/core/toast';
 import {NavigationContainer} from '@react-navigation/native';
 import {useAuth} from '../../utilities/context';
+import {ToastAndroid} from 'react-native';
 
 export default function AddHome({navigation, route}) {
   const [title, setTitle] = useState('');
@@ -141,22 +147,23 @@ export default function AddHome({navigation, route}) {
     let options = {
       mediaType: type,
       quality: 1,
+      selectionLimit: 6,
     };
 
     launchImageLibrary(options, response => {
       console.log('Response = ', response);
 
       if (response.didCancel) {
-        alert('User cancelled camera picker');
+        ToastAndroid.show('Cancelled by user', ToastAndroid.LONG);
         return;
       } else if (response.errorCode == 'camera_unavailable') {
-        alert('Camera not available on device');
+        ToastAndroid.show('Camera not available on device', ToastAndroid.LONG);
         return;
       } else if (response.errorCode == 'permission') {
-        alert('Permission not satisfied');
+        ToastAndroid.show('Permission not satisfied', ToastAndroid.LONG);
         return;
       } else if (response.errorCode == 'others') {
-        alert(response.errorMessage);
+        ToastAndroid.show(response.errorMessage, ToastAndroid.LONG);
         return;
       }
       const details = {
@@ -166,7 +173,7 @@ export default function AddHome({navigation, route}) {
       };
       setImageDetails([...imageDetails, details]);
       const filePath = response?.assets[0]?.uri;
-      fireStoreUpload(filePath);
+      fireStoreUpload(response);
       const newImages = [...images, response?.assets[0]?.uri];
       setImages([...images, response?.assets[0]?.uri]);
       // storeImages(newImages);
@@ -179,53 +186,80 @@ export default function AddHome({navigation, route}) {
   //     console.log(e);
   //   }
   // };
+  uriToBlob = uri => {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        // return the blob
+        resolve(xhr.response);
+      };
+
+      xhr.onerror = function () {
+        // something went wrong
+        reject(new Error('uriToBlob failed'));
+      };
+      // this helps us get a blob
+      xhr.responseType = 'blob';
+      xhr.open('GET', uri, true);
+
+      xhr.send(null);
+    });
+  };
+
   const fireStoreUpload = async fireStoreImage => {
     const metadata = {
       contentType: 'image/jpeg',
     };
-    const storageRef = ref(storage, 'landlordImages/' + fireStoreImage);
-    const uploadTask = uploadBytesResumable(
-      storageRef,
-      fireStoreImage,
-      metadata,
+    const storageRef = ref(
+      storage,
+      'landlordImages/' + 'user1/' + fireStoreImage?.assets[0]?.fileName,
     );
-    uploadTask.on(
-      'state_changed',
-      snapshot => {
-        const progress =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log('Upload is ' + progress + '% done');
-        switch (snapshot.state) {
-          case 'paused':
-            console.log('Upload is paused');
-            break;
-          case 'running':
-            console.log('Upload is running');
-            break;
-        }
-      },
-      error => {
-        switch (error.code) {
-          case 'storage/unauthorized':
-            // User doesn't have permission to access the object
-            console.log("User doesn't have permission to access the object");
-            break;
-          case 'storage/canceled':
-            // User canceled the upload
-            console.log('User canceled the upload');
-            break;
-          case 'storage/unknown':
-            // Unknown error occurred, inspect error.serverResponse
-            console.log('Unknown error occurred, inspect error.serverResponse');
-            break;
-        }
-      },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then(downloadURL => {
+    let blob = await uriToBlob(fireStoreImage?.assets[0]?.uri);
+    const uploadTask = uploadBytes(storageRef, blob)
+      .then(snapshot => {
+        getDownloadURL(snapshot.ref).then(downloadURL => {
           console.log('File available at', downloadURL);
         });
-      },
-    );
+      })
+      .catch(err => console.log(err));
+
+    // uploadTask.on(
+    //   'state_changed',
+    //   snapshot => {
+    //     const progress =
+    //       (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    //     console.log('Upload is ' + progress + '% done');
+    //     switch (snapshot.state) {
+    //       case 'paused':
+    //         console.log('Upload is paused');
+    //         break;
+    //       case 'running':
+    //         console.log('Upload is running');
+    //         break;
+    //     }
+    //   },
+    //   error => {
+    //     switch (error.code) {
+    //       case 'storage/unauthorized':
+    //         // User doesn't have permission to access the object
+    //         console.log("User doesn't have permission to access the object");
+    //         break;
+    //       case 'storage/canceled':
+    //         // User canceled the upload
+    //         console.log('User canceled the upload');
+    //         break;
+    //       case 'storage/unknown':
+    //         // Unknown error occurred, inspect error.serverResponse
+    //         console.log('Unknown error occurred, inspect error.serverResponse');
+    //         break;
+    //     }
+    //   },
+    //   () => {
+    //     getDownloadURL(uploadTask.snapshot.ref).then(downloadURL => {
+    //       console.log('File available at', downloadURL);
+    //     });
+    //   },
+    // );
   };
 
   // const getImages = async () => {
@@ -323,282 +357,280 @@ export default function AddHome({navigation, route}) {
           </Box> */}
           <VStack>
             <FormControl>
-              <Stack>
-                <Input
-                  _focus={{
-                    borderWidth: '2',
-                    borderColor: '#FF4E83',
-                    backgroundColor: '#FF4E83:alpha.5',
-                  }}
-                  InputLeftElement={
-                    <Icon
-                      as={<MaterialIcons name="title" />}
-                      size={5}
-                      ml="2"
-                      color="pink.400"
-                    />
-                  }
-                  type="text"
-                  defaultValue={''}
-                  value={title}
-                  placeholder="Title"
-                  backgroundColor={'#FF4E83:alpha.10'}
-                  borderColor={'#FF4E83'}
-                  focusOutlineColor={'red'}
-                  fontSize={'md'}
-                  color={'#666'}
-                  onChangeText={e => setTitle(e)}
-                />
-                <TextArea
-                  my={5}
-                  _focus={{
-                    borderWidth: '1',
-                    borderColor: '#FF4E83',
-                    backgroundColor: '#FF4E83:alpha.5',
-                  }}
-                  InputLeftElement={
-                    <Icon
-                      as={<MaterialIcons name="description" />}
-                      size={5}
-                      ml="2"
-                      color="pink.400"
-                    />
-                  }
-                  placeholder="Description"
-                  value={description}
-                  onChangeText={e => setDescription(e)}
-                  backgroundColor={'#FF4E83:alpha.10'}
-                  borderColor={'#FF4E83'}
-                  focusOutlineColor={'red'}
-                  fontSize={'md'}
-                  color={'#666'}
-                />
-
-                <Input
-                  _focus={{
-                    borderWidth: '2',
-                    borderColor: '#FF4E83',
-                    backgroundColor: '#FF4E83:alpha.5',
-                  }}
-                  InputLeftElement={
-                    <Icon
-                      as={<FontAwesome name="dollar" />}
-                      size={5}
-                      ml="2"
-                      color="pink.400"
-                    />
-                  }
-                  type="text"
-                  defaultValue={''}
-                  value={rent}
-                  placeholder="Rent Amount"
-                  backgroundColor={'#FF4E83:alpha.10'}
-                  borderColor={'#FF4E83'}
-                  focusOutlineColor={'red'}
-                  fontSize={'md'}
-                  color={'#666'}
-                  onChangeText={e => setRent(e)}
-                />
-                <HStack mt={5} space={2}>
-                  <Button
-                    size="sm"
-                    colorScheme="secondary"
-                    variant={`${images.length > 0 ? 'subtle' : 'outline'}`}
-                    leftIcon={
-                      <Icon
-                        mt={1}
-                        as={<MaterialIcons name="add-a-photo" />}
-                        size={5}
-                        ml="2"
-                        color="pink.300"
-                      />
-                    }>
-                    <Text
-                      fontSize="lg"
-                      // onPress={() => captureImage('photo')}>
-                      onPress={() => chooseFile('photo')}>
-                      Upload Photos
-                    </Text>
-                  </Button>
-                </HStack>
-                <Box px={3}>
-                  <SliderBox
-                    images={images}
-                    sliderBoxHeight={305}
-                    parentWidth={305}
-                    onCurrentImagePressed={index =>
-                      console.log(`image ${index} pressed`)
-                    }
+              <Input
+                _focus={{
+                  borderWidth: '2',
+                  borderColor: '#FF4E83',
+                  backgroundColor: '#FF4E83:alpha.5',
+                }}
+                InputLeftElement={
+                  <Icon
+                    as={<MaterialIcons name="title" />}
+                    size={5}
+                    ml="2"
+                    color="pink.400"
                   />
-                </Box>
-                {/* <Image source={{uri: filePath.uri}} style={styles.imageStyle} /> */}
-                <HStack mt={5}>
-                  <Button
-                    size="sm"
-                    colorScheme="secondary"
-                    variant={`${
-                      route?.params?.locationName ? 'subtle' : 'outline'
-                    }`}
-                    leftIcon={
-                      <Icon
-                        as={<MaterialIcons name="add-location" />}
-                        size={7}
-                        ml="2"
-                        color="pink.300"
-                      />
-                    }>
-                    <Text
-                      fontSize="lg"
-                      onPress={() => navigation.navigate('LocationPicker')}>
-                      Pick Location
-                    </Text>
-                  </Button>
-                  {route?.params?.locationName && (
-                    <HStack mt={3}>
-                      <RNText
-                        style={{
-                          fontFamily: 'Poppins-Regular',
-                          fontSize: 15,
-                          marginHorizontal: 6,
-                        }}>
-                        {route?.params?.locationName}
-                      </RNText>
-                      <MaterialIcons name="check" size={24} color="green" />
-                    </HStack>
-                  )}
-                </HStack>
-                <HStack space={2} my={5}>
-                  <Button
-                    size="sm"
-                    colorScheme="secondary"
-                    variant={`${roomType !== '' ? 'subtle' : 'outline'}`}
-                    leftIcon={
-                      <Icon
-                        onPress={onOpen}
-                        as={<AntDesign name="antdesign" />}
-                        size={7}
-                        ml="2"
-                        color="pink.300"
-                      />
-                    }>
-                    <Text fontSize="lg" onPress={onOpen}>
-                      Add Facilities
-                    </Text>
-                  </Button>
-                </HStack>
-                <Actionsheet isOpen={isOpen} onClose={onClose}>
-                  <Actionsheet.Content bgColor="#2D3D4C">
-                    <ScrollView
-                      showsVerticalScrollIndicator={false}
-                      style={{width: '100%'}}>
-                      <Actionsheet.Item bgColor="#2D3D4C">
-                        <VStack mx={2}>
-                          <Text style={styles.categoryTitle}>Room Type</Text>
-                          <Radio.Group
-                            defaultValue={roomType}
-                            accessibilityLabel="pick an item"
-                            onChange={values => setRoomType(values)}>
-                            <Radio
-                              value="single"
-                              my="0.5"
-                              _text={{style: styles.filterValues}}>
-                              Single
-                            </Radio>
-                            <Radio
-                              value="shared"
-                              my="0.5"
-                              _text={{style: styles.filterValues}}>
-                              Shared
-                            </Radio>
-                            <Radio
-                              value="house"
-                              my="0.5"
-                              _text={{style: styles.filterValues}}>
-                              House
-                            </Radio>
-                          </Radio.Group>
-                        </VStack>
-                      </Actionsheet.Item>
-                      <Actionsheet.Item bgColor="#2D3D4C">
-                        <VStack mx={2} mb={7}>
-                          <Text style={styles.categoryTitle}>Facilities</Text>
-                          <Checkbox.Group
-                            accessibilityLabel="pick an item"
-                            defaultValue={facilitiesValue}
-                            onChange={prev => setFacilitiesValue(prev || [])}>
-                            <Checkbox
-                              value="furniture"
-                              my="0.5"
-                              size={'sm'}
-                              _text={{style: styles.filterValues}}>
-                              Furniture
-                            </Checkbox>
-                            <Checkbox
-                              value="bed"
-                              my="0.5"
-                              size={'sm'}
-                              _text={{style: styles.filterValues}}>
-                              Bed & Mattress
-                            </Checkbox>
-                            <Checkbox
-                              value="ac"
-                              my="0.5"
-                              size={'sm'}
-                              _text={{style: styles.filterValues}}>
-                              AC
-                            </Checkbox>
-                            <Checkbox
-                              value="fan"
-                              my="0.5"
-                              size={'sm'}
-                              _text={{style: styles.filterValues}}>
-                              Celing fan, Wall fan, Table fan
-                            </Checkbox>
-                            <Checkbox
-                              value="cooking"
-                              my="0.5"
-                              size={'sm'}
-                              _text={{style: styles.filterValues}}>
-                              Cooking facilities
-                            </Checkbox>
-                          </Checkbox.Group>
-                        </VStack>
+                }
+                type="text"
+                defaultValue={''}
+                value={title}
+                placeholder="Title"
+                backgroundColor={'#FF4E83:alpha.10'}
+                borderColor={'#FF4E83'}
+                focusOutlineColor={'red'}
+                fontSize={'md'}
+                color={'#666'}
+                onChangeText={e => setTitle(e)}
+              />
+              <TextArea
+                my={5}
+                _focus={{
+                  borderWidth: '1',
+                  borderColor: '#FF4E83',
+                  backgroundColor: '#FF4E83:alpha.5',
+                }}
+                InputLeftElement={
+                  <Icon
+                    as={<MaterialIcons name="description" />}
+                    size={5}
+                    ml="2"
+                    color="pink.400"
+                  />
+                }
+                placeholder="Description"
+                value={description}
+                onChangeText={e => setDescription(e)}
+                backgroundColor={'#FF4E83:alpha.10'}
+                borderColor={'#FF4E83'}
+                focusOutlineColor={'red'}
+                fontSize={'md'}
+                color={'#666'}
+              />
 
-                        <VStack mx={2} mb={7}>
-                          <Text style={styles.categoryTitle}>No of beds</Text>
-                          <Input
-                            variant="underlined"
-                            value={noOfBeds}
-                            placeholder="No of beds"
-                            style={styles.filterValues}
-                            onChangeText={value => setNoOfBeds(value)}
-                          />
-                        </VStack>
+              <Input
+                _focus={{
+                  borderWidth: '2',
+                  borderColor: '#FF4E83',
+                  backgroundColor: '#FF4E83:alpha.5',
+                }}
+                InputLeftElement={
+                  <Icon
+                    as={<FontAwesome name="dollar" />}
+                    size={5}
+                    ml="2"
+                    color="pink.400"
+                  />
+                }
+                type="text"
+                defaultValue={''}
+                value={rent}
+                placeholder="Rent Amount"
+                backgroundColor={'#FF4E83:alpha.10'}
+                borderColor={'#FF4E83'}
+                focusOutlineColor={'red'}
+                fontSize={'md'}
+                color={'#666'}
+                onChangeText={e => setRent(e)}
+              />
+              <HStack mt={5} mb={1} space={2}>
+                <Button
+                  size="sm"
+                  colorScheme="secondary"
+                  variant={`${images.length > 0 ? 'subtle' : 'outline'}`}
+                  leftIcon={
+                    <Icon
+                      mt={1}
+                      as={<MaterialIcons name="add-a-photo" />}
+                      size={5}
+                      ml="2"
+                      color="pink.300"
+                    />
+                  }>
+                  <Text
+                    fontSize="lg"
+                    // onPress={() => captureImage('photo')}>
+                    onPress={() => chooseFile('photo')}>
+                    Upload Photos
+                  </Text>
+                </Button>
+              </HStack>
+              <Box width={150}>
+                <SliderBox
+                  images={images}
+                  // sliderBoxHeight={305}
+                  // parentWidth={305}
+                  onCurrentImagePressed={index =>
+                    console.log(`image ${index} pressed`)
+                  }
+                />
+              </Box>
+              {/* <Image source={{uri: filePath.uri}} style={styles.imageStyle} /> */}
+              <HStack mt={5}>
+                <Button
+                  size="sm"
+                  colorScheme="secondary"
+                  variant={`${
+                    route?.params?.locationName ? 'subtle' : 'outline'
+                  }`}
+                  leftIcon={
+                    <Icon
+                      as={<MaterialIcons name="add-location" />}
+                      size={7}
+                      ml="2"
+                      color="pink.300"
+                    />
+                  }>
+                  <Text
+                    fontSize="lg"
+                    onPress={() => navigation.navigate('LocationPicker')}>
+                    Pick Location
+                  </Text>
+                </Button>
+                {route?.params?.locationName && (
+                  <HStack alignItems={'center'}>
+                    <RNText
+                      style={{
+                        fontFamily: 'Poppins-Regular',
+                        fontSize: 12,
+                        marginHorizontal: 6,
+                        color: '#666',
+                      }}>
+                      {route?.params?.locationName}
+                    </RNText>
+                    <MaterialIcons name="check" size={18} color="green" />
+                  </HStack>
+                )}
+              </HStack>
+              <HStack space={2} my={5}>
+                <Button
+                  size="sm"
+                  colorScheme="secondary"
+                  variant={`${roomType !== '' ? 'subtle' : 'outline'}`}
+                  leftIcon={
+                    <Icon
+                      onPress={onOpen}
+                      as={<AntDesign name="antdesign" />}
+                      size={7}
+                      ml="2"
+                      color="pink.300"
+                    />
+                  }>
+                  <Text fontSize="lg" onPress={onOpen}>
+                    Add Facilities
+                  </Text>
+                </Button>
+              </HStack>
+              <Actionsheet isOpen={isOpen} onClose={onClose}>
+                <Actionsheet.Content bgColor="#2D3D4C">
+                  <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    style={{width: '100%'}}>
+                    <Actionsheet.Item bgColor="#2D3D4C">
+                      <VStack mx={2}>
+                        <Text style={styles.categoryTitle}>Room Type</Text>
+                        <Radio.Group
+                          defaultValue={roomType}
+                          accessibilityLabel="pick an item"
+                          onChange={values => setRoomType(values)}>
+                          <Radio
+                            value="single"
+                            my="0.5"
+                            _text={{style: styles.filterValues}}>
+                            Single
+                          </Radio>
+                          <Radio
+                            value="shared"
+                            my="0.5"
+                            _text={{style: styles.filterValues}}>
+                            Shared
+                          </Radio>
+                          <Radio
+                            value="house"
+                            my="0.5"
+                            _text={{style: styles.filterValues}}>
+                            House
+                          </Radio>
+                        </Radio.Group>
+                      </VStack>
+                    </Actionsheet.Item>
+                    <Actionsheet.Item bgColor="#2D3D4C">
+                      <VStack mx={2} mb={7}>
+                        <Text style={styles.categoryTitle}>Facilities</Text>
+                        <Checkbox.Group
+                          accessibilityLabel="pick an item"
+                          defaultValue={facilitiesValue}
+                          onChange={prev => setFacilitiesValue(prev || [])}>
+                          <Checkbox
+                            value="furniture"
+                            my="0.5"
+                            size={'sm'}
+                            _text={{style: styles.filterValues}}>
+                            Furniture
+                          </Checkbox>
+                          <Checkbox
+                            value="bed"
+                            my="0.5"
+                            size={'sm'}
+                            _text={{style: styles.filterValues}}>
+                            Bed & Mattress
+                          </Checkbox>
+                          <Checkbox
+                            value="ac"
+                            my="0.5"
+                            size={'sm'}
+                            _text={{style: styles.filterValues}}>
+                            AC
+                          </Checkbox>
+                          <Checkbox
+                            value="fan"
+                            my="0.5"
+                            size={'sm'}
+                            _text={{style: styles.filterValues}}>
+                            Celing fan, Wall fan, Table fan
+                          </Checkbox>
+                          <Checkbox
+                            value="cooking"
+                            my="0.5"
+                            size={'sm'}
+                            _text={{style: styles.filterValues}}>
+                            Cooking facilities
+                          </Checkbox>
+                        </Checkbox.Group>
+                      </VStack>
 
-                        <VStack mx={2} mb={7}>
-                          <Text style={styles.categoryTitle}>
-                            Offering Meals
-                          </Text>
-                          <Radio.Group
-                            defaultValue={meals}
-                            accessibilityLabel="pick an item"
-                            onChange={values => setMeals(values)}>
-                            <Radio
-                              value={true}
-                              size={'sm'}
-                              my="0.5"
-                              _text={{style: styles.filterValues}}>
-                              Yes
-                            </Radio>
-                            <Radio
-                              value={false}
-                              size={'sm'}
-                              my="0.5"
-                              _text={{style: styles.filterValues}}>
-                              No
-                            </Radio>
-                          </Radio.Group>
-                        </VStack>
+                      <VStack mx={2} mb={7}>
+                        <Text style={styles.categoryTitle}>No of beds</Text>
+                        <Input
+                          variant="underlined"
+                          value={noOfBeds}
+                          placeholder="No of beds"
+                          style={styles.filterValues}
+                          onChangeText={value => setNoOfBeds(value)}
+                        />
+                      </VStack>
+
+                      <VStack mx={2} mb={7}>
+                        <Text style={styles.categoryTitle}>Offering Meals</Text>
+                        <Radio.Group
+                          defaultValue={meals}
+                          accessibilityLabel="pick an item"
+                          onChange={values => setMeals(values)}>
+                          <Radio
+                            value={true}
+                            size={'sm'}
+                            my="0.5"
+                            _text={{style: styles.filterValues}}>
+                            Yes
+                          </Radio>
+                          <Radio
+                            value={false}
+                            size={'sm'}
+                            my="0.5"
+                            _text={{style: styles.filterValues}}>
+                            No
+                          </Radio>
+                        </Radio.Group>
+                      </VStack>
 
                         <VStack mx={2}>
                           <Text style={styles.categoryTitle}>
@@ -682,7 +714,7 @@ export default function AddHome({navigation, route}) {
                     </HStack>
                   </Button>
                 </HStack>
-              </Stack>
+           
             </FormControl>
           </VStack>
         </Box>

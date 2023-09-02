@@ -34,7 +34,7 @@ import {
   AntDesign,
 } from '@expo/vector-icons';
 import axios from 'axios';
-import {findAddress, findLocation} from '../components/findLocation';
+import {findAddress} from '../functions/findAddress';
 import BrowserSkelton from '../components/core/SkeltonBrowser';
 import Filters from '../components/Filters';
 

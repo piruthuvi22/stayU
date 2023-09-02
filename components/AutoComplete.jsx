@@ -46,5 +46,8 @@ let styles = {
   description: {
     color: '#666',
   },
+  placeholder: {
+    color: '#666',
+  },
 };
 export default AutoComplete;

@@ -72,9 +72,9 @@ export default function App() {
             ),
             tabBarItemStyle: {
               marginBottom: 2,
-              borderBottomWidth: 2,
-              borderBottomColor: '#fff',
-              borderRadius: 10,
+              // borderBottomWidth: 2,
+              // borderBottomColor: '#fff',
+              // borderRadius: 10,
             },
             tabBarLabel: 'WishList',
             tabBarLabelStyle: {color: 'white', fontSize: 14},

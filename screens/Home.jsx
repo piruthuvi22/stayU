@@ -8,7 +8,6 @@ import { Client } from "@googlemaps/google-maps-services-js";
 
 import { Feather } from "@expo/vector-icons";
 import RoomCard from "../components/RoomCard";
-import { findAddress, findLocation } from "../components/findLocation";
 
 const client = new Client({});
 
@@ -18,10 +17,7 @@ const Home = () => {
 
   useEffect(() => {
     console.log("Home.jsx mounted");
-    findLocation().then((res) => {
-      // setLocation(res.lantlong);
-      findAddress(res.lantlong).then((res) => setUniName(res.uniName));
-    });
+ 
   }, []);
 
   return (
