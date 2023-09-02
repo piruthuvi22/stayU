@@ -32,7 +32,7 @@ const BrowseCard = ({
         setUserRole(res.data);
       })
       .catch(err => {
-        console.log(err);
+        console.log('Browse Card Axios Error: ', err);
       });
   };
   useFocusEffect(

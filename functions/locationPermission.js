@@ -1,4 +1,9 @@
-import {Platform, PermissionsAndroid, ToastAndroid} from 'react-native';
+import {
+  Platform,
+  PermissionsAndroid,
+  ToastAndroid,
+  Linking,
+} from 'react-native';
 
 export const hasLocationPermission = async () => {
   if (Platform.OS === 'android' && Platform.Version < 23) {
@@ -18,20 +23,20 @@ export const hasLocationPermission = async () => {
   );
 
   if (status === PermissionsAndroid.RESULTS.GRANTED) {
-    console.log('Location permission granted by user.');
+    // console.log('Location permission granted by user.');
     return true;
   }
 
   if (status === PermissionsAndroid.RESULTS.DENIED) {
-    console.log('Location permission denied by user.');
+    // console.log('Location permission denied by user.');
     ToastAndroid.show('Location permission denied by user.', ToastAndroid.LONG);
   } else if (status === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
-    console.log('Location permission revoked by user.');
+    // console.log('Location permission revoked by user.');
     ToastAndroid.show(
-        
-      'Location permission revoked by user.',
+      'Location permission revoked. Allow location access in settings',
       ToastAndroid.LONG,
     );
+    Linking.openSettings();
   }
 
   return false;

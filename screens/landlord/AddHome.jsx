@@ -47,6 +47,7 @@ import env from '../../env';
 import showToast from '../../components/core/toast';
 import {NavigationContainer} from '@react-navigation/native';
 import {useAuth} from '../../utilities/context';
+import {ToastAndroid} from 'react-native';
 
 export default function AddHome({navigation, route}) {
   const [title, setTitle] = useState('');
@@ -196,22 +197,23 @@ export default function AddHome({navigation, route}) {
     let options = {
       mediaType: type,
       quality: 1,
+      selectionLimit: 6,
     };
 
     launchImageLibrary(options, response => {
-      // console.log('Response = ', response);
+      console.log('Response = ', response);
 
       if (response.didCancel) {
-        alert('User cancelled camera picker');
+        ToastAndroid.show('Cancelled by user', ToastAndroid.LONG);
         return;
       } else if (response.errorCode == 'camera_unavailable') {
-        alert('Camera not available on device');
+        ToastAndroid.show('Camera not available on device', ToastAndroid.LONG);
         return;
       } else if (response.errorCode == 'permission') {
-        alert('Permission not satisfied');
+        ToastAndroid.show('Permission not satisfied', ToastAndroid.LONG);
         return;
       } else if (response.errorCode == 'others') {
-        alert(response.errorMessage);
+        ToastAndroid.show(response.errorMessage, ToastAndroid.LONG);
         return;
       }
       const details = {
@@ -405,353 +407,348 @@ export default function AddHome({navigation, route}) {
           </Box> */}
           <VStack>
             <FormControl>
-              <Stack>
-                <Input
-                  _focus={{
-                    borderWidth: '2',
-                    borderColor: '#FF4E83',
-                    backgroundColor: '#FF4E83:alpha.5',
-                  }}
-                  InputLeftElement={
-                    <Icon
-                      as={<MaterialIcons name="title" />}
-                      size={5}
-                      ml="2"
-                      color="pink.400"
-                    />
-                  }
-                  type="text"
-                  defaultValue={''}
-                  value={title}
-                  placeholder="Title"
-                  backgroundColor={'#FF4E83:alpha.10'}
-                  borderColor={'#FF4E83'}
-                  focusOutlineColor={'red'}
-                  fontSize={'md'}
-                  color={'#666'}
-                  onChangeText={e => setTitle(e)}
-                />
-                <TextArea
-                  my={5}
-                  _focus={{
-                    borderWidth: '1',
-                    borderColor: '#FF4E83',
-                    backgroundColor: '#FF4E83:alpha.5',
-                  }}
-                  InputLeftElement={
-                    <Icon
-                      as={<MaterialIcons name="description" />}
-                      size={5}
-                      ml="2"
-                      color="pink.400"
-                    />
-                  }
-                  placeholder="Description"
-                  value={description}
-                  onChangeText={e => setDescription(e)}
-                  backgroundColor={'#FF4E83:alpha.10'}
-                  borderColor={'#FF4E83'}
-                  focusOutlineColor={'red'}
-                  fontSize={'md'}
-                  color={'#666'}
-                />
-
-                <Input
-                  _focus={{
-                    borderWidth: '2',
-                    borderColor: '#FF4E83',
-                    backgroundColor: '#FF4E83:alpha.5',
-                  }}
-                  InputLeftElement={
-                    <Icon
-                      as={<FontAwesome name="dollar" />}
-                      size={5}
-                      ml="2"
-                      color="pink.400"
-                    />
-                  }
-                  type="text"
-                  defaultValue={''}
-                  value={rent}
-                  placeholder="Rent Amount"
-                  backgroundColor={'#FF4E83:alpha.10'}
-                  borderColor={'#FF4E83'}
-                  focusOutlineColor={'red'}
-                  fontSize={'md'}
-                  color={'#666'}
-                  onChangeText={e => setRent(e)}
-                />
-                <HStack mt={5} space={2}>
-                  <Button
-                    size="sm"
-                    colorScheme="secondary"
-                    variant={`${images.length > 0 ? 'subtle' : 'outline'}`}
-                    leftIcon={
-                      <Icon
-                        mt={1}
-                        as={<MaterialIcons name="add-a-photo" />}
-                        size={5}
-                        ml="2"
-                        color="pink.300"
-                      />
-                    }>
-                    <Text
-                      fontSize="lg"
-                      // onPress={() => captureImage('photo')}>
-                      onPress={() => chooseFile('photo')}>
-                      Upload Photos
-                    </Text>
-                  </Button>
-                </HStack>
-                <Box px={3}>
-                  <SliderBox
-                    images={images}
-                    sliderBoxHeight={305}
-                    parentWidth={305}
-                    onCurrentImagePressed={index =>
-                      console.log(`image ${index} pressed`)
-                    }
+              <Input
+                _focus={{
+                  borderWidth: '2',
+                  borderColor: '#FF4E83',
+                  backgroundColor: '#FF4E83:alpha.5',
+                }}
+                InputLeftElement={
+                  <Icon
+                    as={<MaterialIcons name="title" />}
+                    size={5}
+                    ml="2"
+                    color="pink.400"
                   />
-                </Box>
-                {/* <Image source={{uri: filePath.uri}} style={styles.imageStyle} /> */}
-                <HStack mt={5}>
-                  <Button
-                    size="sm"
-                    colorScheme="secondary"
-                    variant={`${
-                      route?.params?.locationName ? 'subtle' : 'outline'
-                    }`}
-                    leftIcon={
-                      <Icon
-                        as={<MaterialIcons name="add-location" />}
-                        size={7}
-                        ml="2"
-                        color="pink.300"
-                      />
-                    }>
-                    <Text
-                      fontSize="lg"
-                      onPress={() => navigation.navigate('LocationPicker')}>
-                      Pick Location
-                    </Text>
-                  </Button>
-                  {route?.params?.locationName && (
-                    <HStack mt={3}>
-                      <RNText
-                        style={{
-                          fontFamily: 'Poppins-Regular',
-                          fontSize: 15,
-                          marginHorizontal: 6,
-                        }}>
-                        {route?.params?.locationName}
-                      </RNText>
-                      <MaterialIcons name="check" size={24} color="green" />
-                    </HStack>
-                  )}
-                </HStack>
-                <HStack space={2} my={5}>
-                  <Button
-                    size="sm"
-                    colorScheme="secondary"
-                    variant={`${roomType !== '' ? 'subtle' : 'outline'}`}
-                    leftIcon={
-                      <Icon
-                        onPress={onOpen}
-                        as={<AntDesign name="antdesign" />}
-                        size={7}
-                        ml="2"
-                        color="pink.300"
-                      />
-                    }>
-                    <Text fontSize="lg" onPress={onOpen}>
-                      Add Facilities
-                    </Text>
-                  </Button>
-                </HStack>
-                <Actionsheet isOpen={isOpen} onClose={onClose}>
-                  <Actionsheet.Content bgColor="#2D3D4C">
-                    <ScrollView
-                      showsVerticalScrollIndicator={false}
-                      style={{width: '100%'}}>
-                      <Actionsheet.Item bgColor="#2D3D4C">
-                        <VStack mx={2}>
-                          <Text style={styles.categoryTitle}>Room Type</Text>
-                          <Radio.Group
-                            defaultValue={roomType}
-                            accessibilityLabel="pick an item"
-                            onChange={values => setRoomType(values)}>
-                            <Radio
-                              value="single"
-                              my="0.5"
-                              _text={{style: styles.filterValues}}>
-                              Single
-                            </Radio>
-                            <Radio
-                              value="shared"
-                              my="0.5"
-                              _text={{style: styles.filterValues}}>
-                              Shared
-                            </Radio>
-                            <Radio
-                              value="house"
-                              my="0.5"
-                              _text={{style: styles.filterValues}}>
-                              House
-                            </Radio>
-                          </Radio.Group>
-                        </VStack>
-                      </Actionsheet.Item>
-                      <Actionsheet.Item bgColor="#2D3D4C">
-                        <VStack mx={2} mb={7}>
-                          <Text style={styles.categoryTitle}>Facilities</Text>
-                          <Checkbox.Group
-                            accessibilityLabel="pick an item"
-                            defaultValue={facilitiesValue}
-                            onChange={prev => setFacilitiesValue(prev || [])}>
-                            <Checkbox
-                              value="furniture"
-                              my="0.5"
-                              size={'sm'}
-                              _text={{style: styles.filterValues}}>
-                              Furniture
-                            </Checkbox>
-                            <Checkbox
-                              value="bed"
-                              my="0.5"
-                              size={'sm'}
-                              _text={{style: styles.filterValues}}>
-                              Bed & Mattress
-                            </Checkbox>
-                            <Checkbox
-                              value="ac"
-                              my="0.5"
-                              size={'sm'}
-                              _text={{style: styles.filterValues}}>
-                              AC
-                            </Checkbox>
-                            <Checkbox
-                              value="fan"
-                              my="0.5"
-                              size={'sm'}
-                              _text={{style: styles.filterValues}}>
-                              Celing fan, Wall fan, Table fan
-                            </Checkbox>
-                            <Checkbox
-                              value="cooking"
-                              my="0.5"
-                              size={'sm'}
-                              _text={{style: styles.filterValues}}>
-                              Cooking facilities
-                            </Checkbox>
-                          </Checkbox.Group>
-                        </VStack>
+                }
+                type="text"
+                defaultValue={''}
+                value={title}
+                placeholder="Title"
+                backgroundColor={'#FF4E83:alpha.10'}
+                borderColor={'#FF4E83'}
+                focusOutlineColor={'red'}
+                fontSize={'md'}
+                color={'#666'}
+                onChangeText={e => setTitle(e)}
+              />
+              <TextArea
+                my={5}
+                _focus={{
+                  borderWidth: '1',
+                  borderColor: '#FF4E83',
+                  backgroundColor: '#FF4E83:alpha.5',
+                }}
+                InputLeftElement={
+                  <Icon
+                    as={<MaterialIcons name="description" />}
+                    size={5}
+                    ml="2"
+                    color="pink.400"
+                  />
+                }
+                placeholder="Description"
+                value={description}
+                onChangeText={e => setDescription(e)}
+                backgroundColor={'#FF4E83:alpha.10'}
+                borderColor={'#FF4E83'}
+                focusOutlineColor={'red'}
+                fontSize={'md'}
+                color={'#666'}
+              />
 
-                        <VStack mx={2} mb={7}>
-                          <Text style={styles.categoryTitle}>No of beds</Text>
-                          <Input
-                            variant="underlined"
-                            value={noOfBeds}
-                            placeholder="No of beds"
-                            style={styles.filterValues}
-                            onChangeText={value => setNoOfBeds(value)}
-                          />
-                        </VStack>
+              <Input
+                _focus={{
+                  borderWidth: '2',
+                  borderColor: '#FF4E83',
+                  backgroundColor: '#FF4E83:alpha.5',
+                }}
+                InputLeftElement={
+                  <Icon
+                    as={<FontAwesome name="dollar" />}
+                    size={5}
+                    ml="2"
+                    color="pink.400"
+                  />
+                }
+                type="text"
+                defaultValue={''}
+                value={rent}
+                placeholder="Rent Amount"
+                backgroundColor={'#FF4E83:alpha.10'}
+                borderColor={'#FF4E83'}
+                focusOutlineColor={'red'}
+                fontSize={'md'}
+                color={'#666'}
+                onChangeText={e => setRent(e)}
+              />
+              <HStack mt={5} mb={1} space={2}>
+                <Button
+                  size="sm"
+                  colorScheme="secondary"
+                  variant={`${images.length > 0 ? 'subtle' : 'outline'}`}
+                  leftIcon={
+                    <Icon
+                      mt={1}
+                      as={<MaterialIcons name="add-a-photo" />}
+                      size={5}
+                      ml="2"
+                      color="pink.300"
+                    />
+                  }>
+                  <Text
+                    fontSize="lg"
+                    // onPress={() => captureImage('photo')}>
+                    onPress={() => chooseFile('photo')}>
+                    Upload Photos
+                  </Text>
+                </Button>
+              </HStack>
+              <Box width={150}>
+                <SliderBox
+                  images={images}
+                  // sliderBoxHeight={305}
+                  // parentWidth={305}
+                  onCurrentImagePressed={index =>
+                    console.log(`image ${index} pressed`)
+                  }
+                />
+              </Box>
+              {/* <Image source={{uri: filePath.uri}} style={styles.imageStyle} /> */}
+              <HStack mt={5}>
+                <Button
+                  size="sm"
+                  colorScheme="secondary"
+                  variant={`${
+                    route?.params?.locationName ? 'subtle' : 'outline'
+                  }`}
+                  leftIcon={
+                    <Icon
+                      as={<MaterialIcons name="add-location" />}
+                      size={7}
+                      ml="2"
+                      color="pink.300"
+                    />
+                  }>
+                  <Text
+                    fontSize="lg"
+                    onPress={() => navigation.navigate('LocationPicker')}>
+                    Pick Location
+                  </Text>
+                </Button>
+                {route?.params?.locationName && (
+                  <HStack alignItems={'center'}>
+                    <RNText
+                      style={{
+                        fontFamily: 'Poppins-Regular',
+                        fontSize: 12,
+                        marginHorizontal: 6,
+                        color: '#666',
+                      }}>
+                      {route?.params?.locationName}
+                    </RNText>
+                    <MaterialIcons name="check" size={18} color="green" />
+                  </HStack>
+                )}
+              </HStack>
+              <HStack space={2} my={5}>
+                <Button
+                  size="sm"
+                  colorScheme="secondary"
+                  variant={`${roomType !== '' ? 'subtle' : 'outline'}`}
+                  leftIcon={
+                    <Icon
+                      onPress={onOpen}
+                      as={<AntDesign name="antdesign" />}
+                      size={7}
+                      ml="2"
+                      color="pink.300"
+                    />
+                  }>
+                  <Text fontSize="lg" onPress={onOpen}>
+                    Add Facilities
+                  </Text>
+                </Button>
+              </HStack>
+              <Actionsheet isOpen={isOpen} onClose={onClose}>
+                <Actionsheet.Content bgColor="#2D3D4C">
+                  <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    style={{width: '100%'}}>
+                    <Actionsheet.Item bgColor="#2D3D4C">
+                      <VStack mx={2}>
+                        <Text style={styles.categoryTitle}>Room Type</Text>
+                        <Radio.Group
+                          defaultValue={roomType}
+                          accessibilityLabel="pick an item"
+                          onChange={values => setRoomType(values)}>
+                          <Radio
+                            value="single"
+                            my="0.5"
+                            _text={{style: styles.filterValues}}>
+                            Single
+                          </Radio>
+                          <Radio
+                            value="shared"
+                            my="0.5"
+                            _text={{style: styles.filterValues}}>
+                            Shared
+                          </Radio>
+                          <Radio
+                            value="house"
+                            my="0.5"
+                            _text={{style: styles.filterValues}}>
+                            House
+                          </Radio>
+                        </Radio.Group>
+                      </VStack>
+                    </Actionsheet.Item>
+                    <Actionsheet.Item bgColor="#2D3D4C">
+                      <VStack mx={2} mb={7}>
+                        <Text style={styles.categoryTitle}>Facilities</Text>
+                        <Checkbox.Group
+                          accessibilityLabel="pick an item"
+                          defaultValue={facilitiesValue}
+                          onChange={prev => setFacilitiesValue(prev || [])}>
+                          <Checkbox
+                            value="furniture"
+                            my="0.5"
+                            size={'sm'}
+                            _text={{style: styles.filterValues}}>
+                            Furniture
+                          </Checkbox>
+                          <Checkbox
+                            value="bed"
+                            my="0.5"
+                            size={'sm'}
+                            _text={{style: styles.filterValues}}>
+                            Bed & Mattress
+                          </Checkbox>
+                          <Checkbox
+                            value="ac"
+                            my="0.5"
+                            size={'sm'}
+                            _text={{style: styles.filterValues}}>
+                            AC
+                          </Checkbox>
+                          <Checkbox
+                            value="fan"
+                            my="0.5"
+                            size={'sm'}
+                            _text={{style: styles.filterValues}}>
+                            Celing fan, Wall fan, Table fan
+                          </Checkbox>
+                          <Checkbox
+                            value="cooking"
+                            my="0.5"
+                            size={'sm'}
+                            _text={{style: styles.filterValues}}>
+                            Cooking facilities
+                          </Checkbox>
+                        </Checkbox.Group>
+                      </VStack>
 
-                        <VStack mx={2} mb={7}>
-                          <Text style={styles.categoryTitle}>
-                            Offering Meals
-                          </Text>
-                          <Radio.Group
-                            defaultValue={meals}
-                            accessibilityLabel="pick an item"
-                            onChange={values => setMeals(values)}>
-                            <Radio
-                              value={true}
-                              size={'sm'}
-                              my="0.5"
-                              _text={{style: styles.filterValues}}>
-                              Yes
-                            </Radio>
-                            <Radio
-                              value={false}
-                              size={'sm'}
-                              my="0.5"
-                              _text={{style: styles.filterValues}}>
-                              No
-                            </Radio>
-                          </Radio.Group>
-                        </VStack>
+                      <VStack mx={2} mb={7}>
+                        <Text style={styles.categoryTitle}>No of beds</Text>
+                        <Input
+                          variant="underlined"
+                          value={noOfBeds}
+                          placeholder="No of beds"
+                          style={styles.filterValues}
+                          onChangeText={value => setNoOfBeds(value)}
+                        />
+                      </VStack>
 
-                        <VStack mx={2}>
-                          <Text style={styles.categoryTitle}>
-                            Wash room type
-                          </Text>
-                          <Checkbox.Group
-                            defaultValue={washroom}
-                            accessibilityLabel="pick an item"
-                            onChange={values => setWashroom(values)}>
-                            <Checkbox
-                              value="traditional"
-                              my="0.5"
-                              size={'sm'}
-                              _text={{style: styles.filterValues}}>
-                              Traditional
-                            </Checkbox>
-                            <Checkbox
-                              value="western"
-                              my="0.5"
-                              size={'sm'}
-                              _text={{style: styles.filterValues}}>
-                              Western
-                            </Checkbox>
-                            <Checkbox
-                              value="attached"
-                              my="0.5"
-                              size={'sm'}
-                              _text={{style: styles.filterValues}}>
-                              Attached
-                            </Checkbox>
-                            <Checkbox
-                              value="common"
-                              my="0.5"
-                              size={'sm'}
-                              _text={{style: styles.filterValues}}>
-                              Common
-                            </Checkbox>
-                          </Checkbox.Group>
-                        </VStack>
-                      </Actionsheet.Item>
-                      <Actionsheet.Item bgColor="#2D3D4C">
-                        <VStack mx={2} mb={0}>
-                          <Text style={styles.categoryTitle}>Payment </Text>
-                          <Radio.Group
-                            defaultValue={payment}
-                            accessibilityLabel="pick an item"
-                            onChange={values => setPayment(values)}>
-                            <Radio
-                              value="monthly"
-                              my="0.5"
-                              _text={{style: styles.filterValues}}>
-                              Monthly
-                            </Radio>
-                            <Radio
-                              value="annually"
-                              my="0.5"
-                              _text={{style: styles.filterValues}}>
-                              Annually
-                            </Radio>
-                          </Radio.Group>
-                        </VStack>
-                      </Actionsheet.Item>
-                    </ScrollView>
-                  </Actionsheet.Content>
-                </Actionsheet>
-                <HStack space={2} my={5} style={styles.buttonContainer}>
-                  <Button onPress={handleSubmit} backgroundColor={'#FF4E83'}>
-                    <Text color={'#fff'}>Submit</Text>
-                  </Button>
-                </HStack>
-              </Stack>
+                      <VStack mx={2} mb={7}>
+                        <Text style={styles.categoryTitle}>Offering Meals</Text>
+                        <Radio.Group
+                          defaultValue={meals}
+                          accessibilityLabel="pick an item"
+                          onChange={values => setMeals(values)}>
+                          <Radio
+                            value={true}
+                            size={'sm'}
+                            my="0.5"
+                            _text={{style: styles.filterValues}}>
+                            Yes
+                          </Radio>
+                          <Radio
+                            value={false}
+                            size={'sm'}
+                            my="0.5"
+                            _text={{style: styles.filterValues}}>
+                            No
+                          </Radio>
+                        </Radio.Group>
+                      </VStack>
+
+                      <VStack mx={2}>
+                        <Text style={styles.categoryTitle}>Wash room type</Text>
+                        <Checkbox.Group
+                          defaultValue={washroom}
+                          accessibilityLabel="pick an item"
+                          onChange={values => setWashroom(values)}>
+                          <Checkbox
+                            value="traditional"
+                            my="0.5"
+                            size={'sm'}
+                            _text={{style: styles.filterValues}}>
+                            Traditional
+                          </Checkbox>
+                          <Checkbox
+                            value="western"
+                            my="0.5"
+                            size={'sm'}
+                            _text={{style: styles.filterValues}}>
+                            Western
+                          </Checkbox>
+                          <Checkbox
+                            value="attached"
+                            my="0.5"
+                            size={'sm'}
+                            _text={{style: styles.filterValues}}>
+                            Attached
+                          </Checkbox>
+                          <Checkbox
+                            value="common"
+                            my="0.5"
+                            size={'sm'}
+                            _text={{style: styles.filterValues}}>
+                            Common
+                          </Checkbox>
+                        </Checkbox.Group>
+                      </VStack>
+                    </Actionsheet.Item>
+                    <Actionsheet.Item bgColor="#2D3D4C">
+                      <VStack mx={2} mb={0}>
+                        <Text style={styles.categoryTitle}>Payment </Text>
+                        <Radio.Group
+                          defaultValue={payment}
+                          accessibilityLabel="pick an item"
+                          onChange={values => setPayment(values)}>
+                          <Radio
+                            value="monthly"
+                            my="0.5"
+                            _text={{style: styles.filterValues}}>
+                            Monthly
+                          </Radio>
+                          <Radio
+                            value="annually"
+                            my="0.5"
+                            _text={{style: styles.filterValues}}>
+                            Annually
+                          </Radio>
+                        </Radio.Group>
+                      </VStack>
+                    </Actionsheet.Item>
+                  </ScrollView>
+                </Actionsheet.Content>
+              </Actionsheet>
+              <HStack space={2} my={5} style={styles.buttonContainer}>
+                <Button onPress={handleSubmit} backgroundColor={'#FF4E83'}>
+                  <Text color={'#fff'}>Submit</Text>
+                </Button>
+              </HStack>
             </FormControl>
           </VStack>
         </Box>

@@ -51,16 +51,19 @@ export const useLocation = () => {
   }, []);
 
   const updateLocation = () => {
-    Geolocation.getCurrentPosition(
-      position => {
-        const {latitude, longitude} = position.coords;
-        setLocation({latitude, longitude});
-      },
-      error => {
-        setError(error.message);
-      },
-      {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
-    );
+    let hasPermission = hasLocationPermission();
+    if (hasPermission) {
+      Geolocation.getCurrentPosition(
+        position => {
+          const {latitude, longitude} = position.coords;
+          setLocation({latitude, longitude});
+        },
+        error => {
+          setError(error.message);
+        },
+        {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
+      );
+    }
   };
 
   return {location, updateLocation, error};
