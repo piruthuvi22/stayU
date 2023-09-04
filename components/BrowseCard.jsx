@@ -1,6 +1,7 @@
 import React, {useEffect, useState, useCallback} from 'react';
 import {TouchableOpacity, StyleSheet, Text} from 'react-native';
 import {Box, HStack, Image, Row, Column, Badge, Pressable} from 'native-base';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Client} from '@googlemaps/google-maps-services-js';
 import Constants from 'expo-constants';
 import {useFocusEffect} from '@react-navigation/native';
@@ -26,10 +27,25 @@ const BrowseCard = ({
   status,
   _id,
 }) => {
-  const {user, userRole} = useAuth();
+  // const {user, userRole} = useAuth();
   const [distTime, setDistTime] = useState([]);
 
   const [availableNotification, setAvailableNotification] = useState(false);
+  const {user} = useAuth();
+
+  const [userRole, setUserRole] = useState(null);
+
+  const getUserRole = async () => {
+    try {
+      const value = await AsyncStorage.getItem('user');
+      if (value !== null) {
+        const val = JSON.parse(value);
+        setUserRole(val.userRole);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   const availableNotificationHandler = () => {
     axios
@@ -46,48 +62,47 @@ const BrowseCard = ({
   };
 
   useEffect(() => {
-    if (userRole === 'student') {
-      const client = new Client({});
+    getUserRole();
+    availableNotificationHandler();
+    const client = new Client({});
 
-      const calculateDistance = async () => {
-        try {
-          let response = await client.distancematrix({
-            params: {
-              key: 'AIzaSyCz5aHnnwPi7R_v65PASfRLikJ5VVA8Ytc',
-              origins: [uniLocation],
-              destinations: [
-                {
-                  latitude: Coordinates.Latitude,
-                  longitude: Coordinates.Longitude,
-                },
-              ],
-              mode: 'walking',
-              language: 'en',
-              units: 'metric',
-            },
-          });
+    const calculateDistance = async () => {
+      try {
+        let response = await client.distancematrix({
+          params: {
+            key: 'AIzaSyCz5aHnnwPi7R_v65PASfRLikJ5VVA8Ytc',
+            origins: [uniLocation],
+            destinations: [
+              {
+                latitude: Coordinates.Latitude,
+                longitude: Coordinates.Longitude,
+              },
+            ],
+            mode: 'walking',
+            language: 'en',
+            units: 'metric',
+          },
+        });
 
-          //
-          // geolib.getDistance(
-          //   baseCoord,
-          //   {
-          //     latitude: res.Coordinates.Latitude,
-          //     longitude: res.Coordinates.Longitude,
-          //   },
-          //   0.1,
-          // ),
-          setDistTime([
-            response.data?.rows[0].elements[0].distance.text,
-            response.data?.rows[0].elements[0].duration.text,
-          ]);
-          availableNotificationHandler();
-        } catch (error) {
-          throw new Error(error);
-        }
-      };
-      uniLocation && calculateDistance();
-    }
-  }, [uniLocation ? uniLocation : null]);
+        //
+        // geolib.getDistance(
+        //   baseCoord,
+        //   {
+        //     latitude: res.Coordinates.Latitude,
+        //     longitude: res.Coordinates.Longitude,
+        //   },
+        //   0.1,
+        // ),
+        setDistTime([
+          response.data?.rows[0].elements[0].distance.text,
+          response.data?.rows[0].elements[0].duration.text,
+        ]);
+      } catch (error) {
+        throw new Error(error);
+      }
+    };
+    uniLocation && calculateDistance();
+  }, [uniLocation ? uniLocation : null, _id]);
 
   return (
     <Box style={styles.card} w="full" my={1} borderRadius={3}>
@@ -103,6 +118,7 @@ const BrowseCard = ({
             Coordinates,
             uniLocation,
             status,
+            userRole,
           })
         }>
         <Row>
@@ -119,6 +135,7 @@ const BrowseCard = ({
                   PlaceDescription,
                   status,
                   uniLocation,
+                  userRole,
                 })
               }>
               <Image
