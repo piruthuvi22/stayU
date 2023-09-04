@@ -61,7 +61,8 @@ const Details = ({navigation, route}) => {
     onOpen: onOpenFaci,
     onClose: onCloseFaci,
   } = useDisclose();
-  const {user, userRole} = useAuth();
+  const {user} = useAuth();
+  const userRole = route?.params?.userRole;
   const [landlord, setLandlord] = useState({});
 
   const [student, setStudent] = useState({});
@@ -80,6 +81,7 @@ const Details = ({navigation, route}) => {
   //   }, []),
   // );
   const getLandlord = () => {
+    console.log('getLandlord:');
     axios
       .get(env.api + '/users/getLandlord', {
         params: {
@@ -87,7 +89,7 @@ const Details = ({navigation, route}) => {
         },
       })
       .then(res => {
-        console.log(res.data);
+        // console.log(res.data);
         setLandlord(res.data);
       })
       .catch(err => console.log(err));
@@ -105,7 +107,7 @@ const Details = ({navigation, route}) => {
       .catch(err => console.log(err));
   };
   useEffect(() => {
-    console.log('Details:', userRole);
+    console.log('Details userRole:', userRole);
     if (userRole === 'student') {
       getLandlord();
       axios
@@ -119,11 +121,11 @@ const Details = ({navigation, route}) => {
           // console.log(res.data.status);
           res.data.status ? setIsSaved(true) : setIsSaved(false);
         })
-        .catch(err => console.log(err));
+        .catch(err => console.log("Can't get status", err));
     } else {
       getStudent();
     }
-  }, []);
+  }, [_id]);
 
   const handleSave = () => {
     axios
@@ -139,7 +141,6 @@ const Details = ({navigation, route}) => {
   };
 
   const handleReserve = () => {
-    console.log('Reserve', _id, user?.email);
     axios
       .post(env.api + '/reservation/new', {
         PlaceId: _id,
@@ -148,7 +149,7 @@ const Details = ({navigation, route}) => {
       .then(res => {
         console.log(res);
         showToast(toast, 'success', 'Reservation Requested');
-        navigation.navigate('Browse');
+        navigation.navigate('TabNavigator', {screen: 'home-landlord'});
       })
       .catch(err => console.log(err));
   };
@@ -181,7 +182,6 @@ const Details = ({navigation, route}) => {
         PlaceId: _id,
       })
       .then(res => {
-        console.log(res.data);
         showToast(toast, 'success', 'Place is now available');
         navigation.navigate('home-landlord');
       })

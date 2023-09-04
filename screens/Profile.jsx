@@ -13,6 +13,7 @@ import {
   useToast,
   ScrollView,
   AddIcon,
+  Divider,
   KeyboardAvoidingView,
 } from 'native-base';
 import {Feather, MaterialIcons, SimpleLineIcons} from '@expo/vector-icons';
@@ -40,7 +41,7 @@ const Profile = ({navigation}) => {
     try {
       signOut(auth)
         .then(async () => {
-          await AsyncStorage.removeItem('user');
+          await AsyncStorage.clear();
           navigation.navigate('get-start');
         })
         .catch(error => {
@@ -110,7 +111,8 @@ const Profile = ({navigation}) => {
     <ScrollView>
       <KeyboardAvoidingView h={height} behavior={'a'}>
         <HStack
-          style={{marginTop: 50, marginBottom: 20}}
+          style={{marginTop: 25, marginBottom: 2}}
+          alignItems="center"
           space={12}
           justifyContent="space-evenly">
           <Heading size="xl">{user?.displayName}</Heading>
@@ -125,7 +127,7 @@ const Profile = ({navigation}) => {
             </Avatar.Badge>
           </Avatar>
         </HStack>
-
+        <Divider />
         <FormControl my={2}>
           <Stack mx="4">
             <FormControl.Label _text={{fontFamily: 'Poppins-Medium'}}>

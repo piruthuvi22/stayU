@@ -60,8 +60,12 @@ const RenterLogin = ({navigation, route}) => {
       .then(async userCredential => {
         const emailVerified = userCredential?.user?.emailVerified;
         if (emailVerified) {
+          console.log('userRole signIn:', route?.params?.userRole);
           const user = {email: email, userRole: route?.params?.userRole};
           await AsyncStorage.setItem('user', JSON.stringify(user));
+          const value = await AsyncStorage.getItem('user');
+          const val = JSON.parse(value);
+          console.log('value form async storage', val);
           navigation.navigate('TabNavigator', {screen: 'Browse'});
         } else {
           showToast(toast, 'warning', 'Please Verify Email!');
