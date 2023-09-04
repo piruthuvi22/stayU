@@ -96,7 +96,7 @@ const RenterLogin = ({navigation, route}) => {
     <ScrollView>
       <KeyboardAvoidingView h={height} behavior={'a'}>
         <ImageBackground
-          source={require('../../assets/images/backkgroun-login.png')}
+          source={require('../../assets/images/background-login.png')}
           resizeMode="stretch">
           <Stack
             justifyContent={'space-evenly'}
