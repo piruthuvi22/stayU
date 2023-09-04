@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   error: {
-    fontSize: 28,
+    fontSize: 20,
     fontFamily: 'Poppins-Regular',
     color: '#5C5A6F',
   },
