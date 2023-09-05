@@ -11,9 +11,7 @@ import {
   Pressable,
   Button,
   VStack,
-  Flex,
-  Divider,
-  Avatar,
+  Spinner,
   ScrollView,
   KeyboardAvoidingView,
   IconButton,
@@ -42,9 +40,10 @@ let {height, width} = Dimensions.get('screen');
 const RenterLogin = ({navigation, route}) => {
   const {user} = useAuth();
   const [show, setShow] = useState(false);
-  const [email, setEmail] = useState('navaratnamsagini@gmail.com');
-  const [password, setPassword] = useState('Sagini18');
-  const [password2, setPassword2] = useState('Sagini18');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [password2, setPassword2] = useState('');
+  const [buttonLoading, setButtonLoading] = useState(false);
 
   const toast = useToast();
 
@@ -61,6 +60,7 @@ const RenterLogin = ({navigation, route}) => {
   };
 
   const handleRegister = () => {
+    setButtonLoading(true);
     let body = {email, password};
     if (email != '' && password != '' && password2 != '') {
       if (password === password2) {
@@ -85,6 +85,7 @@ const RenterLogin = ({navigation, route}) => {
                   })
                   .then(res => {
                     console.log(res.data);
+                    setButtonLoading(false);
                     showToast(
                       toast,
                       'success',
@@ -93,18 +94,22 @@ const RenterLogin = ({navigation, route}) => {
                     );
                   })
                   .catch(err => {
+                    setButtonLoading(false);
                     console.log(err);
                   });
               })
               .catch(error => {
+                setButtonLoading(false);
                 console.log(error);
               });
           })
           .catch(error => {
+            setButtonLoading(false);
             const errorMessage = error?.message?.split('/')[1]?.split(')')[0];
             showToast(toast, 'warning', errorMessage);
           });
       } else {
+        setButtonLoading(false);
         showToast(toast, 'error', 'Password not match');
       }
     } else {
@@ -266,6 +271,7 @@ const RenterLogin = ({navigation, route}) => {
                   android_ripple={{color: '#F0F1F6'}}
                   backgroundColor="#223343"
                   onPress={handleRegister}
+                  disabled={buttonLoading}
                   width="60%"
                   marginY={1}
                   height={50}
@@ -278,7 +284,17 @@ const RenterLogin = ({navigation, route}) => {
                     fontSize: 'xl',
                     textAlign: 'center',
                   }}>
-                  Register
+                  <HStack space={2}>
+                    {buttonLoading && <Spinner color="#fff" />}
+                    <Text
+                      style={{
+                        color: '#fff',
+                        fontFamily: 'Poppins-Bold',
+                        fontSize: 18,
+                      }}>
+                      Register
+                    </Text>
+                  </HStack>
                 </Button>
                 <Text fontFamily={'Poppins-Medium'} color={'#A0A0A0'} mt={2}>
                   Don't have an account?
