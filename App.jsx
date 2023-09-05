@@ -60,8 +60,27 @@ export default function App() {
     return (
       <Tab.Navigator
         id="tabs"
-        screenOptions={{tabBarHideOnKeyboard: true}}
-        initialRouteName={userRole === 'student' ? 'Browse' : 'home-landlord'}>
+        initialRouteName={userRole === 'student' ? 'Browse' : 'home-landlord'}
+        screenOptions={({route}) => ({
+          tabBarIcon: ({focused, color, size}) => {
+            let iconName;
+            if (route.name === 'home-landlord') {
+              iconName = focused ? 'home' : 'home-outline';
+            } else if (route.name === 'Profile') {
+              iconName = focused ? 'person' : 'person-outline';
+            } else if (route.name === 'WishList') {
+              iconName = focused ? 'bookmarks' : 'bookmarks-outline';
+            } else if (route.name === 'Browse') {
+              iconName = focused ? 'ios-search-sharp' : 'ios-search-outline';
+            }
+
+            // You can return any component that you like here!
+            return <Ionicons name={iconName} size={size} color={color} />;
+          },
+          tabBarActiveTintColor: '#e3b3f2',
+          tabBarInactiveTintColor: '#ffffff',
+          tabBarHideOnKeyboard: true,
+        })}>
         {userRole === 'student' && (
           <>
             <Tab.Screen
@@ -70,10 +89,10 @@ export default function App() {
               options={{
                 headerShown: false,
                 tabBarStyle: {backgroundColor: '#FF4E83', height: 60},
-                tabBarIcon: () => (
-                  <AntDesign name="search1" size={24} color="white" />
-                ),
-                tabBarItemStyle: {marginBottom: 2},
+                // tabBarIcon: () => (
+                //   <AntDesign name="search1" size={24} color="white" />
+                // ),
+                // tabBarItemStyle: {marginBottom: 2},
                 tabBarLabel: 'Browse',
                 tabBarLabelStyle: {color: 'white', fontSize: 14},
               }}
@@ -84,15 +103,15 @@ export default function App() {
               options={{
                 headerShown: false,
                 tabBarStyle: {backgroundColor: '#FF4E83', height: 60},
-                tabBarIcon: () => (
-                  <Ionicons name="bookmarks-outline" size={24} color="white" />
-                ),
-                tabBarItemStyle: {
-                  marginBottom: 2,
-                  borderBottomWidth: 2,
-                  borderBottomColor: '#fff',
-                  borderRadius: 10,
-                },
+                // tabBarIcon: () => (
+                //   <Ionicons name="bookmarks-outline" size={24} color="white" />
+                // ),
+                // tabBarItemStyle: {
+                //   marginBottom: 2,
+                //   // borderBottomWidth: 2,
+                //   // borderBottomColor: '#fff',
+                //   // borderRadius: 10,
+                // },
                 tabBarLabel: 'WishList',
                 tabBarLabelStyle: {color: 'white', fontSize: 14},
               }}
@@ -108,10 +127,10 @@ export default function App() {
               options={{
                 headerShown: false,
                 tabBarStyle: {backgroundColor: '#FF4E83', height: 60},
-                tabBarIcon: () => (
-                  <AntDesign name="home" size={24} color="white" />
-                ),
-                tabBarItemStyle: {marginBottom: 2},
+                // tabBarIcon: () => (
+                //   // <AntDesign name="home" size={24} color="white" />
+                // ),
+                // tabBarItemStyle: {marginBottom: 2},
                 tabBarLabel: 'Home',
                 tabBarLabelStyle: {color: 'white', fontSize: 14},
                 title: 'Add Home',
@@ -160,8 +179,8 @@ export default function App() {
           options={{
             headerShown: false,
             tabBarStyle: {backgroundColor: '#FF4E83', height: 60},
-            tabBarIcon: () => <AntDesign name="user" size={24} color="white" />,
-            tabBarItemStyle: {marginBottom: 2},
+            // tabBarIcon: () => <AntDesign name="user" size={24} color="white" />,
+            // tabBarItemStyle: {marginBottom: 2},
             tabBarLabel: 'Account',
             tabBarLabelStyle: {color: 'white', fontSize: 14},
           }}
