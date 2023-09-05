@@ -8,6 +8,7 @@ import {
   VStack,
   Actionsheet,
   useDisclose,
+  Spinner,
   useToast,
 } from 'native-base';
 import {Rating, AirbnbRating} from 'react-native-ratings';
@@ -17,6 +18,8 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  Dimensions,
+  StatusBar,
   View,
 } from 'react-native';
 import {SliderBox} from 'react-native-image-slider-box';
@@ -64,8 +67,9 @@ const Details = ({navigation, route}) => {
   const {user} = useAuth();
   const userRole = route?.params?.userRole;
   const [landlord, setLandlord] = useState({});
-
+  const [loading, setLoading] = useState(true);
   const [student, setStudent] = useState({});
+  const [buttonLoading, setButtonLoading] = useState(false);
 
   // useFocusEffect(
   //   useCallback(() => {
@@ -89,7 +93,6 @@ const Details = ({navigation, route}) => {
         },
       })
       .then(res => {
-        // console.log(res.data);
         setLandlord(res.data);
       })
       .catch(err => console.log(err));
@@ -107,6 +110,7 @@ const Details = ({navigation, route}) => {
       .catch(err => console.log(err));
   };
   useEffect(() => {
+    setLoading(true);
     console.log('Details userRole:', userRole);
     if (userRole === 'student') {
       getLandlord();
@@ -122,9 +126,15 @@ const Details = ({navigation, route}) => {
           res.data.status ? setIsSaved(true) : setIsSaved(false);
         })
         .catch(err => console.log("Can't get status", err));
+      setLoading(false);
     } else {
       getStudent();
+      setLoading(false);
     }
+    return () => {
+      setLandlord({});
+      setStudent({});
+    };
   }, [_id]);
 
   const handleSave = () => {
@@ -134,54 +144,60 @@ const Details = ({navigation, route}) => {
         userEmail: user?.email,
       })
       .then(res => {
-        console.log(res.data);
         res.data.status === 'added' ? setIsSaved(true) : setIsSaved(false);
       })
       .catch(err => console.log(err));
   };
 
   const handleReserve = () => {
+    setButtonLoading(true);
     axios
       .post(env.api + '/reservation/new', {
         PlaceId: _id,
         UserEmail: user?.email,
       })
       .then(res => {
-        console.log(res);
+        setButtonLoading(false);
         showToast(toast, 'success', 'Reservation Requested');
-        navigation.navigate('TabNavigator', {screen: 'home-landlord'});
+        navigation.navigate('TabNavigator', {screen: 'Browse'});
       })
       .catch(err => console.log(err));
   };
   const handleAccept = () => {
+    setButtonLoading(true);
     axios
       .put(env.api + '/reservation/accepted', {
         PlaceId: _id,
       })
       .then(res => {
+        setButtonLoading(false);
         showToast(toast, 'success', 'Reservation Accepted');
         navigation.navigate('home-landlord');
       })
       .catch(err => console.log(err));
   };
   const handleReject = () => {
+    setButtonLoading(true);
     axios
       .put(env.api + '/reservation/rejected', {
         PlaceId: _id,
       })
       .then(res => {
-        showToast(toast, 'success', 'Reservation Rejected');
+        setButtonLoading(false);
+        showToast(toast, 'warning', 'Reservation Rejected');
         navigation.navigate('home-landlord');
       })
       .catch(err => console.log(err));
   };
 
   const handleAvailable = () => {
+    setButtonLoading(true);
     axios
       .put(env.api + '/reservation/available', {
         PlaceId: _id,
       })
       .then(res => {
+        setButtonLoading(false);
         showToast(toast, 'success', 'Place is now available');
         navigation.navigate('home-landlord');
       })
@@ -190,55 +206,77 @@ const Details = ({navigation, route}) => {
 
   return (
     <Box h={'full'}>
-      <HStack
-        px={3}
-        pt={2}
-        justifyContent={'space-between'}
-        alignItems={'center'}>
-        <VStack>
-          <Text style={styles.title}>{PlaceTitle}</Text>
-          <Text style={styles.location}>{'Katubedda'}</Text>
-        </VStack>
-        <AirbnbRating
-          showRating={false}
-          count={5}
-          defaultRating={Rating}
-          isDisabled
-          size={18}
-          selectedColor={'#F24E1E'}
-          ratingBackgroundColor="blue"
-          // onFinishRating={handleRating}
-        />
-        <Text style={styles.location}>{Rating}</Text>
-      </HStack>
-      <Divider />
-
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        StickyHeaderComponent={() => <Text>Hello</Text>}
-        style={{width: '100%', marginBottom: '60px'}}>
-        {/* Description */}
-        <Box px={3} py={2}>
-          <Text style={styles.desc}>{PlaceDescription}</Text>
+      {loading ? (
+        <Box
+          h="full"
+          style={{
+            position: 'relative',
+            top: StatusBar.currentHeight,
+            backgroundColor: '#eee',
+            height: Dimensions.get('window').height,
+            paddingBottom: 60,
+          }}>
+          <Center h="full">
+            <Spinner color="pink.500" size={'lg'} />
+          </Center>
         </Box>
-
-        {/* Images */}
-        <Box px={3} pt={2}>
-          <SliderBox images={images} sliderBoxHeight={200} parentWidth={337} />
-        </Box>
-
-        {/* Cost & Add to wishlist */}
-        <HStack justifyContent={'space-between'} alignItems="baseline" px={3}>
-          <HStack alignItems="baseline">
-            <Text style={styles.money}>Rs. {Cost}/</Text>
-            <Text style={styles.month}>
-              {Facilities?.Payment?.toLowerCase() === 'monthly'
-                ? 'Month'
-                : 'Year'}
-            </Text>
+      ) : (
+        <>
+          <HStack
+            px={3}
+            pt={2}
+            justifyContent={'space-between'}
+            alignItems={'center'}>
+            <VStack>
+              <Text style={styles.title}>{PlaceTitle}</Text>
+              <Text style={styles.location}>{'Katubedda'}</Text>
+            </VStack>
+            <AirbnbRating
+              showRating={false}
+              count={5}
+              defaultRating={Rating}
+              isDisabled
+              size={18}
+              selectedColor={'#F24E1E'}
+              ratingBackgroundColor="blue"
+              // onFinishRating={handleRating}
+            />
+            <Text style={styles.location}>{Rating}</Text>
           </HStack>
-          <HStack alignItems="center" justifyContent="space-evenly">
-            {/* <Pressable
+          <Divider />
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            StickyHeaderComponent={() => <Text>Hello</Text>}
+            style={{width: '100%', marginBottom: '60px'}}>
+            {/* Description */}
+            <Box px={3} py={2}>
+              <Text style={styles.desc}>{PlaceDescription}</Text>
+            </Box>
+
+            {/* Images */}
+            <Box px={3} pt={2}>
+              <SliderBox
+                images={images}
+                sliderBoxHeight={200}
+                parentWidth={337}
+              />
+            </Box>
+
+            {/* Cost & Add to wishlist */}
+            <HStack
+              justifyContent={'space-between'}
+              alignItems="baseline"
+              px={3}>
+              <HStack alignItems="baseline">
+                <Text style={styles.money}>Rs. {Cost}/</Text>
+                <Text style={styles.month}>
+                  {Facilities?.Payment?.toLowerCase() === 'monthly'
+                    ? 'Month'
+                    : 'Year'}
+                </Text>
+              </HStack>
+              <HStack alignItems="center" justifyContent="space-evenly">
+                {/* <Pressable
             android_ripple={{
               color: "#F24E1E22",
               borderless: true,
@@ -248,96 +286,108 @@ const Details = ({navigation, route}) => {
           >
             <AntDesign name="sharealt" size={25} color="#F24E1E" />
           </Pressable> */}
+                {userRole === 'student' && (
+                  <Pressable
+                    android_ripple={{
+                      color: '#F24E1E22',
+                      borderless: true,
+                      radius: 25,
+                      foreground: true,
+                    }}
+                    onPress={handleSave}>
+                    <Ionicons
+                      name={isSaved ? 'bookmarks' : 'bookmarks-outline'}
+                      size={25}
+                      color="#FF4E83"
+                    />
+                  </Pressable>
+                )}
+              </HStack>
+            </HStack>
+
+            <Divider />
             {userRole === 'student' && (
-              <Pressable
-                android_ripple={{
-                  color: '#F24E1E22',
-                  borderless: true,
-                  radius: 25,
-                  foreground: true,
-                }}
-                onPress={handleSave}>
-                <Ionicons
-                  name={isSaved ? 'bookmarks' : 'bookmarks-outline'}
-                  size={25}
-                  color="#FF4E83"
-                />
-              </Pressable>
+              <>
+                <Text style={styles.userTitle}>Landlord</Text>
+                <Box
+                  style={{
+                    paddingStart: 25,
+                    flexWrap: 'wrap',
+                    paddingBottom: 10,
+                  }}>
+                  <HStack>
+                    <AntDesign name="user" size={17} color="black" />
+                    <Text style={styles.landlordSubtitle}>
+                      {landlord?.displayName}
+                    </Text>
+                  </HStack>
+                  <HStack>
+                    <MaterialCommunityIcons
+                      name="email-outline"
+                      size={17}
+                      color="black"
+                    />
+                    <Text style={styles.landlordSubtitle}>
+                      {landlord?.email}
+                    </Text>
+                  </HStack>
+
+                  <HStack>
+                    <MaterialCommunityIcons
+                      name="phone-outline"
+                      size={17}
+                      color="black"
+                    />
+                    <Text style={styles.landlordSubtitle}>
+                      {landlord?.phoneNumber}
+                    </Text>
+                  </HStack>
+                </Box>
+              </>
             )}
-          </HStack>
-        </HStack>
+            {userRole === 'landlord' &&
+              (status === 'PENDING' || status === 'RESERVED') && (
+                <>
+                  <Text style={styles.userTitle}>Student</Text>
+                  <Box
+                    style={{
+                      paddingStart: 25,
+                      flexWrap: 'wrap',
+                      paddingBottom: 10,
+                    }}>
+                    <HStack>
+                      <AntDesign name="user" size={24} color="black" />
+                      <Text style={styles.landlordSubtitle}>
+                        {student?.displayName}
+                      </Text>
+                    </HStack>
+                    <HStack>
+                      <MaterialCommunityIcons
+                        name="email-outline"
+                        size={24}
+                        color="black"
+                      />
+                      <Text style={styles.landlordSubtitle}>
+                        {student?.email}
+                      </Text>
+                    </HStack>
 
-        <Divider />
-        {userRole === 'student' && (
-          <>
-            <Text style={styles.userTitle}>Landlord</Text>
-            <Box
-              style={{paddingStart: 25, flexWrap: 'wrap', paddingBottom: 10}}>
-              <HStack>
-                <AntDesign name="user" size={17} color="black" />
-                <Text style={styles.landlordSubtitle}>
-                  {landlord?.displayName}
-                </Text>
-              </HStack>
-              <HStack>
-                <MaterialCommunityIcons
-                  name="email-outline"
-                  size={17}
-                  color="black"
-                />
-                <Text style={styles.landlordSubtitle}>{landlord?.email}</Text>
-              </HStack>
+                    <HStack>
+                      <MaterialCommunityIcons
+                        name="phone-outline"
+                        size={24}
+                        color="black"
+                      />
+                      <Text style={styles.landlordSubtitle}>
+                        {student?.phoneNumber}
+                      </Text>
+                    </HStack>
+                  </Box>
+                </>
+              )}
 
-              <HStack>
-                <MaterialCommunityIcons
-                  name="phone-outline"
-                  size={17}
-                  color="black"
-                />
-                <Text style={styles.landlordSubtitle}>
-                  {landlord?.phoneNumber}
-                </Text>
-              </HStack>
-            </Box>
-          </>
-        )}
-        {userRole === 'landlord' &&
-          (status === 'PENDING' || status === 'RESERVED') && (
-            <>
-              <Text style={styles.userTitle}>Student</Text>
-              <Box
-                style={{paddingStart: 25, flexWrap: 'wrap', paddingBottom: 10}}>
-                <HStack>
-                  <AntDesign name="user" size={24} color="black" />
-                  <Text style={styles.landlordSubtitle}>
-                    {student?.displayName}
-                  </Text>
-                </HStack>
-                <HStack>
-                  <MaterialCommunityIcons
-                    name="email-outline"
-                    size={24}
-                    color="black"
-                  />
-                  <Text style={styles.landlordSubtitle}>{student?.email}</Text>
-                </HStack>
-
-                <HStack>
-                  <MaterialCommunityIcons
-                    name="phone-outline"
-                    size={24}
-                    color="black"
-                  />
-                  <Text style={styles.landlordSubtitle}>
-                    {student?.phoneNumber}
-                  </Text>
-                </HStack>
-              </Box>
-            </>
-          )}
-
-        {/* Facilities bar */}
-        {/* <HStack
+            {/* Facilities bar */}
+            {/* <HStack
           style={styles.facilities}
           my={2}
           px={3}
@@ -345,141 +395,158 @@ const Details = ({navigation, route}) => {
           justifyContent={'space-between'}>
           <Text style={styles.location}>Faclities</Text>
         </HStack> */}
-        <Divider />
-        {/* Facilities */}
-        <FacilitiesDetails info={route.params} />
+            <Divider />
+            {/* Facilities */}
+            <FacilitiesDetails info={route.params} />
 
-        {/* Review bar */}
-        <HStack
-          style={styles.reviews}
-          my={2}
-          px={3}
-          alignItems="center"
-          justifyContent={'space-between'}>
-          <Text style={styles.location}>Review</Text>
-          <HStack alignItems="baseline" mx={1}>
-            <AirbnbRating
-              isDisabled
-              showRating={false}
-              count={5}
-              defaultRating={Rating}
-              size={14}
-              selectedColor={'#F24E1E'}
-              ratingBackgroundColor="blue"
-              // onFinishRating={(r) => console.log(r)}
-            />
-
-            <AntDesign
-              name="down"
-              size={24}
-              color="#777"
-              onPress={onOpenComm}
-            />
-          </HStack>
-        </HStack>
-      </ScrollView>
-
-      {/* Review actionsheet */}
-      <Actionsheet isOpen={isOpenComm} onClose={onCloseComm}>
-        <Actionsheet.Content>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            StickyHeaderComponent={() => <Text>Hello</Text>}
-            style={{width: '100%'}}>
-            <Comment />
-            <Comment />
-            <Comment />
-            <Comment />
-            <Comment />
-            <Comment />
-            <Comment />
-            <Comment />
-            <Comment />
-          </ScrollView>
-        </Actionsheet.Content>
-      </Actionsheet>
-
-      {/* Bottom bar */}
-      {userRole === 'student' ? (
-        <Box style={styles.bottomBar}>
-          <HStack
-            alignItems={'center'}
-            h="full"
-            justifyContent={'flex-end'}
-            px={3}
-            w="full">
-            <Button
-              mx={2}
-              px={6}
-              style={
-                status === 'RESERVED' || status === 'PENDING'
-                  ? styles.disabled
-                  : styles.reserve
-              }
-              disabled={
-                status === 'RESERVED' || status === 'PENDING' ? true : false
-              }
-              borderRadius={5}
-              _text={{style: {color: '#fff', fontFamily: 'Poppins-Medium'}}}
-              android_ripple={{color: '#ffffff55'}}
-              onPress={handleReserve}>
-              Reserve
-            </Button>
-          </HStack>
-        </Box>
-      ) : userRole === 'landlord' && status === 'PENDING' ? (
-        <Box style={styles.bottomBar}>
-          <HStack
-            alignItems={'center'}
-            h="full"
-            justifyContent={'flex-end'}
-            px={3}
-            w="full">
-            <Button
-              mx={2}
-              px={6}
-              style={styles.reject}
-              borderRadius={5}
-              _text={{style: {color: '#fff', fontFamily: 'Poppins-Medium'}}}
-              android_ripple={{color: '#ffffff55'}}
-              onPress={handleReject}>
-              Reject
-            </Button>
-            <Button
-              mx={2}
-              px={6}
-              style={styles.accept}
-              borderRadius={5}
-              _text={{style: {color: '#fff', fontFamily: 'Poppins-Medium'}}}
-              android_ripple={{color: '#ffffff55'}}
-              onPress={handleAccept}>
-              Accept
-            </Button>
-          </HStack>
-        </Box>
-      ) : (
-        userRole === 'landlord' &&
-        status === 'RESERVED' && (
-          <Box style={styles.bottomBar}>
+            {/* Review bar */}
             <HStack
-              alignItems={'center'}
-              h="full"
-              justifyContent={'flex-end'}
+              style={styles.reviews}
+              my={2}
               px={3}
-              w="full">
-              <Button
-                mx={2}
-                px={6}
-                style={styles.available}
-                borderRadius={5}
-                _text={{style: {color: '#fff', fontFamily: 'Poppins-Medium'}}}
-                android_ripple={{color: '#ffffff55'}}
-                onPress={handleAvailable}>
-                Available
-              </Button>
+              alignItems="center"
+              justifyContent={'space-between'}>
+              <Text style={styles.location}>Review</Text>
+              <HStack alignItems="baseline" mx={1}>
+                <AirbnbRating
+                  isDisabled
+                  showRating={false}
+                  count={5}
+                  defaultRating={Rating}
+                  size={14}
+                  selectedColor={'#F24E1E'}
+                  ratingBackgroundColor="blue"
+                  // onFinishRating={(r) => console.log(r)}
+                />
+
+                <AntDesign
+                  name="down"
+                  size={24}
+                  color="#777"
+                  onPress={onOpenComm}
+                />
+              </HStack>
             </HStack>
-          </Box>
-        )
+          </ScrollView>
+          {/* Review actionsheet */}
+          <Actionsheet isOpen={isOpenComm} onClose={onCloseComm}>
+            <Actionsheet.Content>
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                StickyHeaderComponent={() => <Text>Hello</Text>}
+                style={{width: '100%'}}>
+                <Comment />
+                <Comment />
+                <Comment />
+                <Comment />
+                <Comment />
+                <Comment />
+                <Comment />
+                <Comment />
+                <Comment />
+              </ScrollView>
+            </Actionsheet.Content>
+          </Actionsheet>
+          {/* Bottom bar */}
+          {userRole === 'student' ? (
+            <Box style={styles.bottomBar}>
+              <HStack
+                alignItems={'center'}
+                h="full"
+                justifyContent={'flex-end'}
+                px={3}
+                w="full">
+                <Button
+                  mx={2}
+                  px={6}
+                  style={
+                    status === 'RESERVED' || status === 'PENDING'
+                      ? styles.disabled
+                      : styles.reserve
+                  }
+                  disabled={
+                    status === 'RESERVED' || status === 'PENDING' ? true : false
+                  }
+                  borderRadius={5}
+                  android_ripple={{color: '#ffffff55'}}
+                  onPress={handleReserve}>
+                  <HStack space={2}>
+                    {buttonLoading && <Spinner color="#fff" />}
+                    <Text style={{color: '#fff', fontFamily: 'Poppins-Medium'}}>
+                      Reserve
+                    </Text>
+                  </HStack>
+                </Button>
+              </HStack>
+            </Box>
+          ) : userRole === 'landlord' && status === 'PENDING' ? (
+            <Box style={styles.bottomBar}>
+              <HStack
+                alignItems={'center'}
+                h="full"
+                justifyContent={'flex-end'}
+                px={3}
+                w="full">
+                <Button
+                  mx={2}
+                  px={6}
+                  style={styles.reject}
+                  borderRadius={5}
+                  android_ripple={{color: '#ffffff55'}}
+                  onPress={handleReject}>
+                  <HStack space={2}>
+                    {buttonLoading && <Spinner color="#fff" />}
+                    <Text style={{color: '#fff', fontFamily: 'Poppins-Medium'}}>
+                      Reject
+                    </Text>
+                  </HStack>
+                </Button>
+                <Button
+                  mx={2}
+                  px={6}
+                  style={styles.accept}
+                  borderRadius={5}
+                  android_ripple={{color: '#ffffff55'}}
+                  onPress={handleAccept}>
+                  <HStack space={2}>
+                    {buttonLoading && <Spinner color="#fff" />}
+                    <Text style={{color: '#fff', fontFamily: 'Poppins-Medium'}}>
+                      Accept
+                    </Text>
+                  </HStack>
+                </Button>
+              </HStack>
+            </Box>
+          ) : (
+            userRole === 'landlord' &&
+            status === 'RESERVED' && (
+              <Box style={styles.bottomBar}>
+                <HStack
+                  alignItems={'center'}
+                  h="full"
+                  justifyContent={'flex-end'}
+                  px={3}
+                  w="full">
+                  <Button
+                    mx={2}
+                    px={6}
+                    style={styles.available}
+                    borderRadius={5}
+                    android_ripple={{color: '#ffffff55'}}
+                    onPress={handleAvailable}>
+                    <HStack space={2}>
+                      {buttonLoading && <Spinner color="#fff" />}
+                      <Text
+                        style={{color: '#fff', fontFamily: 'Poppins-Medium'}}>
+                        Available
+                      </Text>
+                    </HStack>
+                  </Button>
+                </HStack>
+              </Box>
+            )
+          )}
+        </>
       )}
     </Box>
   );
