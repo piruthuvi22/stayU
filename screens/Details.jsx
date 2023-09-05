@@ -31,6 +31,8 @@ import {FacilitiesDetails} from '../components/Facilities';
 import {useFocusEffect} from '@react-navigation/native';
 import showToast from '../components/core/toast';
 import {useAuth} from '../utilities/context';
+import {storage} from '../utilities/firebase';
+import {listAll} from 'firebase/storage';
 // import ImageSlider from "react-native-image-slider";
 
 const Details = ({navigation, route}) => {
@@ -38,6 +40,7 @@ const Details = ({navigation, route}) => {
     _id,
     PlaceTitle,
     PlaceDescription,
+    ImageUrl,
     Cost,
     Rating,
     Facilities,
@@ -47,12 +50,7 @@ const Details = ({navigation, route}) => {
   } = route.params;
   const [isSaved, setIsSaved] = useState(false);
   const toast = useToast();
-  const [images, setImages] = useState([
-    'https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014__340.jpg',
-    'https://images.pexels.com/photos/15286/pexels-photo.jpg?cs=srgb&dl=pexels-luis-del-r%C3%ADo-15286.jpg&fm=jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/3/36/Hopetoun_falls.jpg',
-    'https://www.undp.org/sites/g/files/zskgke326/files/migration/cn/UNDP-CH-Why-Humanity-Must-Save-Nature-To-Save-Itself.jpeg',
-  ]);
+  const [images, setImages] = useState([]);
 
   const {
     isOpen: isOpenComm,
@@ -110,6 +108,11 @@ const Details = ({navigation, route}) => {
       .catch(err => console.log(err));
   };
   useEffect(() => {
+    if (ImageUrl) {
+      setImages([ImageUrl]);
+    } else {
+      setImages([require('../assets/images/image-placeholder.jpg')]);
+    }
     setLoading(true);
     console.log('Details userRole:', userRole);
     if (userRole === 'student') {
@@ -203,6 +206,8 @@ const Details = ({navigation, route}) => {
       })
       .catch(err => console.log(err));
   };
+  // Get all images from firebase storage folder
+  const fetchImages = async () => {};
 
   return (
     <Box h={'full'}>

@@ -52,6 +52,7 @@ import {ToastAndroid} from 'react-native';
 export default function AddHome({navigation, route}) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
   const [rent, setRent] = useState('');
   const {isOpen, onOpen, onClose} = useDisclose();
   const [roomType, setRoomType] = useState('');
@@ -221,6 +222,7 @@ export default function AddHome({navigation, route}) {
     const uploadTask = uploadBytes(storageRef, blob)
       .then(snapshot => {
         getDownloadURL(snapshot.ref).then(downloadURL => {
+          setImageUrl(downloadURL);
           console.log('File available at', downloadURL);
         });
       })
@@ -275,6 +277,7 @@ export default function AddHome({navigation, route}) {
   // useEffect(() => {
   //   getImages();
   // }, []);
+
   const handleSubmit = () => {
     console.log(
       title,
@@ -306,6 +309,7 @@ export default function AddHome({navigation, route}) {
           LandlordEmail: user?.email,
           PlaceTitle: title,
           PlaceDescription: description,
+          ImageUrl:imageUrl,
           Cost: rentAmount,
           Coordinates: route.params?.location,
           Facilities: {

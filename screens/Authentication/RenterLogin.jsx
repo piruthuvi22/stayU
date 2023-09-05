@@ -96,7 +96,7 @@ const RenterLogin = ({navigation, route}) => {
     <ScrollView>
       <KeyboardAvoidingView h={height} behavior={'a'}>
         <ImageBackground
-          source={require('../../assets/images/backkgroun-login.png')}
+          source={require('../../assets/images/background-login.png')}
           resizeMode="stretch">
           <Stack
             justifyContent={'space-evenly'}
@@ -246,35 +246,6 @@ const RenterLogin = ({navigation, route}) => {
                   </Text>
                 </Text>
               </Center>
-
-              {/* <HStack alignItems={"center"} mt={3}>
-              <Divider />
-              <Text
-                color={"#A0A0A0"}
-                onPress={() => console.log("Dont have an acc")}
-              >
-                &nbsp; &nbsp;Or login with&nbsp; &nbsp;
-              </Text>
-              <Divider />
-            </HStack> */}
-
-              {/* <HStack justifyContent={"center"} mt={3} space={5}>
-              <Avatar
-                source={require("../assets/images/fb.png")}
-                backgroundColor={"#ddd"}
-              />
-              <Avatar
-                source={require("../assets/images/google.png")}
-                backgroundColor={"#ddd"}
-              />
-            </HStack> */}
-              {/* Temporary button */}
-              {/* <Button
-                onPress={() =>
-                  navigation.navigate('TabNavigator', {screen: 'add-home'})
-                }>
-                landlord - upload
-              </Button> */}
             </VStack>
           </Stack>
         </ImageBackground>

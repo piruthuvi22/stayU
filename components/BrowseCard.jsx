@@ -20,6 +20,7 @@ const BrowseCard = ({
   Rating,
   PlaceTitle,
   PlaceDescription,
+  ImageUrl,
   Facilities,
   Cost,
   Coordinates,
@@ -103,6 +104,11 @@ const BrowseCard = ({
     uniLocation && calculateDistance();
   }, [uniLocation ? uniLocation : null, _id]);
 
+  const imageSource = ImageUrl
+    ? {uri: ImageUrl} // Local image
+    : require('../assets/images/image-placeholder.jpg'); // Remote image URL
+
+  console.log(ImageUrl);
   return (
     <Box style={styles.card} w="full" my={1} borderRadius={3}>
       <Pressable
@@ -111,6 +117,7 @@ const BrowseCard = ({
             _id,
             PlaceTitle,
             PlaceDescription,
+            ImageUrl,
             Cost,
             Rating,
             Facilities,
@@ -128,6 +135,7 @@ const BrowseCard = ({
                 navigation.navigate('Details', {
                   _id,
                   PlaceTitle,
+                  ImageUrl,
                   Cost,
                   Rating,
                   Facilities,
@@ -137,14 +145,7 @@ const BrowseCard = ({
                   userRole,
                 })
               }>
-              <Image
-                source={{
-                  uri: 'https://www.travelanddestinations.com/wp-content/uploads/2017/10/hostel-room-pixabay-182965_1280.jpg',
-                }}
-                alt="room1"
-                h={'full'}
-                w={'full'}
-              />
+              <Image source={imageSource} alt="room1" h={'full'} w={'full'} />
             </TouchableOpacity>
           </Box>
           <Row justifyContent={'space-between'} style={{width: '60%'}} py={2}>

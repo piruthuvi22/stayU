@@ -45,8 +45,9 @@ const Screen2 = ({navigation}) => {
       <VStack space={1} alignItems={'center'} justifyContent={'center'}>
         <Center h={'50%'} w={'100%'}>
           <Image
+            marginTop={'40%'}
             source={require('../../assets/images/landing_home.png')}
-            w={'80%'}
+            w={'70%'}
             resizeMode="contain"
             alt="home"
           />
