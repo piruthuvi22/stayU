@@ -106,6 +106,7 @@ const BrowseCard = ({
   return (
     <Box style={styles.card} w="full" my={1} borderRadius={3}>
       <Pressable
+        onLongPress={() => console.log('Hello I am long pressed', _id)}
         onPress={() =>
           navigation.navigate('Details', {
             _id,
@@ -258,6 +259,7 @@ const styles = StyleSheet.create({
     // width: "100%",
     backgroundColor: '#fff',
   },
+
   title: {
     fontFamily: 'Poppins-Medium',
     fontSize: 16,
