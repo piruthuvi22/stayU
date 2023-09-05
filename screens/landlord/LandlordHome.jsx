@@ -69,6 +69,16 @@ const LandlordHome = ({navigation}) => {
               <Button onPress={getPlaces} variant={'ghost'}>
                 Try again
               </Button>
+              <Fab
+                renderInPortal={false}
+                style={styles.fabBtn}
+                onPress={() => navigation.navigate('add-home')}
+                shadow={2}
+                size="sm"
+                icon={
+                  <Icon color="#FF4E83" as={AntDesign} name="plus" size="sm" />
+                }
+              />
             </Center>
           ) : (
             <>

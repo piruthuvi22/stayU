@@ -476,7 +476,11 @@ const Details = ({navigation, route}) => {
                       : styles.reserve
                   }
                   disabled={
-                    status === 'RESERVED' || status === 'PENDING' ? true : false
+                    status === 'RESERVED' ||
+                    status === 'PENDING' ||
+                    buttonLoading
+                      ? true
+                      : false
                   }
                   borderRadius={5}
                   android_ripple={{color: '#ffffff55'}}
@@ -502,6 +506,7 @@ const Details = ({navigation, route}) => {
                   mx={2}
                   px={6}
                   style={styles.reject}
+                  disabled={buttonLoading}
                   borderRadius={5}
                   android_ripple={{color: '#ffffff55'}}
                   onPress={handleReject}>
@@ -517,6 +522,7 @@ const Details = ({navigation, route}) => {
                   px={6}
                   style={styles.accept}
                   borderRadius={5}
+                  disabled={buttonLoading}
                   android_ripple={{color: '#ffffff55'}}
                   onPress={handleAccept}>
                   <HStack space={2}>
@@ -542,6 +548,7 @@ const Details = ({navigation, route}) => {
                     mx={2}
                     px={6}
                     style={styles.available}
+                    disabled={buttonLoading}
                     borderRadius={5}
                     android_ripple={{color: '#ffffff55'}}
                     onPress={handleAvailable}>

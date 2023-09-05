@@ -42,6 +42,7 @@ import {LocationPicker} from './components/LocationPicker';
 export default function App() {
   const TabNavigator = () => {
     const [userRole, setUserRole] = useState('');
+    const [loading, setLoading] = useState(false);
     const getUserRole = async () => {
       try {
         const value = await AsyncStorage.getItem('user');
@@ -49,6 +50,7 @@ export default function App() {
           const val = JSON.parse(value);
           setUserRole(val.userRole);
           console.log('userRole.value app.jsx:', userRole);
+          setLoading(true);
         }
       } catch (e) {
         console.log(e);
@@ -58,173 +60,173 @@ export default function App() {
       getUserRole();
     }, [userRole]);
     return (
-      <Tab.Navigator
-        id="tabs"
-        initialRouteName={userRole === 'student' ? 'Browse' : 'home-landlord'}
-        screenOptions={({route}) => ({
-          tabBarIcon: ({focused, color, size}) => {
-            let iconName;
-            if (route.name === 'home-landlord') {
-              iconName = focused ? 'home' : 'home-outline';
-            } else if (route.name === 'Profile') {
-              iconName = focused ? 'person' : 'person-outline';
-            } else if (route.name === 'WishList') {
-              iconName = focused ? 'bookmarks' : 'bookmarks-outline';
-            } else if (route.name === 'Browse') {
-              iconName = focused ? 'ios-search-sharp' : 'ios-search-outline';
-            }
+      loading && (
+        <Tab.Navigator
+          id="tabs"
+          initialRouteName={userRole === 'student' ? 'Browse' : 'home-landlord'}
+          screenOptions={({route}) => ({
+            tabBarIcon: ({focused, color, size}) => {
+              let iconName;
+              if (route.name === 'home-landlord') {
+                iconName = focused ? 'home' : 'home-outline';
+              } else if (route.name === 'Profile') {
+                iconName = focused ? 'person' : 'person-outline';
+              } else if (route.name === 'WishList') {
+                iconName = focused ? 'bookmarks' : 'bookmarks-outline';
+              } else if (route.name === 'Browse') {
+                iconName = focused ? 'ios-search-sharp' : 'ios-search-outline';
+              }
 
-            // You can return any component that you like here!
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-          tabBarActiveTintColor: '#e3b3f2',
-          tabBarInactiveTintColor: '#ffffff',
-          tabBarHideOnKeyboard: true,
-        })}>
-        {userRole === 'student' && (
-          <>
-            <Tab.Screen
-              name="Browse"
-              component={Browse}
-              options={{
-                headerShown: false,
-                tabBarStyle: {backgroundColor: '#FF4E83', height: 60},
-                // tabBarIcon: () => (
-                //   <AntDesign name="search1" size={24} color="white" />
-                // ),
-                // tabBarItemStyle: {marginBottom: 2},
-                tabBarLabel: 'Browse',
-                tabBarLabelStyle: {color: 'white', fontSize: 14},
-              }}
-            />
-            <Tab.Screen
-              name="WishList"
-              component={WishList}
-              options={{
-                headerShown: false,
-                tabBarStyle: {backgroundColor: '#FF4E83', height: 60},
-                // tabBarIcon: () => (
-                //   <Ionicons name="bookmarks-outline" size={24} color="white" />
-                // ),
-                // tabBarItemStyle: {
-                //   marginBottom: 2,
-                //   // borderBottomWidth: 2,
-                //   // borderBottomColor: '#fff',
-                //   // borderRadius: 10,
-                // },
-                tabBarLabel: 'WishList',
-                tabBarLabelStyle: {color: 'white', fontSize: 14},
-              }}
-            />
-          </>
-        )}
+              // You can return any component that you like here!
+              return <Ionicons name={iconName} size={size} color={color} />;
+            },
+            tabBarActiveTintColor: '#e3b3f2',
+            tabBarInactiveTintColor: '#ffffff',
+            tabBarHideOnKeyboard: true,
+          })}>
+          {userRole === 'student' && (
+            <>
+              <Tab.Screen
+                name="Browse"
+                component={Browse}
+                options={{
+                  headerShown: false,
+                  tabBarStyle: {backgroundColor: '#FF4E83', height: 60},
+                  // tabBarIcon: () => (
+                  //   <AntDesign name="search1" size={24} color="white" />
+                  // ),
+                  // tabBarItemStyle: {marginBottom: 2},
+                  tabBarLabel: 'Browse',
+                  tabBarLabelStyle: {color: 'white', fontSize: 14},
+                }}
+              />
+              <Tab.Screen
+                name="WishList"
+                component={WishList}
+                options={{
+                  headerShown: false,
+                  tabBarStyle: {backgroundColor: '#FF4E83', height: 60},
+                  // tabBarIcon: () => (
+                  //   <Ionicons name="bookmarks-outline" size={24} color="white" />
+                  // ),
+                  // tabBarItemStyle: {
+                  //   marginBottom: 2,
+                  //   // borderBottomWidth: 2,
+                  //   // borderBottomColor: '#fff',
+                  //   // borderRadius: 10,
+                  // },
+                  tabBarLabel: 'WishList',
+                  tabBarLabelStyle: {color: 'white', fontSize: 14},
+                }}
+              />
+            </>
+          )}
 
-        {userRole === 'landlord' && (
-          <>
-            <Tab.Screen
-              name="home-landlord"
-              component={LandlordHome}
-              options={{
-                headerShown: false,
-                tabBarStyle: {backgroundColor: '#FF4E83', height: 60},
-                // tabBarIcon: () => (
-                //   // <AntDesign name="home" size={24} color="white" />
-                // ),
-                // tabBarItemStyle: {marginBottom: 2},
-                tabBarLabel: 'Home',
-                tabBarLabelStyle: {color: 'white', fontSize: 14},
-                title: 'Add Home',
-              }}
-            />
-            <Tab.Screen
-              name="add-home"
-              component={AddHome}
-              options={({route, navigation}) => ({
-                headerTitleStyle: {color: '#fff'},
-                headerLeft: () => {
-                  return (
-                    <Ionicons
-                      style={{paddingLeft: 5}}
-                      name="chevron-back-outline"
-                      size={24}
-                      color="#fff"
-                      onPress={() => navigation.navigate('home-landlord')}
-                    />
-                  );
-                },
-                headerStyle: {backgroundColor: '#FF4E83'},
-                title: 'Add Home',
-                tabBarStyle: {
-                  display: 'none',
-                },
-                tabBarItemStyle: {marginBottom: 2, display: 'none'},
-              })}
-            />
-            <Tab.Screen
-              name="LocationPicker"
-              component={LocationPicker}
-              options={{
-                headerShown: false,
-                tabBarStyle: {
-                  display: 'none',
-                },
-                tabBarItemStyle: {marginBottom: 2, display: 'none'},
-              }}
-            />
-          </>
-        )}
-        <Tab.Screen
-          name="Profile"
-          component={Profile}
-          options={{
-            headerShown: false,
-            tabBarStyle: {backgroundColor: '#FF4E83', height: 60},
-            // tabBarIcon: () => <AntDesign name="user" size={24} color="white" />,
-            // tabBarItemStyle: {marginBottom: 2},
-            tabBarLabel: 'Account',
-            tabBarLabelStyle: {color: 'white', fontSize: 14},
-          }}
-        />
-        <Tab.Screen
-          name="Map"
-          component={Map}
-          options={{
-            headerShown: false,
-            tabBarStyle: {
-              display: 'none',
-            },
-            tabBarItemStyle: {marginBottom: 2, display: 'none'},
-          }}
-        />
-        <Tab.Screen
-          name="Details"
-          component={Details}
-          options={({route, navigation}) => ({
-            headerTitleStyle: {color: '#fff'},
-            headerLeft: () => {
-              return (
-                <Ionicons
-                  style={{paddingLeft: 5}}
-                  name="chevron-back-outline"
-                  size={24}
-                  color="#fff"
-                  onPress={() =>
-                    userRole === 'landlord'
-                      ? navigation.navigate('home-landlord')
-                      : navigation.navigate('Browse')
-                  }
-                />
-              );
-            },
-            headerStyle: {backgroundColor: '#FF4E83'},
-            title: route.params?.name || 'Details',
-            tabBarStyle: {
-              display: 'none',
-            },
-            tabBarItemStyle: {marginBottom: 2, display: 'none'},
-          })}
-        />
-      </Tab.Navigator>
+          {userRole === 'landlord' && (
+            <>
+              <Tab.Screen
+                name="home-landlord"
+                component={LandlordHome}
+                options={{
+                  headerShown: false,
+                  tabBarStyle: {backgroundColor: '#FF4E83', height: 60},
+                  // tabBarIcon: () => (
+                  //   // <AntDesign name="home" size={24} color="white" />
+                  // ),
+                  // tabBarItemStyle: {marginBottom: 2},
+                  tabBarLabel: 'Home',
+                  tabBarLabelStyle: {color: 'white', fontSize: 14},
+                  title: 'Add Home',
+                }}
+              />
+              <Tab.Screen
+                name="add-home"
+                component={AddHome}
+                options={({route, navigation}) => ({
+                  headerTitleStyle: {color: '#fff'},
+                  headerLeft: () => {
+                    return (
+                      <Ionicons
+                        style={{paddingLeft: 5}}
+                        name="chevron-back-outline"
+                        size={24}
+                        color="#fff"
+                        onPress={() => navigation.navigate('home-landlord')}
+                      />
+                    );
+                  },
+                  headerStyle: {backgroundColor: '#FF4E83'},
+                  title: 'Add Home',
+                  tabBarStyle: {
+                    display: 'none',
+                  },
+                  tabBarItemStyle: {marginBottom: 2, display: 'none'},
+                })}
+              />
+              <Tab.Screen
+                name="LocationPicker"
+                component={LocationPicker}
+                options={{
+                  headerShown: false,
+                  tabBarStyle: {
+                    display: 'none',
+                  },
+                  tabBarItemStyle: {marginBottom: 2, display: 'none'},
+                }}
+              />
+            </>
+          )}
+          <Tab.Screen
+            name="Profile"
+            component={Profile}
+            options={{
+              headerShown: false,
+              tabBarStyle: {backgroundColor: '#FF4E83', height: 60},
+              tabBarLabel: 'Account',
+              tabBarLabelStyle: {color: 'white', fontSize: 14},
+            }}
+          />
+          <Tab.Screen
+            name="Map"
+            component={Map}
+            options={{
+              headerShown: false,
+              tabBarStyle: {
+                display: 'none',
+              },
+              tabBarItemStyle: {marginBottom: 2, display: 'none'},
+            }}
+          />
+          <Tab.Screen
+            name="Details"
+            component={Details}
+            options={({route, navigation}) => ({
+              headerTitleStyle: {color: '#fff'},
+              headerLeft: () => {
+                return (
+                  <Ionicons
+                    style={{paddingLeft: 5}}
+                    name="chevron-back-outline"
+                    size={24}
+                    color="#fff"
+                    onPress={() =>
+                      userRole === 'landlord'
+                        ? navigation.navigate('home-landlord')
+                        : navigation.navigate('Browse')
+                    }
+                  />
+                );
+              },
+              headerStyle: {backgroundColor: '#FF4E83'},
+              title: route.params?.name || 'Details',
+              tabBarStyle: {
+                display: 'none',
+              },
+              tabBarItemStyle: {marginBottom: 2, display: 'none'},
+            })}
+          />
+        </Tab.Navigator>
+      )
     );
   };
   if (!importFont()) {

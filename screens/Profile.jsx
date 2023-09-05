@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Button,
   Center,
@@ -57,7 +57,9 @@ const Profile = ({navigation}) => {
   const toast = useToast();
   const {user, userRole} = useAuth();
   const [show, setShow] = useState(false);
-  const [displayName, setDisplayName] = useState('');
+  const [displayName, setDisplayName] = useState(
+    auth?.currentUser?.displayName,
+  );
   const [contactNumber, setContactNumber] = useState('');
   const [changedPassword, setChangedPassword] = useState('');
   const [confirmedPassword, setConfirmedPassword] = useState('');
@@ -65,6 +67,19 @@ const Profile = ({navigation}) => {
   const [image, setImage] = useState('');
 
   let {height} = Dimensions.get('screen');
+
+  const getContactNumber = () => {
+    axios
+      .get(env.api + '/users/getContactNumber', {
+        params: {email: auth?.currentUser?.email},
+      })
+      .then(res => {
+        setContactNumber(res.data);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
 
   const handleSignOut = async () => {
     setLoading(true);
@@ -218,6 +233,9 @@ const Profile = ({navigation}) => {
       })
       .catch(err => console.log(err));
   };
+  useEffect(() => {
+    getContactNumber();
+  }, []);
   return loading ? (
     <Box
       h="full"
@@ -243,29 +261,25 @@ const Profile = ({navigation}) => {
               <Avatar
                 bg="amber.500"
                 onTouchEnd={() => chooseFile('photo')}
-                size="lg"
+                size="xl"
                 source={{
-                  uri: auth?.currentUser?.photoURL,
+                  uri: auth?.currentUser?.photoURL || user?.photoURL,
                 }}>
                 <Avatar.Badge bg="#fc99e7">
                   {/* <Ionicons name="add-circle" size={17} color="black" mb={1} />{' '} */}
-                  <MaterialIcons name="mode-edit" size={15} color="black" />
+                  <MaterialIcons name="mode-edit" size={18} color="black" />
                 </Avatar.Badge>
               </Avatar>
               <Heading size="xl">{auth?.currentUser?.displayName}</Heading>
             </HStack>
-            {/* <Button
-              onPress={handleSignOut}
-              style={{backgroundColor: '#a0044d', paddingLeft: 4, zIndex: 1}}>
-              <HStack space={1}> */}
-            <MaterialCommunityIcons
+            {/* <MaterialCommunityIcons
               name="logout"
               size={35}
               color="#FF4E83"
               style={{position: 'absolute', bottom: 20, right: 20, zIndex: 1}}
               onPress={handleSignOut}
-            />
-            {/* <HStack justifyContent={'flex-end'}>
+            /> */}
+            <HStack justifyContent={'flex-end'}>
               <IconButton
                 icon={
                   <Icon
@@ -277,10 +291,8 @@ const Profile = ({navigation}) => {
                 }
                 borderRadius="full"
                 onPress={handleSignOut}
-
               />
-              
-            </HStack> */}
+            </HStack>
 
             {/* <Text style={{color: '#fff', fontWeight: 'bold'}}>Logout</Text>
               </HStack>
@@ -303,7 +315,6 @@ const Profile = ({navigation}) => {
                 type="text"
                 defaultValue=""
                 value={displayName}
-                placeholder="Display name"
                 backgroundColor={'#FF4E83:alpha.10'}
                 borderColor={'#FF4E83'}
                 focusOutlineColor={'red'}
