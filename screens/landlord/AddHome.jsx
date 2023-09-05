@@ -52,6 +52,7 @@ import {ToastAndroid} from 'react-native';
 export default function AddHome({navigation, route}) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
   const [rent, setRent] = useState('');
   const {isOpen, onOpen, onClose} = useDisclose();
   const [roomType, setRoomType] = useState('');
@@ -150,32 +151,35 @@ export default function AddHome({navigation, route}) {
       quality: 1,
       selectionLimit: 6,
     };
+    if (requestExternalWritePermission)
+      launchImageLibrary(options, response => {
+        console.log('Response = ', response);
 
-    launchImageLibrary(options, response => {
-      console.log('Response = ', response);
-
-      if (response.didCancel) {
-        ToastAndroid.show('Cancelled by user', ToastAndroid.LONG);
-        return;
-      } else if (response.errorCode == 'camera_unavailable') {
-        ToastAndroid.show('Camera not available on device', ToastAndroid.LONG);
-        return;
-      } else if (response.errorCode == 'permission') {
-        ToastAndroid.show('Permission not satisfied', ToastAndroid.LONG);
-        return;
-      } else if (response.errorCode == 'others') {
-        ToastAndroid.show(response.errorMessage, ToastAndroid.LONG);
-        return;
-      }
-      const details = {
-        filePath: response?.assets[0]?.uri,
-        width: response?.assets[0]?.width,
-        height: response?.assets[0]?.height,
-      };
-      setImageDetails([...imageDetails, details]);
-      fireStoreUpload(response);
-      setImages([...images, response?.assets[0]?.uri]);
-    });
+        if (response.didCancel) {
+          ToastAndroid.show('Cancelled by user', ToastAndroid.LONG);
+          return;
+        } else if (response.errorCode == 'camera_unavailable') {
+          ToastAndroid.show(
+            'Camera not available on device',
+            ToastAndroid.LONG,
+          );
+          return;
+        } else if (response.errorCode == 'permission') {
+          ToastAndroid.show('Permission not satisfied', ToastAndroid.LONG);
+          return;
+        } else if (response.errorCode == 'others') {
+          ToastAndroid.show(response.errorMessage, ToastAndroid.LONG);
+          return;
+        }
+        const details = {
+          filePath: response?.assets[0]?.uri,
+          width: response?.assets[0]?.width,
+          height: response?.assets[0]?.height,
+        };
+        setImageDetails([...imageDetails, details]);
+        fireStoreUpload(response);
+        setImages([...images, response?.assets[0]?.uri]);
+      });
   };
 
   uriToBlob = uri => {
@@ -215,6 +219,7 @@ export default function AddHome({navigation, route}) {
     const uploadTask = uploadBytes(storageRef, blob)
       .then(snapshot => {
         getDownloadURL(snapshot.ref).then(downloadURL => {
+          setImageUrl(downloadURL);
           console.log('File available at', downloadURL);
         });
       })
@@ -253,6 +258,7 @@ export default function AddHome({navigation, route}) {
           LandlordEmail: user?.email,
           PlaceTitle: title,
           PlaceDescription: description,
+          ImageUrl: imageUrl,
           Cost: rentAmount,
           Coordinates: route.params?.location,
           Facilities: {

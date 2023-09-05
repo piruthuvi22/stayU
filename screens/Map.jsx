@@ -188,6 +188,7 @@ const Map = ({navigation, route}) => {
                 pinColor="#FD683D"
                 flat={true}
                 style={{width: 5, height: 5}}
+                icon={require('../assets/images/marker1.png')}
                 onPress={() => console.log('marker')}
               />
             )
@@ -211,7 +212,7 @@ const Map = ({navigation, route}) => {
                 pinColor="#0000ff"
                 flat={true}
                 style={{width: 2, height: 2}}
-                icon={require('../assets/images/marker2.png')}
+                icon={require('../assets/images/marker3.png')}
                 onPress={() => setSelectedMarker(marker)}
               />
             ) : null;

@@ -17,6 +17,8 @@ import {
   Divider,
   KeyboardAvoidingView,
   Box,
+  IconButton,
+  Icon,
 } from 'native-base';
 import {
   Feather,
@@ -263,6 +265,23 @@ const Profile = ({navigation}) => {
               style={{position: 'absolute', bottom: 20, right: 20, zIndex: 1}}
               onPress={handleSignOut}
             />
+            {/* <HStack justifyContent={'flex-end'}>
+              <IconButton
+                icon={
+                  <Icon
+                    as={MaterialCommunityIcons}
+                    name="logout"
+                    size={29}
+                    color="#FF4E83"
+                  />
+                }
+                borderRadius="full"
+                onPress={handleSignOut}
+
+              />
+              
+            </HStack> */}
+
             {/* <Text style={{color: '#fff', fontWeight: 'bold'}}>Logout</Text>
               </HStack>
             </Button> */}

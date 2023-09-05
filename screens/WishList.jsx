@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     color: '#A0A0A0',
   },
   error: {
-    fontSize: 28,
+    fontSize: 20,
     fontFamily: 'Poppins-Regular',
     color: '#5C5A6F',
   },
