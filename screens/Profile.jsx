@@ -314,7 +314,7 @@ const Profile = ({navigation}) => {
                 }}
                 type="text"
                 defaultValue=""
-                value={displayName}
+                value={displayName || auth?.currentUser?.displayName}
                 backgroundColor={'#FF4E83:alpha.10'}
                 borderColor={'#FF4E83'}
                 focusOutlineColor={'red'}
