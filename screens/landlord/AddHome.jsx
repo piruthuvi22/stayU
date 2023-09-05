@@ -65,6 +65,7 @@ export default function AddHome({navigation, route}) {
   const [imageDetails, setImageDetails] = useState([]);
   const toast = useToast();
   const {user} = useAuth();
+  const [locationName, setLocationName] = useState(route.params?.locationName);
   let {height, width} = Dimensions.get('screen');
 
   const requestCameraPermission = async () => {
@@ -150,43 +151,37 @@ export default function AddHome({navigation, route}) {
       quality: 1,
       selectionLimit: 6,
     };
+    if (requestExternalWritePermission)
+      launchImageLibrary(options, response => {
+        console.log('Response = ', response);
 
-    launchImageLibrary(options, response => {
-      console.log('Response = ', response);
-
-      if (response.didCancel) {
-        ToastAndroid.show('Cancelled by user', ToastAndroid.LONG);
-        return;
-      } else if (response.errorCode == 'camera_unavailable') {
-        ToastAndroid.show('Camera not available on device', ToastAndroid.LONG);
-        return;
-      } else if (response.errorCode == 'permission') {
-        ToastAndroid.show('Permission not satisfied', ToastAndroid.LONG);
-        return;
-      } else if (response.errorCode == 'others') {
-        ToastAndroid.show(response.errorMessage, ToastAndroid.LONG);
-        return;
-      }
-      const details = {
-        filePath: response?.assets[0]?.uri,
-        width: response?.assets[0]?.width,
-        height: response?.assets[0]?.height,
-      };
-      setImageDetails([...imageDetails, details]);
-      const filePath = response?.assets[0]?.uri;
-      fireStoreUpload(response);
-      const newImages = [...images, response?.assets[0]?.uri];
-      setImages([...images, response?.assets[0]?.uri]);
-      // storeImages(newImages);
-    });
+        if (response.didCancel) {
+          ToastAndroid.show('Cancelled by user', ToastAndroid.LONG);
+          return;
+        } else if (response.errorCode == 'camera_unavailable') {
+          ToastAndroid.show(
+            'Camera not available on device',
+            ToastAndroid.LONG,
+          );
+          return;
+        } else if (response.errorCode == 'permission') {
+          ToastAndroid.show('Permission not satisfied', ToastAndroid.LONG);
+          return;
+        } else if (response.errorCode == 'others') {
+          ToastAndroid.show(response.errorMessage, ToastAndroid.LONG);
+          return;
+        }
+        const details = {
+          filePath: response?.assets[0]?.uri,
+          width: response?.assets[0]?.width,
+          height: response?.assets[0]?.height,
+        };
+        setImageDetails([...imageDetails, details]);
+        fireStoreUpload(response);
+        setImages([...images, response?.assets[0]?.uri]);
+      });
   };
-  // const storeImages = async newImages => {
-  //   try {
-  //     await AsyncStorage.setItem('upload-images', JSON.stringify(newImages));
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // };
+
   uriToBlob = uri => {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
@@ -216,6 +211,8 @@ export default function AddHome({navigation, route}) {
       'landlordImages/' +
         user?.email +
         '/' +
+        title +
+        '/' +
         fireStoreImage?.assets[0]?.fileName,
     );
     let blob = await uriToBlob(fireStoreImage?.assets[0]?.uri);
@@ -227,57 +224,7 @@ export default function AddHome({navigation, route}) {
         });
       })
       .catch(err => console.log(err));
-
-    // uploadTask.on(
-    //   'state_changed',
-    //   snapshot => {
-    //     const progress =
-    //       (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-    //     console.log('Upload is ' + progress + '% done');
-    //     switch (snapshot.state) {
-    //       case 'paused':
-    //         console.log('Upload is paused');
-    //         break;
-    //       case 'running':
-    //         console.log('Upload is running');
-    //         break;
-    //     }
-    //   },
-    //   error => {
-    //     switch (error.code) {
-    //       case 'storage/unauthorized':
-    //         // User doesn't have permission to access the object
-    //         console.log("User doesn't have permission to access the object");
-    //         break;
-    //       case 'storage/canceled':
-    //         // User canceled the upload
-    //         console.log('User canceled the upload');
-    //         break;
-    //       case 'storage/unknown':
-    //         // Unknown error occurred, inspect error.serverResponse
-    //         console.log('Unknown error occurred, inspect error.serverResponse');
-    //         break;
-    //     }
-    //   },
-    //   () => {
-    //     getDownloadURL(uploadTask.snapshot.ref).then(downloadURL => {
-    //       console.log('File available at', downloadURL);
-    //     });
-    //   },
-    // );
   };
-
-  // const getImages = async () => {
-  //   // await AsyncStorage.clear();
-  //   const uploadedimages = await AsyncStorage.getItem('upload-images');
-  //   if (!uploadedimages) return;
-  //   const uploaded = JSON.parse(uploadedimages);
-  //   setImages(uploaded);
-  // };
-  // useEffect(() => {
-  //   getImages();
-  // }, []);
-
   const handleSubmit = () => {
     console.log(
       title,
@@ -304,12 +251,14 @@ export default function AddHome({navigation, route}) {
         return showToast(toast, 'warning', 'Please select room type!');
       if (images.length === 0)
         return showToast(toast, 'warning', 'Please select image!');
+      if (title === '')
+        return showToast(toast, 'warning', 'Please enter title!');
       axios
         .post(env.api + '/places/add-place', {
           LandlordEmail: user?.email,
           PlaceTitle: title,
           PlaceDescription: description,
-          ImageUrl:imageUrl,
+          ImageUrl: imageUrl,
           Cost: rentAmount,
           Coordinates: route.params?.location,
           Facilities: {
@@ -335,6 +284,7 @@ export default function AddHome({navigation, route}) {
           setPayment('monthly');
           setNoOfBeds('');
           setImageDetails([]);
+          setLocationName('');
         })
         .catch(err => {
           console.log(err);
@@ -476,9 +426,7 @@ export default function AddHome({navigation, route}) {
                 <Button
                   size="sm"
                   colorScheme="secondary"
-                  variant={`${
-                    route?.params?.locationName ? 'subtle' : 'outline'
-                  }`}
+                  variant={`${locationName ? 'subtle' : 'outline'}`}
                   leftIcon={
                     <Icon
                       as={<MaterialIcons name="add-location" />}
@@ -493,7 +441,7 @@ export default function AddHome({navigation, route}) {
                     Pick Location
                   </Text>
                 </Button>
-                {route?.params?.locationName && (
+                {locationName && (
                   <HStack alignItems={'center'}>
                     <RNText
                       style={{
@@ -502,7 +450,7 @@ export default function AddHome({navigation, route}) {
                         marginHorizontal: 6,
                         color: '#666',
                       }}>
-                      {route?.params?.locationName}
+                      {locationName}
                     </RNText>
                     <MaterialIcons name="check" size={18} color="green" />
                   </HStack>

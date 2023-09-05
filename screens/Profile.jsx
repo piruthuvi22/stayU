@@ -205,6 +205,15 @@ const Profile = ({navigation}) => {
       .then(snapshot => {
         getDownloadURL(snapshot.ref).then(downloadURL => {
           console.log('File available at', downloadURL);
+          updateProfile(auth?.currentUser, {
+            photoURL: downloadURL,
+          })
+            .then(() => {
+              console.log('photoURL is added');
+            })
+            .catch(err => {
+              console.log('PhotoURL :', err);
+            });
         });
       })
       .catch(err => console.log(err));
@@ -236,20 +245,27 @@ const Profile = ({navigation}) => {
                 onTouchEnd={() => chooseFile('photo')}
                 size="lg"
                 source={{
-                  uri: image !== '' ? image : user?.photoURL,
+                  uri: auth?.currentUser?.photoURL,
                 }}>
-                <Avatar.Badge bg="#f2c9eb">
+                <Avatar.Badge bg="#fc99e7">
                   {/* <Ionicons name="add-circle" size={17} color="black" mb={1} />{' '} */}
                   <MaterialIcons name="mode-edit" size={15} color="black" />
                 </Avatar.Badge>
               </Avatar>
-              <Heading size="xl">{user?.displayName}</Heading>
+              <Heading size="xl">{auth?.currentUser?.displayName}</Heading>
             </HStack>
             {/* <Button
               onPress={handleSignOut}
               style={{backgroundColor: '#a0044d', paddingLeft: 4, zIndex: 1}}>
               <HStack space={1}> */}
-            <HStack justifyContent={'flex-end'}>
+            <MaterialCommunityIcons
+              name="logout"
+              size={35}
+              color="#FF4E83"
+              style={{position: 'absolute', bottom: 20, right: 20, zIndex: 1}}
+              onPress={handleSignOut}
+            />
+            {/* <HStack justifyContent={'flex-end'}>
               <IconButton
                 icon={
                   <Icon
@@ -263,13 +279,8 @@ const Profile = ({navigation}) => {
                 onPress={handleSignOut}
 
               />
-              {/* <MaterialCommunityIcons
-                name="logout"
-                size={29}
-                color="#FF4E83"
-                onPress={() => console.log('logout')}
-              /> */}
-            </HStack>
+              
+            </HStack> */}
 
             {/* <Text style={{color: '#fff', fontWeight: 'bold'}}>Logout</Text>
               </HStack>

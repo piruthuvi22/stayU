@@ -32,7 +32,7 @@ import {useFocusEffect} from '@react-navigation/native';
 import showToast from '../components/core/toast';
 import {useAuth} from '../utilities/context';
 import {storage} from '../utilities/firebase';
-import {listAll} from 'firebase/storage';
+import {listAll, ref} from 'firebase/storage';
 // import ImageSlider from "react-native-image-slider";
 
 const Details = ({navigation, route}) => {
@@ -207,7 +207,11 @@ const Details = ({navigation, route}) => {
       .catch(err => console.log(err));
   };
   // Get all images from firebase storage folder
-  const fetchImages = async () => {};
+  const fetchImages = async () => {
+    // console.log('fetchImages:');
+    // let ref = ref(storage, 'landlordImages');
+    // console.log('ref:', ref);
+  };
 
   return (
     <Box h={'full'}>
@@ -233,7 +237,9 @@ const Details = ({navigation, route}) => {
             justifyContent={'space-between'}
             alignItems={'center'}>
             <VStack>
-              <Text style={styles.title}>{PlaceTitle}</Text>
+              <Text style={styles.title} onPress={fetchImages}>
+                {PlaceTitle}
+              </Text>
               <Text style={styles.location}>{'Katubedda'}</Text>
             </VStack>
             <AirbnbRating
