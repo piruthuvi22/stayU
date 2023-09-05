@@ -225,6 +225,7 @@ const Profile = ({navigation}) => {
           })
             .then(() => {
               console.log('photoURL is added');
+              showToast(toast, 'success', 'Profile Picture Updated!');
             })
             .catch(err => {
               console.log('PhotoURL :', err);
@@ -233,6 +234,7 @@ const Profile = ({navigation}) => {
       })
       .catch(err => console.log(err));
   };
+  console.log('user :', user?.photoURL);
   useEffect(() => {
     getContactNumber();
   }, []);
@@ -263,7 +265,7 @@ const Profile = ({navigation}) => {
                 onTouchEnd={() => chooseFile('photo')}
                 size="xl"
                 source={{
-                  uri: auth?.currentUser?.photoURL || user?.photoURL,
+                  uri: user?.photoURL,
                 }}>
                 <Avatar.Badge bg="#fc99e7">
                   {/* <Ionicons name="add-circle" size={17} color="black" mb={1} />{' '} */}
@@ -272,14 +274,14 @@ const Profile = ({navigation}) => {
               </Avatar>
               <Heading size="xl">{auth?.currentUser?.displayName}</Heading>
             </HStack>
-            {/* <MaterialCommunityIcons
+            <MaterialCommunityIcons
               name="logout"
               size={35}
               color="#FF4E83"
               style={{position: 'absolute', bottom: 20, right: 20, zIndex: 1}}
               onPress={handleSignOut}
-            /> */}
-            <HStack justifyContent={'flex-end'}>
+            />
+            {/* <HStack justifyContent={'flex-end'}>
               <IconButton
                 icon={
                   <Icon
@@ -292,7 +294,7 @@ const Profile = ({navigation}) => {
                 borderRadius="full"
                 onPress={handleSignOut}
               />
-            </HStack>
+            </HStack> */}
 
             {/* <Text style={{color: '#fff', fontWeight: 'bold'}}>Logout</Text>
               </HStack>
