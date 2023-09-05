@@ -212,7 +212,10 @@ export default function AddHome({navigation, route}) {
     };
     const storageRef = ref(
       storage,
-      'landlordImages/' + 'user1/' + fireStoreImage?.assets[0]?.fileName,
+      'landlordImages/' +
+        user?.email +
+        '/' +
+        fireStoreImage?.assets[0]?.fileName,
     );
     let blob = await uriToBlob(fireStoreImage?.assets[0]?.uri);
     const uploadTask = uploadBytes(storageRef, blob)
@@ -632,89 +635,86 @@ export default function AddHome({navigation, route}) {
                         </Radio.Group>
                       </VStack>
 
-                        <VStack mx={2}>
-                          <Text style={styles.categoryTitle}>
-                            Wash room type
-                          </Text>
-                          <Checkbox.Group
-                            defaultValue={washroom}
-                            accessibilityLabel="pick an item"
-                            onChange={values => setWashroom(values)}>
-                            <Checkbox
-                              value="traditional"
-                              my="0.5"
-                              size={'sm'}
-                              _text={{style: styles.filterValues}}>
-                              Traditional
-                            </Checkbox>
-                            <Checkbox
-                              value="western"
-                              my="0.5"
-                              size={'sm'}
-                              _text={{style: styles.filterValues}}>
-                              Western
-                            </Checkbox>
-                            <Checkbox
-                              value="attached"
-                              my="0.5"
-                              size={'sm'}
-                              _text={{style: styles.filterValues}}>
-                              Attached
-                            </Checkbox>
-                            <Checkbox
-                              value="common"
-                              my="0.5"
-                              size={'sm'}
-                              _text={{style: styles.filterValues}}>
-                              Common
-                            </Checkbox>
-                          </Checkbox.Group>
-                        </VStack>
-                      </Actionsheet.Item>
-                      <Actionsheet.Item bgColor="#2D3D4C">
-                        <VStack mx={2} mb={0}>
-                          <Text style={styles.categoryTitle}>Payment </Text>
-                          <Radio.Group
-                            defaultValue={payment}
-                            accessibilityLabel="pick an item"
-                            onChange={values => setPayment(values)}>
-                            <Radio
-                              value="monthly"
-                              my="0.5"
-                              _text={{style: styles.filterValues}}>
-                              Monthly
-                            </Radio>
-                            <Radio
-                              value="annually"
-                              my="0.5"
-                              _text={{style: styles.filterValues}}>
-                              Annually
-                            </Radio>
-                          </Radio.Group>
-                        </VStack>
-                      </Actionsheet.Item>
-                    </ScrollView>
-                  </Actionsheet.Content>
-                </Actionsheet>
-                <HStack space={2} my={5} style={styles.buttonContainer}>
-                  <Button onPress={handleSubmit} backgroundColor={'#FF4E83'}>
-                    <HStack space={1}>
-                      <MaterialIcons
-                        name="add-business"
-                        size={24}
-                        color="white"
-                      />
-                      <Text
-                        color={'#fff'}
-                        fontSize={17}
-                        fontWeight={'bold'}
-                        fontFamily={'Poppins-Regular'}>
-                        Submit
-                      </Text>
-                    </HStack>
-                  </Button>
-                </HStack>
-           
+                      <VStack mx={2}>
+                        <Text style={styles.categoryTitle}>Wash room type</Text>
+                        <Checkbox.Group
+                          defaultValue={washroom}
+                          accessibilityLabel="pick an item"
+                          onChange={values => setWashroom(values)}>
+                          <Checkbox
+                            value="traditional"
+                            my="0.5"
+                            size={'sm'}
+                            _text={{style: styles.filterValues}}>
+                            Traditional
+                          </Checkbox>
+                          <Checkbox
+                            value="western"
+                            my="0.5"
+                            size={'sm'}
+                            _text={{style: styles.filterValues}}>
+                            Western
+                          </Checkbox>
+                          <Checkbox
+                            value="attached"
+                            my="0.5"
+                            size={'sm'}
+                            _text={{style: styles.filterValues}}>
+                            Attached
+                          </Checkbox>
+                          <Checkbox
+                            value="common"
+                            my="0.5"
+                            size={'sm'}
+                            _text={{style: styles.filterValues}}>
+                            Common
+                          </Checkbox>
+                        </Checkbox.Group>
+                      </VStack>
+                    </Actionsheet.Item>
+                    <Actionsheet.Item bgColor="#2D3D4C">
+                      <VStack mx={2} mb={0}>
+                        <Text style={styles.categoryTitle}>Payment </Text>
+                        <Radio.Group
+                          defaultValue={payment}
+                          accessibilityLabel="pick an item"
+                          onChange={values => setPayment(values)}>
+                          <Radio
+                            value="monthly"
+                            my="0.5"
+                            _text={{style: styles.filterValues}}>
+                            Monthly
+                          </Radio>
+                          <Radio
+                            value="annually"
+                            my="0.5"
+                            _text={{style: styles.filterValues}}>
+                            Annually
+                          </Radio>
+                        </Radio.Group>
+                      </VStack>
+                    </Actionsheet.Item>
+                  </ScrollView>
+                </Actionsheet.Content>
+              </Actionsheet>
+              <HStack space={2} my={5} style={styles.buttonContainer}>
+                <Button onPress={handleSubmit} backgroundColor={'#FF4E83'}>
+                  <HStack space={1}>
+                    <MaterialIcons
+                      name="add-business"
+                      size={24}
+                      color="white"
+                    />
+                    <Text
+                      color={'#fff'}
+                      fontSize={17}
+                      fontWeight={'bold'}
+                      fontFamily={'Poppins-Regular'}>
+                      Submit
+                    </Text>
+                  </HStack>
+                </Button>
+              </HStack>
             </FormControl>
           </VStack>
         </Box>

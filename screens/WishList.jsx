@@ -14,6 +14,7 @@ import {
   useToast,
 } from 'native-base';
 import axios from 'axios';
+import {useAuth} from '../utilities/context';
 // import Constants from 'expo-constants';
 
 // Components
@@ -32,13 +33,14 @@ const WishList = ({navigation}) => {
 
   // Hooks
   const toast = useToast();
+  const {user} = useAuth();
 
   const fetchWishlist = async () => {
     setRefreshing(true);
     try {
       let res = await axios.get(env.api + '/wish-list/get-wishlist', {
         params: {
-          userId: 'user1',
+          userEmail: user?.email,
         },
       });
       if (res.status === 200) {

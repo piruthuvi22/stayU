@@ -53,7 +53,6 @@ const BrowseCard = ({
         params: {email: user?.email, placeId: _id},
       })
       .then(res => {
-        console.log(res.data);
         setAvailableNotification(res.data);
       })
       .catch(err => {
