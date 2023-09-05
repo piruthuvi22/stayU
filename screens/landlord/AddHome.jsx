@@ -48,6 +48,7 @@ import showToast from '../../components/core/toast';
 import {NavigationContainer} from '@react-navigation/native';
 import {useAuth} from '../../utilities/context';
 import {ToastAndroid} from 'react-native';
+import {hasStoragePermission} from './../../functions/storagePermission';
 
 export default function AddHome({navigation, route}) {
   const [title, setTitle] = useState('');
@@ -65,7 +66,6 @@ export default function AddHome({navigation, route}) {
   const [imageDetails, setImageDetails] = useState([]);
   const toast = useToast();
   const {user} = useAuth();
-  const [locationName, setLocationName] = useState(route.params?.locationName);
   let {height, width} = Dimensions.get('screen');
 
   const requestCameraPermission = async () => {
@@ -105,46 +105,7 @@ export default function AddHome({navigation, route}) {
       return false;
     } else return true;
   };
-  // const captureImage = async type => {
-  //   let options = {
-  //     mediaType: type,
-  //     maxWidth: 300,
-  //     maxHeight: 550,
-  //     quality: 1,
-  //     videoQuality: 'low',
-  //     durationLimit: 30, //Video max duration in seconds
-  //     saveToPhotos: true,
-  //   };
-  //   let isCameraPermitted = await requestCameraPermission();
-  //   let isStoragePermitted = await requestExternalWritePermission();
-  //   if (isCameraPermitted && isStoragePermitted) {
-  //     launchCamera(options, response => {
-  //       console.log('Response = ', response);
 
-  //       if (response.didCancel) {
-  //         alert('User cancelled camera picker');
-  //         return;
-  //       } else if (response.errorCode == 'camera_unavailable') {
-  //         alert('Camera not available on device');
-  //         return;
-  //       } else if (response.errorCode == 'permission') {
-  //         alert('Permission not satisfied');
-  //         return;
-  //       } else if (response.errorCode == 'others') {
-  //         alert(response.errorMessage);
-  //         return;
-  //       }
-  //       console.log('base64 -> ', response.base64);
-  //       console.log('uri -> ', response.uri);
-  //       console.log('width -> ', response.width);
-  //       console.log('height -> ', response.height);
-  //       console.log('fileSize -> ', response.fileSize);
-  //       console.log('type -> ', response.type);
-  //       console.log('fileName -> ', response.fileName);
-  //       setFilePath(response);
-  //     });
-  //   }
-  // };
   const chooseFile = async type => {
     let options = {
       mediaType: type,
@@ -152,37 +113,27 @@ export default function AddHome({navigation, route}) {
       selectionLimit: 6,
     };
 
-    let isStoragePermitted = await requestExternalWritePermission();
-    if (isStoragePermitted) {
-      launchImageLibrary(options, response => {
-        console.log('Response = ', response);
+    let hasPermission = await hasStoragePermission();
 
-        if (response.didCancel) {
-          ToastAndroid.show('Cancelled by user', ToastAndroid.LONG);
-          return;
-        } else if (response.errorCode == 'camera_unavailable') {
-          ToastAndroid.show(
-            'Camera not available on device',
-            ToastAndroid.LONG,
-          );
-          return;
-        } else if (response.errorCode == 'permission') {
-          ToastAndroid.show('Permission not satisfied', ToastAndroid.LONG);
-          return;
-        } else if (response.errorCode == 'others') {
-          ToastAndroid.show(response.errorMessage, ToastAndroid.LONG);
-          return;
-        }
-        const details = {
-          filePath: response?.assets[0]?.uri,
-          width: response?.assets[0]?.width,
-          height: response?.assets[0]?.height,
-        };
-        setImageDetails([...imageDetails, details]);
-        fireStoreUpload(response);
-        setImages([...images, response?.assets[0]?.uri]);
-      });
-    }
+    let isStoragePermitted = await requestExternalWritePermission();
+    let isCameraPermitted = await requestCameraPermission();
+    console.log(hasPermission, isStoragePermitted, isCameraPermitted);
+    // if (hasPermission) {
+    launchImageLibrary(options, response => {
+      if (response.didCancel) {
+        ToastAndroid.show('Cancelled by user', ToastAndroid.LONG);
+        return;
+      }
+      const details = {
+        filePath: response?.assets[0]?.uri,
+        width: response?.assets[0]?.width,
+        height: response?.assets[0]?.height,
+      };
+      setImageDetails([...imageDetails, details]);
+      fireStoreUpload(response);
+      setImages([...images, response?.assets[0]?.uri]);
+    });
+    // }
   };
 
   uriToBlob = uri => {
@@ -223,23 +174,11 @@ export default function AddHome({navigation, route}) {
       .then(snapshot => {
         getDownloadURL(snapshot.ref).then(downloadURL => {
           setImageUrl(downloadURL);
-          console.log('File available at', downloadURL);
         });
       })
       .catch(err => console.log(err));
   };
   const handleSubmit = () => {
-    console.log(
-      title,
-      description,
-      rent,
-      facilitiesValue,
-      meals,
-      washroom,
-      noOfBeds,
-      roomType,
-      payment,
-    );
     const beds = noOfBeds === '' ? 0 : parseInt(noOfBeds, 10);
     const rentAmount = rent === '' ? 0 : parseInt(rent, 10);
 
@@ -287,7 +226,6 @@ export default function AddHome({navigation, route}) {
           setPayment('monthly');
           setNoOfBeds('');
           setImageDetails([]);
-          setLocationName('');
         })
         .catch(err => {
           console.log(err);
@@ -415,21 +353,16 @@ export default function AddHome({navigation, route}) {
                 </Button>
               </HStack>
               <Box width={150}>
-                <SliderBox
-                  images={images}
-                  // sliderBoxHeight={305}
-                  // parentWidth={305}
-                  onCurrentImagePressed={index =>
-                    console.log(`image ${index} pressed`)
-                  }
-                />
+                <SliderBox images={images} />
               </Box>
               {/* <Image source={{uri: filePath.uri}} style={styles.imageStyle} /> */}
               <HStack mt={5}>
                 <Button
                   size="sm"
                   colorScheme="secondary"
-                  variant={`${locationName ? 'subtle' : 'outline'}`}
+                  variant={`${
+                    route.params?.locationName ? 'subtle' : 'outline'
+                  }`}
                   leftIcon={
                     <Icon
                       as={<MaterialIcons name="add-location" />}
@@ -444,7 +377,7 @@ export default function AddHome({navigation, route}) {
                     Pick Location
                   </Text>
                 </Button>
-                {locationName && (
+                {route.params?.locationName && (
                   <HStack alignItems={'center'}>
                     <RNText
                       style={{
@@ -453,7 +386,7 @@ export default function AddHome({navigation, route}) {
                         marginHorizontal: 6,
                         color: '#666',
                       }}>
-                      {locationName}
+                      {route.params?.locationName}
                     </RNText>
                     <MaterialIcons name="check" size={18} color="green" />
                   </HStack>
