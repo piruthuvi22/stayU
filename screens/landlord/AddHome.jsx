@@ -151,7 +151,9 @@ export default function AddHome({navigation, route}) {
       quality: 1,
       selectionLimit: 6,
     };
-    if (requestExternalWritePermission)
+
+    let isStoragePermitted = await requestExternalWritePermission();
+    if (isStoragePermitted) {
       launchImageLibrary(options, response => {
         console.log('Response = ', response);
 
@@ -180,6 +182,7 @@ export default function AddHome({navigation, route}) {
         fireStoreUpload(response);
         setImages([...images, response?.assets[0]?.uri]);
       });
+    }
   };
 
   uriToBlob = uri => {
