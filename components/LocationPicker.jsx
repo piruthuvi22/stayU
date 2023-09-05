@@ -150,17 +150,6 @@ export const LocationPicker = ({navigation, route}) => {
           />
         )}
       </MapView>
-      {/* <Box style={styles.markerFixed} m="0" p="0">
-        <NBImage
-          style={styles.marker}
-          // source={{
-          //   uri: 'https://freeiconshop.com/wp-content/uploads/edd/plus-circle-outline.png',
-          // }}
-          source={require('../assets/images/pick.png')}
-          alt="Marker"
-        />
-      </Box> */}
-
       <Fab
         renderInPortal={false}
         onPress={locate}

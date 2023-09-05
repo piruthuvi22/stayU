@@ -5,9 +5,9 @@ import {
   StatusBar,
   Dimensions,
 } from 'react-native';
-import React, {useState, useCallback} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
-import {Fab, Icon, Box, Center} from 'native-base';
+import {Fab, Icon, Box, Center, Button} from 'native-base';
 import {AntDesign} from '@expo/vector-icons';
 import BrowseCard from './../../components/BrowseCard';
 import env from '../../env';
@@ -45,22 +45,30 @@ const LandlordHome = ({navigation}) => {
         setRefreshing(false);
       });
   };
-  useFocusEffect(
-    useCallback(() => {
-      getPlaces();
-    }, []),
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     getPlaces();
+  //   }, []),
+  // );
+
+  useEffect(() => getPlaces(), []);
   return (
     <>
       {refreshing ? (
         <Center flex={1}>
           <Text>Loading...</Text>
+          <Button onPress={getPlaces} variant={'ghost'}>
+            Try again
+          </Button>
         </Center>
       ) : (
         <Box style={styles.wrapper}>
           {errorMessage !== '' ? (
             <Center style={styles.errorContainer}>
               <Text style={styles.head}>{errorMessage}</Text>
+              <Button onPress={getPlaces} variant={'ghost'}>
+                Try again
+              </Button>
             </Center>
           ) : (
             <>
@@ -69,13 +77,13 @@ const LandlordHome = ({navigation}) => {
               </Box>
               <Box
                 style={{
-                  width: Dimensions.get('window').width,
+                  // width: Dimensions.get('window').width,
                   height: Dimensions.get('window').height - 120,
                 }}
-                mb={3}>
+                mb={3}
+                mx={2}>
                 <ScrollView
                   showsVerticalScrollIndicator={false}
-                  mx={3}
                   refreshControl={
                     <RefreshControl
                       refreshing={refreshing}
@@ -90,6 +98,7 @@ const LandlordHome = ({navigation}) => {
                       Rating={place?.Rating}
                       PlaceTitle={place?.PlaceTitle}
                       PlaceDescription={place?.PlaceDescription}
+                      ImageUrl={place?.ImageUrl}
                       Facilities={{
                         WashRoomType: place?.Facilities?.WashRoomType,
                         Facilities: place?.Facilities?.Facilities,
