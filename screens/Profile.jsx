@@ -20,12 +20,10 @@ import {
   IconButton,
   Icon,
 } from 'native-base';
-import {
-  Feather,
-  MaterialIcons,
-  SimpleLineIcons,
-  MaterialCommunityIcons,
-} from '@expo/vector-icons';
+import Feather from 'react-native-vector-icons/Feather';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   View,
   Dimensions,
@@ -39,7 +37,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {auth} from '../utilities/firebase';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {storage} from '../utilities/firebase';
-import Constants from 'expo-constants';
 import {
   ref,
   getDownloadURL,
@@ -110,12 +107,12 @@ const Profile = ({navigation}) => {
         phoneNumber: contactNumber,
       })
         .then(() => {
-          console.log(
-            'displayName:',
-            displayName,
-            'contactNumber:',
-            contactNumber,
-          );
+          // console.log(
+          //   'displayName:',
+          //   displayName,
+          //   'contactNumber:',
+          //   contactNumber,
+          // );
           axios
             .put(env.api + '/users/updateDisplayName', {
               email: auth?.currentUser?.email,
@@ -132,7 +129,7 @@ const Profile = ({navigation}) => {
             });
         })
         .catch(error => {
-          showToast(toast, 'warning', 'Error in Update');
+          showToast(toast, 'error', 'Error in Update');
         });
     }
   };
@@ -144,7 +141,7 @@ const Profile = ({navigation}) => {
             showToast(toast, 'success', 'Password Updated Successfully!');
           })
           .catch(error => {
-            showToast(toast, 'warning', 'Error in Password Updating!');
+            showToast(toast, 'error', 'Error in Password Updating!');
           });
       } else {
         showToast(toast, 'warning', 'Password does not match');
@@ -160,7 +157,7 @@ const Profile = ({navigation}) => {
       // selectionLimit: 1,
     };
     launchImageLibrary(options, response => {
-      console.log('Response = ', response);
+      // console.log('Response = ', response);
 
       if (response.didCancel) {
         ToastAndroid.show('Cancelled by user', ToastAndroid.LONG);
@@ -219,22 +216,22 @@ const Profile = ({navigation}) => {
     const uploadTask = uploadBytes(storageRef, blob)
       .then(snapshot => {
         getDownloadURL(snapshot.ref).then(downloadURL => {
-          console.log('File available at', downloadURL);
+          // console.log('File available at', downloadURL);
           updateProfile(auth?.currentUser, {
             photoURL: downloadURL,
           })
             .then(() => {
-              console.log('photoURL is added');
+              // console.log('photoURL is added');
               showToast(toast, 'success', 'Profile Picture Updated!');
             })
             .catch(err => {
-              console.log('PhotoURL :', err);
+              console.log('PhotoURL Error :', err);
             });
         });
       })
       .catch(err => console.log(err));
   };
-  console.log('user :', user?.photoURL);
+  
   useEffect(() => {
     getContactNumber();
   }, []);
@@ -267,9 +264,11 @@ const Profile = ({navigation}) => {
                 source={{
                   uri: user?.photoURL,
                 }}>
-                <Avatar.Badge bg="#fc99e7">
+                <Avatar.Badge bg="#fff" size={8}>
                   {/* <Ionicons name="add-circle" size={17} color="black" mb={1} />{' '} */}
-                  <MaterialIcons name="mode-edit" size={18} color="black" />
+                  <Box justifyContent={'center'} alignItems={'center'} h="full">
+                    <MaterialIcons name="mode-edit" size={18} color="#FF4E83" />
+                  </Box>
                 </Avatar.Badge>
               </Avatar>
               <Heading size="xl">{auth?.currentUser?.displayName}</Heading>
@@ -454,7 +453,7 @@ const styles = StyleSheet.create({
   },
   wrapper: {
     height: Dimensions.get('window').height,
-    paddingBottom: Constants.statusBarHeight - 12,
+    paddingBottom: StatusBar.currentHeight - 12,
   },
   button: {
     padding: 10,

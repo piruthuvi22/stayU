@@ -14,7 +14,6 @@ import {
   useToast,
 } from 'native-base';
 import axios from 'axios';
-// import Constants from 'expo-constants';
 
 // Components
 import BrowseCard from '../components/BrowseCard';

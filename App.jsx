@@ -2,14 +2,12 @@ import 'react-native-gesture-handler';
 import './ignoreWarning';
 import React, {useState, useEffect} from 'react';
 import {StyleSheet, Text, View, StatusBar} from 'react-native';
-import {StatusBar as ExpoStatusBar} from 'expo-status-bar';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {Button, NativeBaseProvider, Pressable} from 'native-base';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createDrawerNavigator} from '@react-navigation/drawer';
-import importFont from './utilities/fonts';
 import {AuthProvider} from './utilities/context';
 // "react": "18.2.0",
 
@@ -22,7 +20,6 @@ import GetStarted from './screens/Authentication/GetStarted';
 import RenterLogin from './screens/Authentication/RenterLogin';
 import SignUp from './screens/Authentication/SignUp';
 
-import Home from './screens/Home';
 import Browse from './screens/Browse';
 import WishList from './screens/WishList';
 import Profile from './screens/Profile';
@@ -34,7 +31,9 @@ import LandlordHome from './screens/landlord/LandlordHome';
 import {Reserved} from './screens/Reserved';
 
 // ===============Imports Icons==============
-import {AntDesign, Ionicons, MaterialIcons} from '@expo/vector-icons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+
 import {TouchableOpacity} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LocationPicker} from './components/LocationPicker';
@@ -49,7 +48,7 @@ export default function App() {
         if (value !== null) {
           const val = JSON.parse(value);
           setUserRole(val.userRole);
-          console.log('userRole.value app.jsx:', userRole);
+          console.log('userRole:', userRole);
           setLoading(true);
         }
       } catch (e) {
@@ -63,7 +62,7 @@ export default function App() {
       loading && (
         <Tab.Navigator
           id="tabs"
-          initialRouteName={userRole === 'student' ? 'Browse' : 'home-landlord'}
+          initialRouteName={'Browse'}
           screenOptions={({route}) => ({
             tabBarIcon: ({focused, color, size}) => {
               let iconName;
@@ -74,7 +73,7 @@ export default function App() {
               } else if (route.name === 'WishList') {
                 iconName = focused ? 'bookmarks' : 'bookmarks-outline';
               } else if (route.name === 'Browse') {
-                iconName = focused ? 'ios-search-sharp' : 'ios-search-outline';
+                iconName = focused ? 'search' : 'search-sharp';
               }
 
               // You can return any component that you like here!
@@ -229,54 +228,49 @@ export default function App() {
       )
     );
   };
-  if (!importFont()) {
-    return (
-      <AuthProvider>
-        <NativeBaseProvider>
-          <Text>Font Not loaded</Text>
-        </NativeBaseProvider>
-      </AuthProvider>
-    );
-  } else {
-    return (
-      <AuthProvider>
-        <NativeBaseProvider>
-          <SafeAreaProvider>
-            <ExpoStatusBar
-              // animated={true}
-              // showHideTransition={'slide'}
-              networkActivityIndicatorVisible={false}
-            />
-            <NavigationContainer>
-              <Stack.Navigator initialRouteName="get-start" id="stack">
-                <Stack.Screen
-                  name="get-start"
-                  component={GetStarted}
-                  options={{headerShown: false}}
-                />
 
-                <Stack.Screen
-                  name="renter-login"
-                  component={RenterLogin}
-                  options={{headerShown: false}}
-                />
+  return (
+    <AuthProvider>
+      <NativeBaseProvider>
+        <SafeAreaProvider>
+          <StatusBar
+            // animated={true}
+            // showHideTransition={'slide'}
+            backgroundColor={'#FF4E8300'}
+            barStyle={"dark-content"}
+            // hidden={true}
+            translucent={true}
+            networkActivityIndicatorVisible={false}
+          />
+          <NavigationContainer>
+            <Stack.Navigator initialRouteName="TabNavigator" id="stack">
+              <Stack.Screen
+                name="get-start"
+                component={GetStarted}
+                options={{headerShown: false}}
+              />
 
-                <Stack.Screen
-                  name="sign-up"
-                  component={SignUp}
-                  options={{headerShown: false}}
-                />
+              <Stack.Screen
+                name="renter-login"
+                component={RenterLogin}
+                options={{headerShown: false}}
+              />
 
-                <Stack.Screen
-                  name="TabNavigator"
-                  component={TabNavigator}
-                  options={{headerShown: false}}
-                />
-              </Stack.Navigator>
-            </NavigationContainer>
-          </SafeAreaProvider>
-        </NativeBaseProvider>
-      </AuthProvider>
-    );
-  }
+              <Stack.Screen
+                name="sign-up"
+                component={SignUp}
+                options={{headerShown: false}}
+              />
+
+              <Stack.Screen
+                name="TabNavigator"
+                component={TabNavigator}
+                options={{headerShown: false}}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </NativeBaseProvider>
+    </AuthProvider>
+  );
 }

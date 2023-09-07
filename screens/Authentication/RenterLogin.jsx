@@ -22,8 +22,8 @@ import {
   Dimensions,
   // ScrollView,
 } from 'react-native';
-import {Feather, Ionicons} from '@expo/vector-icons';
-import axios from 'axios';
+import Feather from 'react-native-vector-icons/Feather';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
@@ -38,8 +38,8 @@ let {height, width} = Dimensions.get('screen');
 const RenterLogin = ({navigation, route}) => {
   const toast = useToast();
   const [show, setShow] = useState(false);
-  const [email, setemail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setemail] = useState('navaratnamsagini@gmail.com');
+  const [password, setPassword] = useState('Sagini18');
   const [buttonLoading, setButtonLoading] = useState(false);
   // console.log(route.params);
   const handleemail = e => {
@@ -58,12 +58,12 @@ const RenterLogin = ({navigation, route}) => {
       .then(async userCredential => {
         const emailVerified = userCredential?.user?.emailVerified;
         if (emailVerified) {
-          console.log('userRole signIn:', route?.params?.userRole);
+          // console.log('userRole signIn:', route?.params?.userRole);
           const user = {email: email, userRole: route?.params?.userRole};
           await AsyncStorage.setItem('user', JSON.stringify(user));
           const value = await AsyncStorage.getItem('user');
           const val = JSON.parse(value);
-          console.log('value form async storage', val);
+          // console.log('value form async storage', val);
           setButtonLoading(false);
           navigation.navigate('TabNavigator', {screen: 'Browse'});
         } else {
@@ -74,7 +74,7 @@ const RenterLogin = ({navigation, route}) => {
       .catch(error => {
         const errorMessage = error?.message?.split('/')[1]?.split(')')[0];
         setButtonLoading(false);
-        showToast(toast, 'warning', errorMessage);
+        showToast(toast, 'error', errorMessage);
       });
   };
   const handleForgotPassword = () => {
@@ -84,7 +84,7 @@ const RenterLogin = ({navigation, route}) => {
     }
     sendPasswordResetEmail(auth, email)
       .then(() => {
-        console.log('reset email sent');
+        // console.log('reset email sent');
         showToast(toast, 'success', 'Reset Email sent!');
       })
       .catch(error => {

@@ -14,7 +14,7 @@ export const AuthProvider = ({children}) => {
       if (value !== null) {
         const val = JSON.parse(value);
         setUserRole(val.userRole);
-        console.log('userRole from Context:', userRole);
+        // console.log('userRole from Context:', userRole);
       }
     } catch (e) {
       console.log(e);

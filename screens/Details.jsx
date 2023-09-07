@@ -23,7 +23,12 @@ import {
   View,
 } from 'react-native';
 import {SliderBox} from 'react-native-image-slider-box';
-import {AntDesign, Ionicons, MaterialCommunityIcons} from '@expo/vector-icons';
+
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+
 import Comment from '../components/Comment';
 import axios from 'axios';
 import env from '../env';
@@ -83,7 +88,7 @@ const Details = ({navigation, route}) => {
   //   }, []),
   // );
   const getLandlord = () => {
-    console.log('getLandlord:');
+    // console.log('getLandlord:');
     axios
       .get(env.api + '/users/getLandlord', {
         params: {
@@ -114,7 +119,7 @@ const Details = ({navigation, route}) => {
       setImages([require('../assets/images/image-placeholder.jpg')]);
     }
     setLoading(true);
-    console.log('Details userRole:', userRole);
+    // console.log('Details userRole:', userRole);
     if (userRole === 'student') {
       getLandlord();
       axios

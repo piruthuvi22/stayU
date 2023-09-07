@@ -8,11 +8,10 @@ import {
 import React, {useState, useEffect, useCallback} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 import {Fab, Icon, Box, Center, Button} from 'native-base';
-import {AntDesign} from '@expo/vector-icons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import BrowseCard from './../../components/BrowseCard';
 import env from '../../env';
 import axios from 'axios';
-import Constants from 'expo-constants';
 import {useAuth} from '../../utilities/context';
 import {RefreshControl} from 'react-native-gesture-handler';
 
@@ -30,7 +29,7 @@ const LandlordHome = ({navigation}) => {
         params: {email: user?.email},
       })
       .then(res => {
-        console.log(res.data.length);
+        // console.log(res.data.length);
         if (res.data.length > 0) {
           setPlaces(res.data);
           setRefreshing(false);

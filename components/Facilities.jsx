@@ -2,7 +2,7 @@ import {Box, Divider, HStack, VStack} from 'native-base';
 import React from 'react';
 import {StyleSheet, Text} from 'react-native';
 import {AirbnbRating} from 'react-native-ratings';
-import {Entypo} from '@expo/vector-icons';
+import Entypo from 'react-native-vector-icons/Entypo';
 
 export const FacilitiesDetails = ({info}) => {
   return (

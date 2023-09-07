@@ -23,24 +23,21 @@ import {
   Button as NBButton,
   IconButton,
 } from 'native-base';
-// import Constants from 'expo-constants';
 import BrowseCard from '../components/BrowseCard';
 import AutoComplete from '../components/AutoComplete';
-
-import {
-  FontAwesome,
-  Entypo,
-  MaterialIcons,
-  AntDesign,
-} from '@expo/vector-icons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
+
+import Entypo from 'react-native-vector-icons/Entypo';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import {findAddress} from '../functions/findAddress';
 import BrowserSkelton from '../components/core/SkeltonBrowser';
 import Filters from '../components/Filters';
 
 import env from '../env';
 import showToast from '../components/core/toast';
-import {getLocation, useLocation} from '../hooks/useLocation';
+import { useLocation} from '../hooks/useLocation';
 
 const Browse = ({navigation}) => {
   // States
@@ -62,24 +59,27 @@ const Browse = ({navigation}) => {
     } catch (error) {
       showToast(toast, 'error', error.message);
     }
-    setRefreshing(false);
+    // setRefreshing(false);
   };
 
   const fetchPlaces = async () => {
     if (location?.latitude) {
-      setRefreshing(true);
       try {
+        setRefreshing(true);
         let res = await axios.get(env.api + '/places/get-places', {
           params: {location},
         });
         if (res.status === 200) {
           // console.log('res.data.length = ', res.data.length);
+          setRefreshing(false);
           setStatusCode(res.status);
           setPlaces(res.data);
         }
       } catch (error) {
+        setRefreshing(false);
         console.log('Error axios: ', error);
         if (error.isAxiosError && error.response === undefined) {
+          setStatusCode("Can't connect to server");
           showToast(toast, 'error', error.message);
         } else {
           setStatusCode(error.response.status);
@@ -92,7 +92,6 @@ const Browse = ({navigation}) => {
         }
       }
     }
-    setRefreshing(false);
   };
 
   useEffect(() => {
@@ -174,10 +173,9 @@ const Browse = ({navigation}) => {
     );
   };
 
-  // console.log(location);
   return (
     <>
-      {refreshing ? (
+      {refreshing & (statusCode == null) ? (
         <BrowserSkelton />
       ) : statusCode == 200 ? (
         <Box style={styles.wrapper}>
@@ -269,6 +267,16 @@ const Browse = ({navigation}) => {
         <Box h="full" style={styles.wrapper}>
           <Center h="full">
             <Text style={styles.error}>Places not found</Text>
+            <NBButton onPress={onRefresh} variant={'ghost'}>
+              Try again
+            </NBButton>
+          </Center>
+        </Box>
+      ) : statusCode === "Can't connect to server" ? (
+        <Box h="full" style={styles.wrapper}>
+          <Center h="full">
+            <Text style={styles.error}>{statusCode}</Text>
+            {/* <Text style={styles.error}>Something went wrong</Text> */}
             <NBButton onPress={onRefresh} variant={'ghost'}>
               Try again
             </NBButton>

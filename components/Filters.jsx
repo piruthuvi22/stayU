@@ -14,12 +14,6 @@ import React, { useEffect } from 'react';
 import {Text, StyleSheet, Dimensions, StatusBar} from 'react-native';
 
 export default Filters = ({isOpen, onClose}) => {
-  useEffect(() => {
-    // console.log('Filters');
-  }, []);
-
-  const filters = () => {};
-
   return (
     <Actionsheet isOpen={isOpen} onClose={onClose}>
       <Actionsheet.Content bgColor={'rgba(34, 51, 67,0.95)'}>

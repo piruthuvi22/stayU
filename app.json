@@ -1,4 +1,7 @@
 {
   "name": "stayU",
-  "displayName": "stayU"
+  "displayName": "stayU",
+  "android": {
+    "package": "com.piruthuvi.stayu"
+  }
 }

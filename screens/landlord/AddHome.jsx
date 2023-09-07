@@ -24,12 +24,11 @@ import {
   useToast,
   Button,
 } from 'native-base';
-import {
-  MaterialIcons,
-  FontAwesome,
-  AntDesign,
-  Ionicons,
-} from '@expo/vector-icons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
 import {SliderBox} from 'react-native-image-slider-box';
 import React, {useState, useEffect} from 'react';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
@@ -117,7 +116,7 @@ export default function AddHome({navigation, route}) {
 
     let isStoragePermitted = await requestExternalWritePermission();
     let isCameraPermitted = await requestCameraPermission();
-    console.log(hasPermission, isStoragePermitted, isCameraPermitted);
+    // console.log(hasPermission, isStoragePermitted, isCameraPermitted);
     // if (hasPermission) {
     launchImageLibrary(options, response => {
       if (response.didCancel) {
@@ -213,7 +212,7 @@ export default function AddHome({navigation, route}) {
           },
         })
         .then(res => {
-          console.log(res.data);
+          // console.log(res.data);
           showToast(toast, 'success', 'Successfully added!');
           setTitle('');
           setDescription('');
@@ -229,7 +228,7 @@ export default function AddHome({navigation, route}) {
         })
         .catch(err => {
           console.log(err);
-          showToast(toast, 'warning', 'Error in adding!');
+          showToast(toast, 'error', 'Error in adding!');
         });
     }
   };

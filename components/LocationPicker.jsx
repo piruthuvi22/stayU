@@ -18,13 +18,13 @@ import {
 } from 'native-base';
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
-// import Constants from 'expo-constants';
 const {width, height} = Dimensions.get('window');
 import {Client} from '@googlemaps/google-maps-services-js';
 
 import AutoComplete from '../components/AutoComplete';
 
-import {MaterialIcons} from '@expo/vector-icons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+
 import {useLocation} from '../hooks/useLocation';
 import {findAddress} from '../functions/findAddress';
 import showToast from './core/toast';
@@ -87,7 +87,7 @@ export const LocationPicker = ({navigation, route}) => {
       // console.log('Name = ', name);
       setLocationName(name);
     } catch (error) {
-      console.log('Error = ', error.message);
+      console.log('Error Location Picker = ', error.message);
       // showToast(toast, 'error', error.message);
     }
   };
@@ -103,7 +103,7 @@ export const LocationPicker = ({navigation, route}) => {
   };
 
   const handleSelect = () => {
-    console.log('Selected location = ', coordinate, locationName);
+    // console.log('Selected location = ', coordinate, locationName);
     navigation.navigate('add-home', {location: coordinate, locationName});
   };
 

@@ -3,16 +3,14 @@ import {TouchableOpacity, StyleSheet, Text} from 'react-native';
 import {Box, HStack, Image, Row, Column, Badge, Pressable} from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Client} from '@googlemaps/google-maps-services-js';
-import Constants from 'expo-constants';
+import axios from 'axios';
 import {useFocusEffect} from '@react-navigation/native';
 import {useAuth} from '../utilities/context';
-import {
-  FontAwesome,
-  MaterialIcons,
-  Ionicons,
-  MaterialCommunityIcons,
-} from '@expo/vector-icons';
-import axios from 'axios';
+
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import env from '../env';
 
 const BrowseCard = ({
@@ -195,7 +193,7 @@ const BrowseCard = ({
             {userRole === 'landlord' &&
               (status === 'PENDING' ? (
                 <HStack style={styles.pendingContainer}>
-                  <Ionicons name="lock-open" size={24} color="#a0044d" />
+                  <Ionicons name="lock-open" size={18} color="#a0044d" />
                   <Text
                     style={{
                       marginTop: 6,
@@ -209,8 +207,8 @@ const BrowseCard = ({
                 status === 'RESERVED' && (
                   <HStack style={styles.pendingContainer}>
                     <Ionicons
-                      name="ios-lock-closed"
-                      size={24}
+                      name="lock-closed"
+                      size={18}
                       color="#a0044d"
                     />
                     <Text
@@ -229,18 +227,18 @@ const BrowseCard = ({
                 <HStack style={styles.pendingContainer}>
                   <MaterialCommunityIcons
                     name="sticker-check"
-                    size={24}
+                    size={18}
                     color="#04a256"
                   />
                 </HStack>
               ) : status === 'RESERVED' ? (
                 <HStack style={styles.pendingContainer}>
-                  <Ionicons name="ios-lock-closed" size={24} color="#a0044d" />
+                  <Ionicons name="lock-closed" size={18} color="#a0044d" />
                 </HStack>
               ) : (
                 status === 'PENDING' && (
                   <HStack style={styles.pendingContainer}>
-                    <Ionicons name="lock-open" size={24} color="#a0044d" />
+                    <Ionicons name="lock-open" size={18} color="#a0044d" />
                   </HStack>
                 )
               ))}

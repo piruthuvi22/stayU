@@ -3,13 +3,12 @@ import {StyleSheet, Dimensions, BackHandler, StatusBar} from 'react-native';
 import {Box, Text, HStack, Pressable, VStack} from 'native-base';
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
-// import Constants from 'expo-constants';
 const {width, height} = Dimensions.get('window');
 import {Client} from '@googlemaps/google-maps-services-js';
 
 import AutoComplete from '../components/AutoComplete';
 
-import {Entypo} from '@expo/vector-icons';
+import Entypo from 'react-native-vector-icons/Entypo';
 
 const client = new Client({});
 
@@ -173,10 +172,10 @@ const Map = ({navigation, route}) => {
               key={selectedLocation.latitude}
               // title={marker.title}
               // description="desc"
-              pinColor="#FD683D"
+              pinColor="#FF4E83"
               flat={true}
               style={{width: 5, height: 5}}
-              onPress={() => console.log('marker')}
+              // onPress={() => console.log('marker')}
             />
           ) : (
             selectedPlaceCoord.hasOwnProperty('latitude') && (
@@ -185,22 +184,23 @@ const Map = ({navigation, route}) => {
                 key={selectedPlaceCoord.latitude}
                 // title={marker.title}
                 // description="desc"
-                pinColor="#FD683D"
+                pinColor="#FF4E83"
                 flat={true}
                 style={{width: 5, height: 5}}
-                icon={require('../assets/images/marker1.png')}
-                onPress={() => console.log('marker')}
+
+                image={require('../assets/images/marker-user.png')}
+                // onPress={() => console.log('marker')}
               />
             )
           )}
           {placeInfo.map((marker, i) => {
             return marker.hasOwnProperty('latitude') ? (
               <Marker
+                key={marker.latitude}
                 coordinate={{
                   latitude: marker.latitude,
                   longitude: marker.longitude,
                 }}
-                key={marker.latitude}
                 title={placeInfo[i].title}
                 description={
                   distance?.hasOwnProperty('destination_addresses')
@@ -209,10 +209,9 @@ const Map = ({navigation, route}) => {
                       distance?.rows[0].elements[i].duration?.text
                     : ''
                 }
-                pinColor="#0000ff"
+                // pinColor="#FF4E83"
                 flat={true}
-                style={{width: 2, height: 2}}
-                icon={require('../assets/images/marker3.png')}
+                image={require('../assets/images/marker-home.png')}
                 onPress={() => setSelectedMarker(marker)}
               />
             ) : null;
@@ -223,7 +222,7 @@ const Map = ({navigation, route}) => {
               origin={selectedMarker}
               destination={isChoose ? selectedLocation : selectedPlaceCoord}
               apikey={'AIzaSyCz5aHnnwPi7R_v65PASfRLikJ5VVA8Ytc'}
-              strokeColor={'#FD683D'}
+              strokeColor={'#FF4E83'}
               strokeWidth={3}
             />
           )}

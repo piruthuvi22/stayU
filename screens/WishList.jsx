@@ -15,7 +15,6 @@ import {
 } from 'native-base';
 import axios from 'axios';
 import {useAuth} from '../utilities/context';
-// import Constants from 'expo-constants';
 
 // Components
 import BrowseCard from '../components/BrowseCard';

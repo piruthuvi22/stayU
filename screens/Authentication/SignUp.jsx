@@ -23,7 +23,9 @@ import {
   Dimensions,
   // ScrollView,
 } from 'react-native';
-import {Feather, Ionicons} from '@expo/vector-icons';
+import Feather from 'react-native-vector-icons/Feather';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
 import axios from 'axios';
 import showToast from '../../components/core/toast';
 import env from '../../env';
@@ -67,11 +69,11 @@ const RenterLogin = ({navigation, route}) => {
         createUserWithEmailAndPassword(auth, email, password)
           .then(userCredential => {
             // Signed in
-            console.log('user:');
+            // console.log('user:');
             sendEmailVerification(auth?.currentUser)
               .then(res => {
                 // Email verification sent!
-                console.log('Email verification sent!');
+                // console.log('Email verification sent!');
                 updateProfile(auth?.currentUser, {
                   displayName: auth?.currentUser?.email?.split('@')[0],
                   photoURL:
@@ -84,7 +86,7 @@ const RenterLogin = ({navigation, route}) => {
                     userRole: route?.params?.userRole,
                   })
                   .then(res => {
-                    console.log(res.data);
+                    // console.log(res.data);
                     setButtonLoading(false);
                     showToast(
                       toast,
@@ -106,7 +108,7 @@ const RenterLogin = ({navigation, route}) => {
           .catch(error => {
             setButtonLoading(false);
             const errorMessage = error?.message?.split('/')[1]?.split(')')[0];
-            showToast(toast, 'warning', errorMessage);
+            showToast(toast, 'error', errorMessage);
           });
       } else {
         setButtonLoading(false);
