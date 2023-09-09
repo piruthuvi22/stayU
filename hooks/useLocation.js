@@ -51,7 +51,6 @@ export const useLocation = () => {
   }, []);
 
   const updateLocation = () => {
-    console.log("Refresh hook")
     let hasPermission = hasLocationPermission();
     if (hasPermission) {
       Geolocation.getCurrentPosition(

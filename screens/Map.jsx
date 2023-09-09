@@ -109,7 +109,7 @@ const Map = ({navigation, route}) => {
         })
         .then(r => {
           setDistance(r.data);
-          console.log('Distance setted2', r.data);
+          // console.log('Distance setted2', r.data);
         })
         .catch(e => {
           console.log('e', e);
@@ -188,7 +188,7 @@ const Map = ({navigation, route}) => {
                 flat={true}
                 style={{width: 5, height: 5}}
 
-                image={require('../assets/images/marker-user.png')}
+                image={require('../assets/images/user-marker.png')}
                 // onPress={() => console.log('marker')}
               />
             )
@@ -211,7 +211,7 @@ const Map = ({navigation, route}) => {
                 }
                 // pinColor="#FF4E83"
                 flat={true}
-                image={require('../assets/images/marker-home.png')}
+                image={require('../assets/images/home-marker.png')}
                 onPress={() => setSelectedMarker(marker)}
               />
             ) : null;

@@ -65,7 +65,7 @@ const RenterLogin = ({navigation, route}) => {
           const val = JSON.parse(value);
           // console.log('value form async storage', val);
           setButtonLoading(false);
-          navigation.navigate('TabNavigator', {screen: 'Browse'});
+          navigation.navigate('TabNavigator', {screen: 'Browse',userRole:route?.params?.userRole});
         } else {
           setButtonLoading(false);
           showToast(toast, 'warning', 'Please Verify Email!');

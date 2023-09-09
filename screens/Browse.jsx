@@ -37,7 +37,7 @@ import Filters from '../components/Filters';
 
 import env from '../env';
 import showToast from '../components/core/toast';
-import { useLocation} from '../hooks/useLocation';
+import {useLocation} from '../hooks/useLocation';
 
 const Browse = ({navigation}) => {
   // States
@@ -93,6 +93,7 @@ const Browse = ({navigation}) => {
       }
     }
   };
+  // console.log(statusCode, refreshing);
 
   useEffect(() => {
     // console.log('Use 1', location, coordinate);
@@ -175,7 +176,7 @@ const Browse = ({navigation}) => {
 
   return (
     <>
-      {refreshing & (statusCode == null) ? (
+      {refreshing ? (
         <BrowserSkelton />
       ) : statusCode == 200 ? (
         <Box style={styles.wrapper}>
