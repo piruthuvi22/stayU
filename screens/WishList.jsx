@@ -1,5 +1,11 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {RefreshControl, StyleSheet, Dimensions, Text} from 'react-native';
+import {
+  RefreshControl,
+  StyleSheet,
+  Dimensions,
+  Text,
+  StatusBar,
+} from 'react-native';
 import {
   Box,
   Center,
@@ -8,7 +14,8 @@ import {
   useToast,
 } from 'native-base';
 import axios from 'axios';
-import Constants from 'expo-constants';
+import {useAuth} from '../utilities/context';
+// import Constants from 'expo-constants';
 
 // Components
 import BrowseCard from '../components/BrowseCard';
@@ -26,13 +33,14 @@ const WishList = ({navigation}) => {
 
   // Hooks
   const toast = useToast();
-  
+  const {user} = useAuth();
+
   const fetchWishlist = async () => {
     setRefreshing(true);
     try {
       let res = await axios.get(env.api + '/wish-list/get-wishlist', {
         params: {
-          userId: 'user1',
+          userEmail: user?.email,
         },
       });
       if (res.status === 200) {
@@ -73,7 +81,7 @@ const WishList = ({navigation}) => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#FF754E', '#fff']}
+            colors={['#FF4E83', '#fff']}
             progressBackgroundColor={'#223343'}
           />
         }>
@@ -136,7 +144,7 @@ const WishList = ({navigation}) => {
 const styles = StyleSheet.create({
   wrapper: {
     position: 'relative',
-    top: Constants.statusBarHeight,
+    top: StatusBar.currentHeight,
     backgroundColor: '#eee',
     height: Dimensions.get('window').height,
     paddingBottom: 60,
@@ -152,7 +160,7 @@ const styles = StyleSheet.create({
     color: '#A0A0A0',
   },
   error: {
-    fontSize: 28,
+    fontSize: 20,
     fontFamily: 'Poppins-Regular',
     color: '#5C5A6F',
   },

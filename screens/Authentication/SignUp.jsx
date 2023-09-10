@@ -11,9 +11,7 @@ import {
   Pressable,
   Button,
   VStack,
-  Flex,
-  Divider,
-  Avatar,
+  Spinner,
   ScrollView,
   KeyboardAvoidingView,
   IconButton,
@@ -32,8 +30,9 @@ import env from '../../env';
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
+  updateProfile,
 } from 'firebase/auth';
-import auth from '../../utilities/firebase';
+import {auth} from '../../utilities/firebase';
 import {useAuth} from '../../utilities/context';
 
 let {height, width} = Dimensions.get('screen');
@@ -41,9 +40,10 @@ let {height, width} = Dimensions.get('screen');
 const RenterLogin = ({navigation, route}) => {
   const {user} = useAuth();
   const [show, setShow] = useState(false);
-  const [email, setEmail] = useState('navaratnamsagini@gmail.com');
-  const [password, setPassword] = useState('Sagini18');
-  const [password2, setPassword2] = useState('Sagini18');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [password2, setPassword2] = useState('');
+  const [buttonLoading, setButtonLoading] = useState(false);
 
   const toast = useToast();
 
@@ -60,24 +60,56 @@ const RenterLogin = ({navigation, route}) => {
   };
 
   const handleRegister = () => {
+    setButtonLoading(true);
     let body = {email, password};
     if (email != '' && password != '' && password2 != '') {
       if (password === password2) {
         createUserWithEmailAndPassword(auth, email, password)
           .then(userCredential => {
             // Signed in
-            sendEmailVerification(auth.currentUser).then(() => {
-              // Email verification sent!
-              showToast(toast, 'success', 'Email verification sent!', () =>
-                navigation.navigate('get-start'),
-              );
-            });
+            console.log('user:');
+            sendEmailVerification(auth?.currentUser)
+              .then(res => {
+                // Email verification sent!
+                console.log('Email verification sent!');
+                updateProfile(auth?.currentUser, {
+                  displayName: auth?.currentUser?.email?.split('@')[0],
+                  photoURL:
+                    'https://cdn5.vectorstock.com/i/1000x1000/09/79/user-neon-sign-vector-28270979.jpg',
+                });
+                axios
+                  .post(env.api + '/users/register', {
+                    email: email,
+                    displayName: auth?.currentUser?.email?.split('@')[0],
+                    userRole: route?.params?.userRole,
+                  })
+                  .then(res => {
+                    console.log(res.data);
+                    setButtonLoading(false);
+                    showToast(
+                      toast,
+                      'success',
+                      'Email verification sent!',
+                      () => navigation.navigate('get-start'),
+                    );
+                  })
+                  .catch(err => {
+                    setButtonLoading(false);
+                    console.log(err);
+                  });
+              })
+              .catch(error => {
+                setButtonLoading(false);
+                console.log(error);
+              });
           })
           .catch(error => {
+            setButtonLoading(false);
             const errorMessage = error?.message?.split('/')[1]?.split(')')[0];
             showToast(toast, 'warning', errorMessage);
           });
       } else {
+        setButtonLoading(false);
         showToast(toast, 'error', 'Password not match');
       }
     } else {
@@ -85,11 +117,12 @@ const RenterLogin = ({navigation, route}) => {
       showToast(toast, 'error', 'Invalid credentials!');
     }
   };
+
   return (
     <ScrollView>
       <KeyboardAvoidingView h={height} behavior={'a'}>
         <ImageBackground
-          source={require('../../assets/images/backkgroun-login.png')}
+          source={require('../../assets/images/background-login.png')}
           resizeMode="stretch">
           <Stack
             justifyContent={'space-evenly'}
@@ -238,6 +271,7 @@ const RenterLogin = ({navigation, route}) => {
                   android_ripple={{color: '#F0F1F6'}}
                   backgroundColor="#223343"
                   onPress={handleRegister}
+                  disabled={buttonLoading}
                   width="60%"
                   marginY={1}
                   height={50}
@@ -250,7 +284,17 @@ const RenterLogin = ({navigation, route}) => {
                     fontSize: 'xl',
                     textAlign: 'center',
                   }}>
-                  Register
+                  <HStack space={2}>
+                    {buttonLoading && <Spinner color="#fff" />}
+                    <Text
+                      style={{
+                        color: '#fff',
+                        fontFamily: 'Poppins-Bold',
+                        fontSize: 18,
+                      }}>
+                      Register
+                    </Text>
+                  </HStack>
                 </Button>
                 <Text fontFamily={'Poppins-Medium'} color={'#A0A0A0'} mt={2}>
                   Don't have an account?
@@ -266,28 +310,6 @@ const RenterLogin = ({navigation, route}) => {
                   </Text>
                 </Text>
               </Center>
-
-              {/* <HStack alignItems={"center"} mt={3}>
-              <Divider />
-              <Text
-                color={"#A0A0A0"}
-                onPress={() => console.log("Dont have an acc")}
-              >
-                &nbsp; &nbsp;Or login with&nbsp; &nbsp;
-              </Text>
-              <Divider />
-            </HStack> */}
-
-              {/* <HStack justifyContent={"center"} mt={3} space={5}>
-              <Avatar
-                source={require("../assets/images/fb.png")}
-                backgroundColor={"#ddd"}
-              />
-              <Avatar
-                source={require("../assets/images/google.png")}
-                backgroundColor={"#ddd"}
-              />
-            </HStack> */}
             </VStack>
           </Stack>
         </ImageBackground>

@@ -11,13 +11,9 @@ import {
   Pressable,
   Button,
   VStack,
-  Flex,
-  Divider,
-  Avatar,
   ScrollView,
   KeyboardAvoidingView,
-  IconButton,
-  Image,
+  Spinner,
   useToast,
 } from 'native-base';
 import {
@@ -32,7 +28,7 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
 } from 'firebase/auth';
-import auth from '../../utilities/firebase';
+import {auth} from '../../utilities/firebase';
 import env from '../../env';
 import showToast from '../../components/core/toast';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -42,9 +38,10 @@ let {height, width} = Dimensions.get('screen');
 const RenterLogin = ({navigation, route}) => {
   const toast = useToast();
   const [show, setShow] = useState(false);
-  const [email, setemail] = useState('saginisaju@gmail.com');
-  const [password, setPassword] = useState('Sagini18');
-  console.log(route.params);
+  const [email, setemail] = useState('');
+  const [password, setPassword] = useState('');
+  const [buttonLoading, setButtonLoading] = useState(false);
+  // console.log(route.params);
   const handleemail = e => {
     setemail(e);
   };
@@ -54,17 +51,29 @@ const RenterLogin = ({navigation, route}) => {
   };
 
   const handleRenterLogin = () => {
+    setButtonLoading(true);
     let body = {email, password, role: 'renter'};
 
     signInWithEmailAndPassword(auth, email, password)
-      .then(userCredential => {
+      .then(async userCredential => {
         const emailVerified = userCredential?.user?.emailVerified;
-        emailVerified
-          ? navigation.navigate('TabNavigator', {screen: 'Browse'})
-          : showToast(toast, 'warning', 'Please Verify Email!');
+        if (emailVerified) {
+          console.log('userRole signIn:', route?.params?.userRole);
+          const user = {email: email, userRole: route?.params?.userRole};
+          await AsyncStorage.setItem('user', JSON.stringify(user));
+          const value = await AsyncStorage.getItem('user');
+          const val = JSON.parse(value);
+          console.log('value form async storage', val);
+          setButtonLoading(false);
+          navigation.navigate('TabNavigator', {screen: 'Browse'});
+        } else {
+          setButtonLoading(false);
+          showToast(toast, 'warning', 'Please Verify Email!');
+        }
       })
       .catch(error => {
         const errorMessage = error?.message?.split('/')[1]?.split(')')[0];
+        setButtonLoading(false);
         showToast(toast, 'warning', errorMessage);
       });
   };
@@ -88,7 +97,7 @@ const RenterLogin = ({navigation, route}) => {
     <ScrollView>
       <KeyboardAvoidingView h={height} behavior={'a'}>
         <ImageBackground
-          source={require('../../assets/images/backkgroun-login.png')}
+          source={require('../../assets/images/background-login.png')}
           resizeMode="stretch">
           <Stack
             justifyContent={'space-evenly'}
@@ -116,7 +125,7 @@ const RenterLogin = ({navigation, route}) => {
                 color={'#A0A0A0'}
                 fontFamily={'Poppins-Regular'}
                 fontSize={'md'}>
-                {route.params.userRole === 'landlord'
+                {route?.params?.userRole === 'landlord'
                   ? 'Showcase your rooms with us'
                   : 'Discover your boarding with us'}
               </Text>
@@ -210,19 +219,24 @@ const RenterLogin = ({navigation, route}) => {
                   android_ripple={{color: '#F0F1F628'}}
                   backgroundColor="#223343"
                   onPress={handleRenterLogin}
+                  disabled={buttonLoading}
                   width="60%"
                   marginY={1}
                   height={50}
                   borderRadius={100}
                   borderColor={'#FF4E83'}
-                  borderWidth={2}
-                  // fontFamily={"Poppins-Bold"}
-                  _text={{
-                    fontFamily: 'Poppins-Bold',
-                    fontSize: 'xl',
-                    textAlign: 'center',
-                  }}>
-                  Login
+                  borderWidth={2}>
+                  <HStack space={2}>
+                    {buttonLoading && <Spinner color="#fff" />}
+                    <Text
+                      style={{
+                        color: '#fff',
+                        fontFamily: 'Poppins-Bold',
+                        fontSize: 18,
+                      }}>
+                      Login
+                    </Text>
+                  </HStack>
                 </Button>
                 <Text fontFamily={'Poppins-Medium'} color={'#A0A0A0'} mt={2}>
                   Don't have an account?
@@ -238,28 +252,6 @@ const RenterLogin = ({navigation, route}) => {
                   </Text>
                 </Text>
               </Center>
-
-              {/* <HStack alignItems={"center"} mt={3}>
-              <Divider />
-              <Text
-                color={"#A0A0A0"}
-                onPress={() => console.log("Dont have an acc")}
-              >
-                &nbsp; &nbsp;Or login with&nbsp; &nbsp;
-              </Text>
-              <Divider />
-            </HStack> */}
-
-              {/* <HStack justifyContent={"center"} mt={3} space={5}>
-              <Avatar
-                source={require("../assets/images/fb.png")}
-                backgroundColor={"#ddd"}
-              />
-              <Avatar
-                source={require("../assets/images/google.png")}
-                backgroundColor={"#ddd"}
-              />
-            </HStack> */}
             </VStack>
           </Stack>
         </ImageBackground>

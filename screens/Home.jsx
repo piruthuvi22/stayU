@@ -2,13 +2,12 @@ import React, { useState, useEffect } from "react";
 import * as Location from "expo-location";
 
 import { Box, Text, HStack, ScrollView } from "native-base";
-import { StyleSheet } from "react-native";
-import Constants from "expo-constants";
+import { StyleSheet,  StatusBar, } from "react-native";
+// import Constants from "expo-constants";
 import { Client } from "@googlemaps/google-maps-services-js";
 
 import { Feather } from "@expo/vector-icons";
 import RoomCard from "../components/RoomCard";
-import { findAddress, findLocation } from "../components/findLocation";
 
 const client = new Client({});
 
@@ -18,10 +17,7 @@ const Home = () => {
 
   useEffect(() => {
     console.log("Home.jsx mounted");
-    findLocation().then((res) => {
-      // setLocation(res.lantlong);
-      findAddress(res.lantlong).then((res) => setUniName(res.uniName));
-    });
+ 
   }, []);
 
   return (
@@ -51,7 +47,7 @@ const Home = () => {
 const styles = StyleSheet.create({
   wrapper: {
     position: "relative",
-    top: Constants.statusBarHeight,
+    top: StatusBar.currentHeight,
     backgroundColor: "#eee",
   },
   head: {

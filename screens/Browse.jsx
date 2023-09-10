@@ -5,6 +5,7 @@ import {
   Text,
   Button,
   RefreshControl,
+  StatusBar,
 } from 'react-native';
 import {
   Box,
@@ -22,7 +23,7 @@ import {
   Button as NBButton,
   IconButton,
 } from 'native-base';
-import Constants from 'expo-constants';
+// import Constants from 'expo-constants';
 import BrowseCard from '../components/BrowseCard';
 import AutoComplete from '../components/AutoComplete';
 
@@ -33,7 +34,7 @@ import {
   AntDesign,
 } from '@expo/vector-icons';
 import axios from 'axios';
-import {findAddress, findLocation} from '../components/findLocation';
+import {findAddress} from '../functions/findAddress';
 import BrowserSkelton from '../components/core/SkeltonBrowser';
 import Filters from '../components/Filters';
 
@@ -46,6 +47,7 @@ const Browse = ({navigation}) => {
   const [refreshing, setRefreshing] = useState(true);
   const [uniName, setUniName] = useState(null);
   const [places, setPlaces] = useState([]);
+  const [coordinate, setCoordinate] = useState(null);
   const [statusCode, setStatusCode] = useState(null);
 
   // Hooks
@@ -94,10 +96,21 @@ const Browse = ({navigation}) => {
   };
 
   useEffect(() => {
-    if (location?.latitude) getAddress(location);
+    // console.log('Use 1', location, coordinate);
+    if (location?.latitude) {
+      setCoordinate(location);
+      getAddress(location);
+    }
   }, [location]);
 
   useEffect(() => {
+    if (coordinate?.latitude) {
+      getAddress(coordinate);
+    }
+  }, [coordinate]);
+
+  useEffect(() => {
+    // console.log('Use 2');
     fetchPlaces();
   }, [location]);
 
@@ -113,7 +126,9 @@ const Browse = ({navigation}) => {
       });
       navigation.navigate('Map', {
         placeInfo,
-        selectedPlaceCoord: location.hasOwnProperty('latitude') ? location : {},
+        selectedPlaceCoord: coordinate.hasOwnProperty('latitude')
+          ? coordinate
+          : {},
         selectedPlaceName: uniName,
       });
     }
@@ -124,6 +139,7 @@ const Browse = ({navigation}) => {
       latitude: details?.geometry.location.lat || 0,
       longitude: details?.geometry.location.lng || 0,
     };
+    setCoordinate(position);
     // setUniLocation(position);
     setUniName(details?.name);
   };
@@ -136,13 +152,13 @@ const Browse = ({navigation}) => {
     return (
       <ScrollView
         showsVerticalScrollIndicator={false}
-        style={{marginTop: 70}}
-        mx={3}
+        mx={2}
         refreshControl={
           <RefreshControl
+            style={{zIndex: 500}}
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#FF754E', '#fff']}
+            colors={['#FF4E83', '#fff']}
             progressBackgroundColor={'#223343'}
           />
         }>
@@ -150,7 +166,7 @@ const Browse = ({navigation}) => {
           <BrowseCard
             key={place._id}
             {...place}
-            uniLocation={location}
+            uniLocation={coordinate}
             navigation={navigation}
           />
         ))}
@@ -165,21 +181,27 @@ const Browse = ({navigation}) => {
         <BrowserSkelton />
       ) : statusCode == 200 ? (
         <Box style={styles.wrapper}>
-          <>
+          <Box style={{height: 110}} marginX={2}>
             <HStack
-              marginX={3}
-              marginTop={3}
+              paddingTop={3}
               alignItems="center"
               justifyContent={'space-between'}>
               <Text
                 style={{
-                  fontFamily: 'Poppins-Medium',
-                  fontSize: 13,
+                  fontFamily: 'Poppins-Regular',
+                  fontSize: 12,
                   color: '#A0A0A0',
                 }}>
                 {uniName}
               </Text>
-              <HStack width={'20'} justifyContent={'space-between'}>
+              <Pressable
+                android_ripple={{color: '#ccc', borderless: true, radius: 30}}
+                onPress={updateLocation}>
+                <MaterialIcons name="gps-fixed" size={24} color="#A0A0A0" />
+              </Pressable>
+              {/* Filter button commented */}
+
+              {/* <HStack width={'20'} justifyContent={'space-between'}>
                 <Pressable
                   android_ripple={{color: '#ccc', borderless: true, radius: 30}}
                   onPress={updateLocation}>
@@ -190,9 +212,9 @@ const Browse = ({navigation}) => {
                   onPress={onOpen}>
                   <FontAwesome name="bars" size={24} color="#A0A0A0" />
                 </Pressable>
-              </HStack>
+              </HStack> */}
             </HStack>
-            <Box style={{zIndex: 20}} m={2}>
+            <Box style={{zIndex: 20}}>
               <Box style={styles.searchContainer}>
                 <AutoComplete
                   label={'University'}
@@ -200,30 +222,39 @@ const Browse = ({navigation}) => {
                 />
               </Box>
             </Box>
+          </Box>
+          <Box
+            style={{
+              width: Dimensions.get('window').width,
+              height: Dimensions.get('window').height - 110 - 60,
+              // marginBottom: 70,
+            }}>
             {renderPlaceCard()}
-            <Box style={styles.fab}>
-              <Fab
-                renderInPortal={false}
-                onPress={passToMaps}
-                style={styles.fabBtn}
-                shadow={3}
-                placement="bottom-right"
-                icon={
-                  <Icon color="#FF754E" as={Entypo} name="location" size="19" />
-                }
-              />
-            </Box>
+            <Fab
+              renderInPortal={false}
+              onPress={passToMaps}
+              style={styles.fabBtn}
+              shadow={3}
+              placement="bottom-right"
+              icon={
+                <Icon color="#FF4E83" as={Entypo} name="location" size="19" />
+              }
+            />
+          </Box>
 
-            {/* <Actionsheet isOpen={isOpen} onClose={onClose}>
+          {/* <Box style={styles.fab}>
+         
+          </Box> */}
+
+          {/* <Actionsheet isOpen={isOpen} onClose={onClose}>
           <Actionsheet.Content bgColor={'rgba(34, 51, 67,0.95)'}>
             <ScrollView
               showsVerticalScrollIndicator={false}
               style={{width: '100%'}}> */}
-            <Filters isOpen={isOpen} onClose={onClose} />
-            {/* </ScrollView>
+          <Filters isOpen={isOpen} onClose={onClose} />
+          {/* </ScrollView>
           </Actionsheet.Content>
         </Actionsheet> */}
-          </>
         </Box>
       ) : statusCode === 500 ? (
         <Box h="full" style={styles.wrapper}>
@@ -260,19 +291,16 @@ const Browse = ({navigation}) => {
 
 const styles = StyleSheet.create({
   wrapper: {
-    position: 'relative',
-    top: Constants.statusBarHeight,
-    backgroundColor: '#eee',
-    paddingBottom: 60,
+    // position: 'relative',
+    top: StatusBar.currentHeight,
+    // backgroundColor: '#eee',
+    // paddingBottom: 60,
     height: Dimensions.get('window').height,
   },
   searchContainer: {
     position: 'absolute',
     width: '100%',
-    backgroundColor: '#eee',
-    padding: 5,
-    // height: 50,
-    // zIndex: 3000,
+    // backgroundColor: '#eee',
   },
   head: {
     fontFamily: 'Poppins-Regular',
@@ -292,7 +320,7 @@ const styles = StyleSheet.create({
   fabBtn: {
     backgroundColor: '#223343',
     borderWidth: 1,
-    borderColor: '#FF754E',
+    borderColor: '#FD683D',
   },
   container: {
     flex: 1,
@@ -320,7 +348,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   error: {
-    fontSize: 28,
+    fontSize: 20,
     fontFamily: 'Poppins-Regular',
     color: '#5C5A6F',
   },

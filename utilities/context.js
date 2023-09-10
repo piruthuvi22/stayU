@@ -1,11 +1,28 @@
 import {createContext, useContext, useState, useEffect} from 'react';
 import {onAuthStateChanged, updateProfile} from 'firebase/auth';
-import auth from '../utilities/firebase';
-const AuthContext = createContext();
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {auth} from '../utilities/firebase';
+export const AuthContext = createContext();
 
 export const AuthProvider = ({children}) => {
   const [user, setUser] = useState(null);
+  const [userRole, setUserRole] = useState('');
+
+  const getUserRole = async () => {
+    try {
+      const value = await AsyncStorage.getItem('user');
+      if (value !== null) {
+        const val = JSON.parse(value);
+        setUserRole(val.userRole);
+        console.log('userRole from Context:', userRole);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
+    getUserRole();
     const unsubscribe = onAuthStateChanged(auth, user => {
       if (user) {
         setUser(user);
@@ -26,9 +43,14 @@ export const AuthProvider = ({children}) => {
       displayName: displayName,
       photoURL: photoURL,
     });
-    return unsubscribe;
-  }, [user]);
 
-  return <AuthContext.Provider value={{user}}>{children}</AuthContext.Provider>;
+    return unsubscribe;
+  }, [user, userRole]);
+
+  return (
+    <AuthContext.Provider value={{user, userRole}}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 export const useAuth = () => useContext(AuthContext);

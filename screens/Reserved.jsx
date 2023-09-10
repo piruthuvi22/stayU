@@ -1,5 +1,11 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {RefreshControl, StyleSheet, Dimensions, Text} from 'react-native';
+import {
+  RefreshControl,
+  StyleSheet,
+  Dimensions,
+  Text,
+  StatusBar,
+} from 'react-native';
 import {
   Box,
   Center,
@@ -8,7 +14,7 @@ import {
   useToast,
 } from 'native-base';
 import axios from 'axios';
-import Constants from 'expo-constants';
+// import Constants from 'expo-constants';
 
 // Components
 import BrowseCard from '../components/BrowseCard';
@@ -75,7 +81,7 @@ export const Reserved = ({navigation}) => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#FF754E', '#fff']}
+            colors={['#FF4E83', '#fff']}
             progressBackgroundColor={'#223343'}
           />
         }>
@@ -136,7 +142,7 @@ export const Reserved = ({navigation}) => {
 const styles = StyleSheet.create({
   wrapper: {
     position: 'relative',
-    top: Constants.statusBarHeight,
+    top: StatusBar.currentHeight,
     backgroundColor: '#eee',
     height: Dimensions.get('window').height,
     paddingBottom: 60,

@@ -1,4 +1,4 @@
-import {Button, Input} from 'native-base';
+import {Button, Input, Box} from 'native-base';
 import React, {useEffect} from 'react';
 import {Text} from 'react-native';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
@@ -35,8 +35,8 @@ let styles = {
     zIndex: 1000,
   },
   textInput: {
-    backgroundColor: '#fd683d1a',
-    borderColor: '#FD683D',
+    backgroundColor: '#f9e3e7',
+    borderColor: '#FF4E83',
     borderWidth: 1,
     color: '#666',
   },
@@ -44,6 +44,9 @@ let styles = {
     display: 'none',
   },
   description: {
+    color: '#666',
+  },
+  placeholder: {
     color: '#666',
   },
 };
